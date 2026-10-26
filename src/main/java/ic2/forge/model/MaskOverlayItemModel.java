@@ -21,6 +21,7 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.client.resources.model.Material;
 import net.minecraft.client.resources.model.ModelBaker;
 import net.minecraft.client.resources.model.ModelState;
+import net.minecraft.client.resources.model.UnbakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
@@ -242,6 +243,18 @@ public final class MaskOverlayItemModel implements Ic2Model, BakedModel {
     }
 
     return ret;
+  }
+
+  @Override
+  public void resolveParents(
+      Function<ResourceLocation, UnbakedModel> modelGetter, IGeometryBakingContext context) {
+    // The base model is referenced by a custom JSON field instead of the normal parent field.
+    // Resolve its parent chain explicitly so the generated-item geometry and layer0 texture are
+    // available when the model is baked.
+    UnbakedModel unbakedBaseModel = modelGetter.apply(this.baseModelLocation);
+    if (unbakedBaseModel != null) {
+      unbakedBaseModel.resolveParents(modelGetter);
+    }
   }
 
   @Override
