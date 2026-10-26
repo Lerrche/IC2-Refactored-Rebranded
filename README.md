@@ -2,57 +2,53 @@
 
 An unofficial continuation of the IndustrialCraft 2 port for Minecraft 1.21.1 on NeoForge.
 
-I started working on this because I wanted to improve the original port with more mod compatibility, some quality-of-life changes, and a better way for other modders to make addons without having to rewrite the mod's code.
+I started this project to build on the existing port with compatibility work, quality-of-life fixes, and a more approachable API for people who want to make add-ons. I did **not** create the original port and do not claim ownership of the original IC2 code or assets.
 
-This project is based on the original port by [neo-industrial-mc/IC2R](https://github.com/neo-industrial-mc/IC2R). I did **not** make the original port and I do not claim ownership of the original IC2 code or assets. Most of my work is focused on changes and additions on top of it.
+## Documentation
 
-## What I'm working on
+**[Read the IC2 Refactored Add-on API documentation](https://lerrche.github.io/IC2-Refactored-Rebranded/)**
 
-- Compatibility between IC2 energy systems and other tech mods.
-- An addon API for creating custom machines, generators, cables and other electric blocks.
-- Support for custom electric tools, mining tools, weapons and armor effects.
-- Quality-of-life changes and fixes.
-- Making it easier to extend IC2 without having to modify its internal code every time.
+The docs cover project setup, content registration, electric items, energy storage, generators, examples, and API notes. They're a work in progress, so check the actual source when something is marked experimental or incomplete.
 
-The main idea is to let addon developers make their own content and have it work with IC2's systems, instead of needing to rewrite everything from scratch.
+## Project goals
 
-## Current status
-
-This is still a work in progress. Some features may need more testing, and the API can change while I'm working on it.
-
-Don't expect everything to work perfectly yet. If you find a bug, feel free to open an issue with the error log and steps to reproduce it.
+- Improve compatibility between IC2 energy systems and other tech mods.
+- Make it easier to create add-ons with custom items, machines, generators, and energy storage.
+- Add quality-of-life improvements and fixes on top of the existing port.
+- Keep integration examples and API notes in one place for other developers.
 
 ## Requirements
 
 - Minecraft 1.21.1
-- NeoForge
+- NeoForge (use the version configured by this repository)
 - Java 21
 
-## Building from source
+## Build from source
 
-Clone or download the repository, then run:
+Run these commands from the repository root in PowerShell:
 
 ```powershell
+.\gradlew.bat spotlessApply
 .\gradlew.bat build
 ```
 
-To launch the development client:
+On Linux or macOS, use `./gradlew spotlessApply` followed by `./gradlew build`.
+
+`spotlessApply` formats the source files according to the project's Spotless rules. It does not replace compilation or tests; `build` is still required. When the build succeeds, look in `build/libs/` for the generated JAR. Check the filename and use the normal mod JAR rather than a sources or development artifact if multiple JARs are present.
+
+To launch the development client on Windows:
 
 ```powershell
 .\gradlew.bat runClient
 ```
 
-## Credits
+## Credits and ownership
 
 - Original port: [neo-industrial-mc/IC2R](https://github.com/neo-industrial-mc/IC2R)
 - IndustrialCraft 2 and its original developers.
 
-This project is unofficial and is not affiliated with or endorsed by the original IndustrialCraft 2 developers.
+This is an unofficial community project and is not affiliated with or endorsed by the original IndustrialCraft 2 developers. The original code, assets, and their applicable licensing/ownership notices remain distinct from my own changes. See [`LICENSE`](LICENSE) and the [original repository](https://github.com/neo-industrial-mc/IC2R) for licensing context.
 
-## License and ownership
+## Contributing
 
-This project contains code derived from the original IC2R port. I do not own the original IC2 code or assets, and this repository does not claim otherwise.
-
-Please check the included `LICENSE` file and the original repository for licensing information. The original project's licensing and the rights to the underlying IC2 code and assets are separate matters.
-
-IndustrialCraft 2 is a trademark of its respective owners, if applicable. This project is a community effort and is not an official release.
+Bug reports and practical add-on API examples are welcome. When reporting a build or runtime problem, include the Minecraft/NeoForge versions, the command you ran, the relevant error output, and steps to reproduce it.

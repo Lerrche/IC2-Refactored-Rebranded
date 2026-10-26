@@ -1,29 +1,24 @@
 # IC2 Refactored Add-on API
 
-Documentation for building add-ons for **IndustrialCraft 2: Refactored** on **Minecraft 1.21.1 + NeoForge**.
+Welcome! This site documents the add-on-facing helpers and reusable electric-content base classes available in this IC2 Refactored source snapshot for **Minecraft 1.21.1 and NeoForge**.
 
-This site documents the API present in the project source snapshot used to prepare these pages. The project is evolving, so check the source for your exact revision before relying on an example in a released add-on.
+The aim is to help you build an add-on without having to reverse-engineer every implementation class. The API is still evolving, so treat the source as the final authority when behavior or signatures are unclear.
 
 ## Start here
 
-- [Getting started](getting-started.md) — environment, dependency, and project setup.
-- [Content registration](registration.md) — register items and blocks under your own mod ID.
-- [Energy API](energy/index.md) — batteries, generators, and EU tiers.
-- [Electric items](items/electric-items.md) — chargeable items and melee weapons.
-- [Armor and jetpacks](items/armor.md) — electric armor support.
-- [API reference](api-reference.md) — classes and verified constructor contracts.
+- [Getting started](getting-started.md) — environment and dependency setup.
+- [Registration](registration.md) — register blocks and items under your own mod ID.
+- [Examples](examples/index.md) — small patterns you can adapt.
+- [Energy API](energy/index.md) — storage and generators.
+- [Electric items](items/electric-items.md) — chargeable items, weapons, armor, and jetpacks.
+- [API reference](api-reference.md) — verified API entry points.
+- [Building the mod](building.md) — format, build, and locate the JAR.
 
-## Supported baseline
+## A few rules of thumb
 
-| Component | Version in the inspected project snapshot |
-| --- | --- |
-| Minecraft | `1.21.1` |
-| NeoForge | `21.1.234` in `gradle.properties` |
-| Java toolchain | `21` |
-| Mod ID | `ic2` |
+1. Use your own mod ID for add-on content and resources.
+2. Prefer classes in `ic2.api.*` where they cover your use case. Some reusable base classes extend IC2R internals and are more version-sensitive.
+3. Register your own blocks, items, and block-entity types. The helper classes do not automatically create all models, textures, menus, recipes, or loot tables.
+4. Run `spotlessApply` before `build`, as described in [Building the mod](building.md).
 
-The repository's `gradle.properties` is the source of truth for versions. If your checkout differs, use its values instead.
-
-## Scope and attribution
-
-This is community documentation for an unofficial add-on API. The original IC2R port and underlying IC2 code/assets have their own authorship and licensing history; see the repository's `LICENSE` and upstream project for details.
+[Open the source repository](https://github.com/Lerrche/IC2-Refactored-Rebranded) · [Original IC2R port](https://github.com/neo-industrial-mc/IC2R)

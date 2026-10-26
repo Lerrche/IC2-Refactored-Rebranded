@@ -1,31 +1,20 @@
 # Generators
 
-`ic2.api.block.AddonGeneratorBlockEntity` is an abstract base for add-on generators. It extends IC2R's `TileEntityBaseGenerator`, which handles normal generator ticking and existing generator energy/charging behavior.
+`ic2.api.block.AddonGeneratorBlockEntity` extends IC2R's generator base. It provides EU storage, output handling, the charging slot, and the normal generator tick loop.
 
-## Constructor contract
-
-```java
-protected AddonGeneratorBlockEntity(
-    BlockEntityType<? extends TileEntityBaseGenerator> type,
-    BlockPos pos,
-    BlockState state,
-    double euPerTick,
-    int tier,
-    int capacityEu)
-```
-
-The base validates that `euPerTick` is finite and greater than zero, the tier is between `0` and `3`, and capacity is positive. Your subclass must implement the inherited abstract method `gainFuel()` and any fuel-specific state/logic.
-
-## Fuel logic
-
-The method signature present on the parent class is:
+The subclass must implement:
 
 ```java
-public abstract boolean gainFuel();
+@Override
+public boolean gainFuel() {
+    // Check your inventory and fuel state.
+    // Consume a fuel item and set your fuel duration/state when valid.
+    // Return true if inventory/state changed, otherwise false.
+}
 ```
 
-Return behavior should match the parent generator's expectation: inspect `TileEntityBaseGenerator.updateEntityServer()` in the same source revision before implementing fuel consumption. This documentation intentionally does not invent a fuel-slot layout or fuel API that the base class does not define.
+The base tick calls `gainFuel()` when `needsFuel()` is true, then calls `gainEnergy()`. The base generator's fuel counter is an integer field and the base class saves it, but you must define how your fuel items and additional state work.
 
-## Block entity registration
+Constructor parameters are `BlockEntityType`, `BlockPos`, `BlockState`, `euPerTick`, `tier`, and `capacityEu`. In the current source, `euPerTick` must be finite and positive, tier must be 0–3, and capacity must be positive.
 
-Register your concrete generator block entity and block using the normal NeoForge 1.21.1 registration approach for your project. The `AddonGeneratorBlockEntity` base does not register those objects for you.
+See [the generator example](../examples/generator.md) for the subclass skeleton and its limitations. A usable generator also needs its own block, block-entity registration, visuals, and usually a menu/screen or inventory interaction.

@@ -1,26 +1,21 @@
-# Compatibility and troubleshooting
+# Compatibility notes
 
-## Keep your namespace separate
+## Minecraft and NeoForge versions
 
-Register add-on content under your own mod ID. Keep assets and data under `assets/<your_modid>/` and `data/<your_modid>/`. Do not replace `ic2:*` resources from an add-on.
+This documentation targets Minecraft 1.21.1. Use the NeoForge version configured by the IC2R checkout you build against. Do not assume a class compiled against another Minecraft or NeoForge version will be binary compatible.
 
-## Depend on the correct IC2R version
+## Public API vs implementation
 
-The project source snapshot's Gradle properties are for Minecraft 1.21.1 and NeoForge 21.1.234. Other builds may use different NeoForge versions or APIs. Compile and test against the exact IC2R artifact or source revision you intend to support.
+Prefer documented `ic2.api.*` classes. The reusable block-entity bases currently extend classes in `ic2.core.*`; they are useful but coupled to IC2R internals and may change between revisions. Avoid depending on unrelated internal classes unless you accept that maintenance cost.
 
-## Energy interop is not automatic
+## Energy interop
 
-Having EU storage does not automatically make a block compatible with FE or another mod's energy API. Check whether a capability or explicit adapter exists in the target source. Test import/export direction, side configuration, buffer capacity, transfer limits, and rounding at conversion boundaries.
+IC2R's native energy system uses EU. Other mods may expose FE or another energy unit. Never assume a 1:1 mapping without checking the adapter. A robust bridge should document its conversion ratio, rounding behavior, transfer limits, and buffer policy, and should avoid creating energy through repeated rounding or duplicate transfers.
 
 ## Common problems
 
-- **Registry object is missing:** ensure `Ic2AddonContent.register(modEventBus)` is called once in the mod constructor.
-- **Content has the wrong ID:** verify the namespace passed to `Ic2AddonContent.create(...)` matches your mod ID.
-- **Missing texture or model:** check resource paths and JSON IDs; registration helpers do not create assets.
-- **Generator never consumes fuel:** inspect the parent `TileEntityBaseGenerator.updateEntityServer()` flow and implement `gainFuel()` according to its contract.
-- **Electric item does not mine blocks:** `AddonElectricItem` provides charge handling, not drill behavior. Inspect `IMiningDrill` and existing drill implementations.
-- **Compiles but fails in-game:** test block-entity registration, metadata dependency constraints, assets, and server-side behavior in a development client.
-
-## Reporting an issue
-
-Include the Minecraft version, NeoForge version, IC2R revision, add-on revision, relevant log or crash report, and exact reproduction steps. Avoid posting only a screenshot when a log is available.
+- **Missing IC2R classes:** make sure IC2R is on the add-on's compile classpath and present at runtime.
+- **Content doesn't appear:** verify the mod ID/namespace, registry event bus, asset paths, and language keys.
+- **Block entity crashes:** verify the registered `BlockEntityType` matches your subclass and block.
+- **Wrong textures/models:** registration does not generate resource files.
+- **Build fails on formatting:** run `spotlessApply`, then rerun `build` and inspect the first real error if it still fails.

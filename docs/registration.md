@@ -1,8 +1,8 @@
 # Content registration
 
-`ic2.api.registry.Ic2AddonContent` is a helper in the inspected source for registering an add-on's blocks and items with NeoForge deferred registers. It keeps content under the add-on's own namespace.
+`ic2.api.registry.Ic2AddonContent` is a helper around NeoForge deferred block/item registries. It uses the namespace passed to `create(...)` and returns the usual `DeferredBlock` and `DeferredItem` handles.
 
-## Register a simple item and block
+## Register a few items and blocks
 
 ```java
 package example.addon;
@@ -18,13 +18,13 @@ import net.neoforged.fml.common.Mod;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredItem;
 
-@Mod(ExampleIc2Addon.MOD_ID)
-public final class ExampleIc2Addon {
+@Mod(ExampleAddon.MOD_ID)
+public final class ExampleAddon {
     public static final String MOD_ID = "example_ic2_addon";
     public static final Ic2AddonContent CONTENT = Ic2AddonContent.create(MOD_ID);
 
-    public static final DeferredItem<Item> BRONZE_GEAR = CONTENT.registerItem(
-        "bronze_gear", () -> new Item(new Item.Properties()));
+    public static final DeferredItem<Item> ALLOY_DUST = CONTENT.registerItem(
+        "alloy_dust", () -> new Item(new Item.Properties()));
 
     public static final DeferredBlock<Block> ALLOY_BLOCK = CONTENT.registerSimpleBlock(
         "alloy_block",
@@ -33,36 +33,37 @@ public final class ExampleIc2Addon {
     public static final DeferredItem<BlockItem> ALLOY_BLOCK_ITEM =
         CONTENT.registerBlockItem("alloy_block", ALLOY_BLOCK);
 
-    public ExampleIc2Addon(IEventBus modEventBus) {
+    public ExampleAddon(IEventBus modEventBus) {
         CONTENT.register(modEventBus);
     }
 }
 ```
 
-Register content in the mod constructor before registries fire. Call `CONTENT.register(modEventBus)` once. The helper rejects registration calls made after its `register` method has run.
+The example shows the helper's supported pattern. Your project still needs the correct imports and NeoForge project setup.
 
-## Available helpers
+## Methods confirmed in `Ic2AddonContent`
 
-- `create(namespace)` — creates a registry helper for the add-on's namespace.
-- `registerItem(name, factory)` — registers an item or item subclass.
-- `registerElectricItem(name, maxCharge, transferLimit, tier, canProvideEnergy)` — registers an `AddonElectricItem` with default item properties.
-- `registerElectricItem(name, properties, maxCharge, transferLimit, tier, canProvideEnergy)` — same with custom item properties.
-- `registerBlock(name, factory, properties)` — registers a custom block.
-- `registerSimpleBlock(name, properties)` — registers a plain block.
-- `registerBlockItem(name, block)` / `registerBlockItem(name, block, properties)` — registers a block item.
-- `id(path)` — creates a `ResourceLocation` under the helper's namespace.
-- `namespace()` — returns the namespace string.
+- `create(String namespace)` — creates the helper for your mod ID.
+- `registerItem(String name, Supplier<? extends T> factory)` — registers a custom item.
+- `registerBlock(String name, Function<BlockBehaviour.Properties, ? extends T> factory, BlockBehaviour.Properties properties)` — registers a block using a factory and properties.
+- `registerSimpleBlock(String name, BlockBehaviour.Properties properties)` — registers a plain block.
+- `registerBlockItem(String name, Supplier<? extends Block> block)` — registers a block item with default item properties.
+- `registerBlockItem(String name, Supplier<? extends Block> block, Item.Properties properties)` — registers a block item with custom properties.
+- `registerElectricItem(...)` — registers an `AddonElectricItem` with charge parameters.
+- `id(String path)` — creates a `ResourceLocation` in your namespace.
+- `namespace()` — returns the namespace.
+- `register(IEventBus modEventBus)` — attaches its deferred registers to the mod event bus.
 
-## Add assets in your namespace
+**Register content before calling `CONTENT.register(modEventBus)`.** The helper intentionally rejects additional registration after it has been registered.
+
+## Resources are still your job
+
+For an item named `alloy_dust`, add your own resources, such as:
 
 ```text
-src/main/resources/
-  assets/example_ic2_addon/
-    lang/en_us.json
-    models/item/bronze_gear.json
-    textures/item/bronze_gear.png
-  data/example_ic2_addon/
-    recipe/bronze_gear.json
+assets/example_ic2_addon/lang/en_us.json
+assets/example_ic2_addon/models/item/alloy_dust.json
+assets/example_ic2_addon/textures/item/alloy_dust.png
 ```
 
-Blocks usually also need blockstates, block models, item models, textures, loot tables, and any recipes or tags they use. These are normal Minecraft resources, not generated automatically by `Ic2AddonContent`.
+For blocks, you also need blockstates, block models, item models, textures, loot tables, and any recipes or data tags your content uses. Registration does not generate assets automatically.

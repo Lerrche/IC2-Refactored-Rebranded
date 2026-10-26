@@ -1,22 +1,16 @@
 # Energy API overview
 
-IC2R's native energy system uses **EU**. The inspected add-on API provides base classes for certain energy-storage blocks and generators, while lower-level energy interfaces and prefabs are available in `ic2.api.energy`.
+IC2R uses EU for its native energy system. The add-on helpers documented here provide reusable starting points, not automatic content registration.
 
-## Which base should I start with?
+## Available bases in the source snapshot
 
-| Goal | Source type to inspect | Notes |
-| --- | --- | --- |
-| Battery / energy box | `ic2.api.block.AddonEnergyStorageBlockEntity` | Extends IC2R's `TileEntityElectricBlock`. |
-| Generator | `ic2.api.block.AddonGeneratorBlockEntity` | Extends `TileEntityBaseGenerator`; implement `gainFuel()`. |
-| Existing energy-net tile patterns | `ic2.api.energy.prefab` and `ic2.api.energy.tile` | Read the interfaces and lifecycle expectations before implementing directly. |
-| Chargeable item | `ic2.api.item.AddonElectricItem` | Uses IC2R's electric-item manager through its base class. |
+- `ic2.api.block.AddonEnergyStorageBlockEntity` — energy storage block entity base.
+- `ic2.api.block.AddonGeneratorBlockEntity` — generator base that requires a `gainFuel()` implementation.
+- `ic2.api.item.AddonElectricItem` — electric item base with charge/tier configuration.
+- `ic2.api.energy.prefab.BasicEnergyTile` — existing energy tile prefab; consult its source for the exact methods required by your implementation.
 
-The energy storage and generator helpers extend `ic2.core.*` classes. They are convenient, but they are more coupled to IC2R internals than a stable cross-version abstraction would be. Re-check signatures when updating IC2R versions.
+Start with [storage block entities](storage.md) or [generators](generators.md). For registration helper details, see [Content registration](../registration.md).
 
-## EU tiers
+## Important
 
-The helper constructors validate tiers in the range `0` through `3` inclusive. Choose the tier and transfer/output values to match the balance and behavior you want; do not infer that tier alone sets every machine's transfer rate.
-
-## Interoperability
-
-Do not assume that a third-party cable or machine will accept EU directly. Cross-mod energy compatibility depends on explicit adapters/capabilities and conversion rules in the target versions. Test both directions, storage limits, and rounding behavior when implementing an integration.
+Do not assume EU values and Forge Energy (FE) values are interchangeable. If your add-on bridges another energy API, use an explicit conversion policy and test transfer limits, rounding, and buffering. Compatibility behavior depends on the relevant adapter implementation.

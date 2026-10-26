@@ -1,38 +1,28 @@
-# Energy storage blocks
+# Energy storage block entities
 
-`ic2.api.block.AddonEnergyStorageBlockEntity` is an abstract base for add-on energy boxes or batteries. In the inspected source it extends `TileEntityElectricBlock`, so it inherits IC2R's existing storage, output, inventory/charging-slot, and related behavior from that base.
+`ic2.api.block.AddonEnergyStorageBlockEntity` is a base class for add-on energy boxes or batteries. Its protected constructor accepts:
 
-## Constructor contract
+- Your registered `BlockEntityType` (the current signature is bounded by `TileEntityElectricBlock`).
+- Block position and block state.
+- Tier (0–3).
+- Output in EU per tick (non-negative).
+- Capacity in EU (positive).
 
-```java
-protected AddonEnergyStorageBlockEntity(
-    BlockEntityType<? extends TileEntityElectricBlock> type,
-    BlockPos pos,
-    BlockState state,
-    int tier,
-    int outputEuPerTick,
-    int capacityEu)
-```
-
-The constructor validates:
-
-- `tier` must be between `0` and `3` inclusive.
-- `outputEuPerTick` must be non-negative.
-- `capacityEu` must be at least `1` EU.
-
-Your concrete block entity still needs to be registered with a `BlockEntityType` in your add-on, and its block must use that type. Registration boilerplate depends on your NeoForge setup; this base class does not register a block or block entity automatically.
-
-## Implementation shape
+Example subclass shape:
 
 ```java
-public final class DenseBatteryBlockEntity extends AddonEnergyStorageBlockEntity {
-    public DenseBatteryBlockEntity(
+public final class AlloyBatteryBlockEntity extends AddonEnergyStorageBlockEntity {
+    public AlloyBatteryBlockEntity(
             BlockEntityType<? extends TileEntityElectricBlock> type,
             BlockPos pos,
             BlockState state) {
-        super(type, pos, state, 2, 128, 100_000);
+        super(type, pos, state, 2, 512, 100_000);
     }
 }
 ```
 
-This shows the constructor call only. You must use a block-entity type and block registration that match the concrete class, and verify the generic type accepted by the target IC2R revision. The numbers are example balance choices, not recommended defaults.
+Imports are omitted here for readability. Match the generic type used by the exact source you are compiling against. Because the constructor is protected, subclass it rather than trying to instantiate the abstract base directly.
+
+The base inherits IC2R storage, energy component, charging/discharging slots, output behavior, and related machine behavior. It does **not** register your block, block entity type, model, texture, menu, loot table, or recipes for you.
+
+For a full integration, register the subclass's `BlockEntityType` using NeoForge's normal deferred-register pattern and make sure the corresponding block returns/uses that type. The exact registration boilerplate is omitted here rather than guessing at your add-on's registry setup.

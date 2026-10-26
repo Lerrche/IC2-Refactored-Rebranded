@@ -1,13 +1,11 @@
-# Electric items and weapons
+# Electric items and batteries
 
-## Chargeable items
+## `AddonElectricItem`
 
-`ic2.api.item.AddonElectricItem` extends IC2R's `BaseElectricItem`. It delegates charge handling to IC2R's `ElectricItem.manager` and adds a configurable `canProvideEnergy` value.
-
-Constructor:
+`ic2.api.item.AddonElectricItem` extends IC2R's `BaseElectricItem`. Its constructor takes:
 
 ```java
-public AddonElectricItem(
+AddonElectricItem(
     Item.Properties properties,
     double maxCharge,
     double transferLimit,
@@ -15,32 +13,16 @@ public AddonElectricItem(
     boolean canProvideEnergy)
 ```
 
-The class requires finite, positive values for `maxCharge` and `transferLimit`, and a tier from `0` to `3`. Subclass it when you need custom interaction behavior, or register it directly through `Ic2AddonContent.registerElectricItem(...)`.
+The current implementation validates that `maxCharge` and `transferLimit` are finite positive values and that `tier` is between 0 and 3. `canProvideEnergy` controls whether the item can discharge energy to consumers.
 
-Example registration:
+You can register a standard electric item directly with `Ic2AddonContent.registerElectricItem(...)`, or subclass `AddonElectricItem` for custom behavior. See the [electric item example](../examples/electric-item.md).
 
-```java
-public static final DeferredItem<AddonElectricItem> BATTERY_TOOL = CONTENT.registerElectricItem(
-    "battery_tool", 20_000.0, 256.0, 1, false);
-```
+Use `ic2.api.item.ElectricItem.manager` for charging, discharging, reading charge, and consuming EU. Avoid manually editing internal data components/NBT.
 
-The example registers an item with charge metadata; it does not add mining or combat behavior by itself.
+## Other item bases
 
-## Electric melee weapons
+- `AddonElectricWeapon` — charge-powered melee weapon base; see [weapon example](../examples/electric-weapon.md).
+- `AddonElectricArmor` — electric armor with energy-per-damage and absorption-ratio settings.
+- `AddonElectricJetpack` — chest-slot electric jetpack implementing IC2R's `IJetpack` interface.
 
-`ic2.api.item.AddonElectricWeapon` extends `AddonElectricItem` and takes `Item.Properties`, maximum charge, transfer limit, tier, and `energyPerHit`. The inspected implementation calls `ElectricItem.manager.use(...)` on the logical server when a successful melee hit is processed. It leaves normal melee damage to the Minecraft item properties and the normal combat flow.
-
-```java
-public AddonElectricWeapon(
-    Item.Properties properties,
-    double maxCharge,
-    double transferLimit,
-    int tier,
-    double energyPerHit)
-```
-
-`energyPerHit` must be finite and non-negative. The base class does not configure attack damage or attack speed; set those using the item properties supported by your target Minecraft/NeoForge version.
-
-## Drill-specific behavior
-
-The source includes `ic2.api.item.IMiningDrill`, which is an existing IC2 API contract. `AddonElectricItem` alone is not a drill implementation. Before writing a custom drill, inspect `IMiningDrill` and the current IC2R drill implementations to match the required method signatures and mining behavior. This page intentionally does not invent a universal `AddonElectricMiningTool` class.
+These bases do not generate their own models, textures, language entries, recipes, or creative-tab entries.

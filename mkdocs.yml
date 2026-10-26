@@ -1,33 +1,33 @@
-site_name: IC2 Refactored Add-on API
-site_description: Developer documentation for the IC2 Refactored add-on API on Minecraft 1.21.1 and NeoForge.
-site_url: https://lerche.github.io/IC2-Refactored-Rebranded/
+site_name: IC2 Refactored Documentation
+site_description: Add-on API documentation for IndustrialCraft 2 Refactored on Minecraft 1.21.1 and NeoForge.
+site_url: https://lerrche.github.io/IC2-Refactored-Rebranded/
 repo_url: https://github.com/Lerrche/IC2-Refactored-Rebranded
 repo_name: Lerrche/IC2-Refactored-Rebranded
 edit_uri: edit/main/docs/
 
+copyright: Unofficial community documentation for IC2 Refactored.
+
 theme:
   name: material
-  language: en
   features:
-    - navigation.instant
     - navigation.sections
-    - navigation.indexes
+    - navigation.expand
     - navigation.top
+    - content.code.copy
     - search.suggest
     - search.highlight
-    - content.code.copy
   palette:
     - scheme: slate
-      primary: indigo
-      accent: cyan
+      primary: amber
+      accent: orange
       toggle:
-        icon: material/brightness-7
+        icon: material/weather-sunny
         name: Switch to light mode
     - scheme: default
-      primary: indigo
-      accent: cyan
+      primary: brown
+      accent: amber
       toggle:
-        icon: material/brightness-4
+        icon: material/weather-night
         name: Switch to dark mode
 
 markdown_extensions:
@@ -35,25 +35,30 @@ markdown_extensions:
   - attr_list
   - def_list
   - pymdownx.details
+  - pymdownx.superfences
   - pymdownx.highlight:
       anchor_linenums: true
-  - pymdownx.inlinehilite
-  - pymdownx.superfences
-  - pymdownx.tabbed:
-      alternate_style: true
   - toc:
       permalink: true
 
 nav:
   - Home: index.md
-  - Getting started: getting-started.md
-  - Content registration: registration.md
-  - Energy:
+  - Getting Started: getting-started.md
+  - Registration: registration.md
+  - Examples:
+      - Overview: examples/index.md
+      - Register Items and Blocks: examples/registration.md
+      - Electric Item: examples/electric-item.md
+      - Electric Weapon: examples/electric-weapon.md
+      - Generator Base: examples/generator.md
+  - Energy API:
       - Overview: energy/index.md
-      - Energy storage: energy/storage.md
+      - Storage Block Entities: energy/storage.md
       - Generators: energy/generators.md
-  - Electric items:
-      - Electric items and weapons: items/electric-items.md
-      - Armor and jetpacks: items/armor.md
-  - API reference: api-reference.md
-  - Compatibility and troubleshooting: compatibility.md
+  - Electric Items:
+      - Electric Items and Batteries: items/electric-items.md
+      - Armor and Jetpacks: items/armor.md
+  - API Reference: api-reference.md
+  - Compatibility: compatibility.md
+  - Building the Mod: building.md
+  - Contributing: contributing.md
