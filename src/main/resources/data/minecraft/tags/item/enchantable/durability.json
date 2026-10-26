@@ -1,0 +1,9 @@
+{
+  "replace": false,
+  "values": [
+    "ic2:drill",
+    "ic2:diamond_drill",
+    "ic2:iridium_drill",
+    "ic2:nano_saber"
+  ]
+}

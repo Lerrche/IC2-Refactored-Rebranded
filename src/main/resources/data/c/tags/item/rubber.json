@@ -1,0 +1,18 @@
+{
+  "values": [
+    "ic2:rubber",
+    "minecraft:dried_kelp",
+    {
+      "id": "rubberworks:rubber_sheet",
+      "required": false
+    },
+    {
+      "id": "rubberworks:rubber_block",
+      "required": false
+    },
+    {
+      "id": "createpolymer:rubber",
+      "required": false
+    }
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "type": "ic2:shapeless",
+  "ingredients": [
+    {
+      "tag": "c:rubber"
+    },
+    {
+      "tag": "c:rubber"
+    },
+    {
+      "item": "ic2:iron_cable"
+    }
+  ],
+  "result": {
+    "item": "ic2:double_insulated_iron_cable"
+  }
+}
