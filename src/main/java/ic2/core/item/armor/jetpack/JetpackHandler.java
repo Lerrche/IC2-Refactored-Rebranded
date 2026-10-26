@@ -4,6 +4,7 @@ import ic2.api.item.ElectricItem;
 import ic2.api.item.IBackupElectricItemManager;
 import ic2.api.item.IElectricItem;
 import ic2.core.ref.Ic2Items;
+import ic2.integration.curios.CuriosCompat;
 import ic2.core.util.Ic2Tooltip;
 import ic2.core.util.StackUtil;
 import java.util.Map;
@@ -27,9 +28,6 @@ import net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent;
 import net.neoforged.neoforge.event.entity.living.LivingIncomingDamageEvent;
 import net.neoforged.neoforge.event.entity.player.ItemTooltipEvent;
 import net.neoforged.neoforge.event.tick.PlayerTickEvent;
-import top.theillusivec4.curios.api.CuriosApi;
-import top.theillusivec4.curios.api.type.inventory.ICurioStacksHandler;
-import top.theillusivec4.curios.api.type.inventory.IDynamicStackHandler;
 
 public class JetpackHandler implements IBackupElectricItemManager {
   static final ItemStack jetpack = new ItemStack(Ic2Items.JETPACK_ELECTRIC);
@@ -66,25 +64,7 @@ public class JetpackHandler implements IBackupElectricItemManager {
   }
 
   private static ItemStack getBackSlotJetpack(Player player) {
-    return CuriosApi.getCuriosInventory(player)
-        .map(
-            curios -> {
-              ICurioStacksHandler backHandler = curios.getCurios().get("back");
-              if (backHandler == null) {
-                return ItemStack.EMPTY;
-              }
-
-              IDynamicStackHandler stacks = backHandler.getStacks();
-              for (int i = 0; i < stacks.getSlots(); i++) {
-                ItemStack stack = stacks.getStackInSlot(i);
-                if (hasJetpack(stack)) {
-                  return stack;
-                }
-              }
-
-              return ItemStack.EMPTY;
-            })
-        .orElse(ItemStack.EMPTY);
+    return CuriosCompat.findBackSlotStack(player, JetpackHandler::hasJetpack);
   }
 
   public static void setJetpackAttached(ItemStack stack, boolean value) {
