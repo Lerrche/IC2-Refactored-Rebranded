@@ -1,4 +1,4 @@
-# IC2 Refactored (Rebranded)
+# IC2 Refactored  (Rebranded)
 
 An unofficial continuation of the IndustrialCraft 2 port for Minecraft 1.21.1 on NeoForge.
 
