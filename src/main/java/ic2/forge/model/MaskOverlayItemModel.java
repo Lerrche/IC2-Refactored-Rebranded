@@ -1,6 +1,7 @@
 package ic2.forge.model;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import com.mojang.blaze3d.vertex.PoseStack;
 import ic2.core.item.tool.ItemObscurator;
 import ic2.core.util.StackUtil;
 import java.io.IOException;
@@ -13,6 +14,7 @@ import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.model.BakedQuad;
 import net.minecraft.client.renderer.block.model.ItemOverrides;
+import net.minecraft.client.renderer.block.model.ItemTransforms;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
@@ -24,6 +26,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.neoforge.client.model.data.ModelData;
@@ -307,6 +310,19 @@ public final class MaskOverlayItemModel implements Ic2Model, BakedModel {
   }
 
   @Override
+  public BakedModel applyTransform(
+      ItemDisplayContext transformType, PoseStack poseStack, boolean applyLeftHandTransform) {
+    // The custom geometry model replaces the base baked model, so forward its display transform.
+    this.baseModel.applyTransform(transformType, poseStack, applyLeftHandTransform);
+    return this;
+  }
+
+  @Override
+  public ItemTransforms getTransforms() {
+    return this.baseModel.getTransforms();
+  }
+
+  @Override
   public @NotNull List<BakedQuad> getQuads(
       @Nullable BlockState state,
       @Nullable Direction side,
@@ -424,6 +440,19 @@ public final class MaskOverlayItemModel implements Ic2Model, BakedModel {
   private record OverlaidModel(
       BakedModel baseModel, List<BakedQuad> baseQuads, List<BakedQuad> overlayQuads)
       implements BakedModel {
+    @Override
+    public BakedModel applyTransform(
+        ItemDisplayContext transformType, PoseStack poseStack, boolean applyLeftHandTransform) {
+      // Keep the overlay model wrapper while applying the transforms from the generated base item.
+      this.baseModel.applyTransform(transformType, poseStack, applyLeftHandTransform);
+      return this;
+    }
+
+    @Override
+    public ItemTransforms getTransforms() {
+      return this.baseModel.getTransforms();
+    }
+
     @Override
     public @NotNull List<BakedQuad> getQuads(
         @Nullable BlockState state,
