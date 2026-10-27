@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "c:chests/wooden"
+            "items": "#c:chests/wooden"
           }
         ]
       },

@@ -53,7 +53,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "c:plates/iron"
+            "items": "#c:plates/iron"
           }
         ]
       },

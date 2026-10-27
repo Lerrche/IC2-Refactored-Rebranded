@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/optional/storage/re_battery",
+  "display": {
+    "icon": {
+      "id": "ic2:batbox_chargepad"
+    },
+    "title": {
+      "translate": "advancements.ic2.optional.storage.batbox_chargepad"
+    },
+    "description": {
+      "translate": "advancements.ic2.optional.storage.batbox_chargepad.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "batbox_chargepad": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:batbox_chargepad"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "batbox_chargepad"
+    ]
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/optional/fluids/distilled_water",
+  "display": {
+    "icon": {
+      "id": "ic2:coolant_cell"
+    },
+    "title": {
+      "translate": "advancements.ic2.Keep Your Cool"
+    },
+    "description": {
+      "translate": "advancements.ic2.Keep Your Cool.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "has_item": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:coolant_cell"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_item"
+    ]
+  ]
+}

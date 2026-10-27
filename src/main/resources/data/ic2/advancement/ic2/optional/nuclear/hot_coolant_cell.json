@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/optional/nuclear/reactor_heat_vent",
+  "display": {
+    "icon": {
+      "id": "ic2:hot_coolant_cell"
+    },
+    "title": {
+      "translate": "advancements.ic2.optional.nuclear.hot_coolant_cell"
+    },
+    "description": {
+      "translate": "advancements.ic2.optional.nuclear.hot_coolant_cell.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "hot_coolant_cell": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:hot_coolant_cell"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "hot_coolant_cell"
+    ]
+  ]
+}

@@ -1,0 +1,115 @@
+{
+  "parent": "ic2:ic2/build_generator/root",
+  "display": {
+    "icon": {
+      "id": "ic2:manual_kinetic_generator"
+    },
+    "title": {
+      "translate": "advancements.ic2.first_kinetic_generator"
+    },
+    "description": {
+      "translate": "advancements.ic2.first_kinetic_generator.desc"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "kinetic_generator": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:kinetic_generator"
+            ]
+          }
+        ]
+      }
+    },
+    "manual_kinetic_generator": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:manual_kinetic_generator"
+            ]
+          }
+        ]
+      }
+    },
+    "water_kinetic_generator": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:water_kinetic_generator"
+            ]
+          }
+        ]
+      }
+    },
+    "wind_kinetic_generator": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:wind_kinetic_generator"
+            ]
+          }
+        ]
+      }
+    },
+    "stirling_kinetic_generator": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:stirling_kinetic_generator"
+            ]
+          }
+        ]
+      }
+    },
+    "steam_kinetic_generator": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:steam_kinetic_generator"
+            ]
+          }
+        ]
+      }
+    },
+    "electric_kinetic_generator": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:electric_kinetic_generator"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "kinetic_generator",
+      "manual_kinetic_generator",
+      "water_kinetic_generator",
+      "wind_kinetic_generator",
+      "stirling_kinetic_generator",
+      "steam_kinetic_generator",
+      "electric_kinetic_generator"
+    ]
+  ]
+}

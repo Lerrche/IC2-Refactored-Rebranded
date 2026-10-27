@@ -20,7 +20,8 @@ public final class CuriosCompat {
   private CuriosCompat() {}
 
   /** Visits all equipped Curios stacks when Curios is available. */
-  public static void forEachEquippedStack(LivingEntity entity, java.util.function.Consumer<ItemStack> consumer) {
+  public static void forEachEquippedStack(
+      LivingEntity entity, java.util.function.Consumer<ItemStack> consumer) {
     if (entity == null || consumer == null || !ModList.get().isLoaded("curios")) {
       return;
     }
@@ -53,8 +54,8 @@ public final class CuriosCompat {
   }
 
   /**
-   * Returns the first stack in Curios' "back" slot that matches the predicate.
-   * If Curios is absent or its API is incompatible, this safely returns an empty stack.
+   * Returns the first stack in Curios' "back" slot that matches the predicate. If Curios is absent
+   * or its API is incompatible, this safely returns an empty stack.
    */
   public static ItemStack findBackSlotStack(LivingEntity entity, Predicate<ItemStack> predicate) {
     if (entity == null || predicate == null || !ModList.get().isLoaded("curios")) {

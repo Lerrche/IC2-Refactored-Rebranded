@@ -53,7 +53,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "c:plates/tin"
+            "items": "#c:plates/tin"
           }
         ]
       },

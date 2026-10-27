@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:root",
+  "display": {
+    "icon": {
+      "id": "ic2:fluid_ejector_upgrade"
+    },
+    "title": {
+      "translate": "advancements.ic2.No More Bucket Runs"
+    },
+    "description": {
+      "translate": "advancements.ic2.No More Bucket Runs.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "has_item": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:fluid_ejector_upgrade"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_item"
+    ]
+  ]
+}

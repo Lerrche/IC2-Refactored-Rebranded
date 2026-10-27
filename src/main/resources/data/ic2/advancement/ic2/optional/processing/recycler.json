@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/optional/processing/macerator",
+  "display": {
+    "icon": {
+      "id": "ic2:recycler"
+    },
+    "title": {
+      "translate": "advancements.ic2.recycler"
+    },
+    "description": {
+      "translate": "advancements.ic2.recycler.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "recycler": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:recycler"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "recycler"
+    ]
+  ]
+}

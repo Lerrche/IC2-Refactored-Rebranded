@@ -29,7 +29,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "c:nuggets/iridium"
+            "items": "#c:nuggets/iridium"
           }
         ]
       },
@@ -39,7 +39,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "c:plates/steel"
+            "items": "#c:plates/steel"
           }
         ]
       },

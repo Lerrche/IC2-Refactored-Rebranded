@@ -1,0 +1,89 @@
+{
+  "parent": "ic2:ic2/build_generator/build_batbox/root",
+  "display": {
+    "icon": {
+      "id": "ic2:lv_transformer"
+    },
+    "title": {
+      "translate": "advancements.ic2.transformer_basics"
+    },
+    "description": {
+      "translate": "advancements.ic2.transformer_basics.desc"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "lv_transformer": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:lv_transformer"
+            ]
+          }
+        ]
+      }
+    },
+    "mv_transformer": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:mv_transformer"
+            ]
+          }
+        ]
+      }
+    },
+    "hv_transformer": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:hv_transformer"
+            ]
+          }
+        ]
+      }
+    },
+    "ev_transformer": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:ev_transformer"
+            ]
+          }
+        ]
+      }
+    },
+    "transformer_upgrade": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:transformer_upgrade"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "lv_transformer",
+      "mv_transformer",
+      "hv_transformer",
+      "ev_transformer",
+      "transformer_upgrade"
+    ]
+  ]
+}

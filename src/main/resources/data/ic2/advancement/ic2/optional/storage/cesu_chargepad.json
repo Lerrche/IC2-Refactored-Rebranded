@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:root",
+  "display": {
+    "icon": {
+      "id": "ic2:cesu_chargepad"
+    },
+    "title": {
+      "translate": "advancements.ic2.optional.storage.cesu_chargepad"
+    },
+    "description": {
+      "translate": "advancements.ic2.optional.storage.cesu_chargepad.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "cesu_chargepad": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:cesu_chargepad"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "cesu_chargepad"
+    ]
+  ]
+}

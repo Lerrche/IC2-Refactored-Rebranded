@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/optional/fluids/iron_tank",
+  "display": {
+    "icon": {
+      "id": "ic2:distilled_water_bucket"
+    },
+    "title": {
+      "translate": "advancements.ic2.A Cleaner Cycle"
+    },
+    "description": {
+      "translate": "advancements.ic2.A Cleaner Cycle.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "has_item": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:distilled_water_bucket"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_item"
+    ]
+  ]
+}

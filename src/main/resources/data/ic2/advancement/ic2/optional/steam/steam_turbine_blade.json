@@ -1,0 +1,50 @@
+{
+  "parent": "ic2:ic2/optional/steam/steam_boiler",
+  "display": {
+    "icon": {
+      "id": "ic2:steam_turbine"
+    },
+    "title": {
+      "translate": "advancements.ic2.steam_turbine_blade"
+    },
+    "description": {
+      "translate": "advancements.ic2.steam_turbine_blade.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "steam_turbine": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:steam_turbine"
+            ]
+          }
+        ]
+      }
+    },
+    "steam_turbine_blade": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:steam_turbine_blade"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "steam_turbine",
+      "steam_turbine_blade"
+    ]
+  ]
+}

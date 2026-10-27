@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:root",
+  "display": {
+    "icon": {
+      "id": "ic2:energy_storage_upgrade"
+    },
+    "title": {
+      "translate": "advancements.ic2.optional.storage.energy_storage_upgrade"
+    },
+    "description": {
+      "translate": "advancements.ic2.optional.storage.energy_storage_upgrade.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "energy_storage_upgrade": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:energy_storage_upgrade"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "energy_storage_upgrade"
+    ]
+  ]
+}

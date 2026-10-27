@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:root",
+  "display": {
+    "icon": {
+      "id": "ic2:lv_transformer"
+    },
+    "title": {
+      "translate": "advancements.ic2.A Gentle Step Down"
+    },
+    "description": {
+      "translate": "advancements.ic2.A Gentle Step Down.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "has_item": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:lv_transformer"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_item"
+    ]
+  ]
+}

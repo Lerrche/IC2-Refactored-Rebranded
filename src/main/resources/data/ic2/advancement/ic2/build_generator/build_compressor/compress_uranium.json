@@ -1,8 +1,8 @@
 {
-  "parent": "ic2:ic2/build_generator/build_compressor/root",
+  "parent": "ic2:ic2/build_generator/build_compressor/build_advanced_circuit",
   "display": {
     "icon": {
-      "item": "ic2:uranium"
+      "id": "ic2:uranium_fuel_rod"
     },
     "title": {
       "translate": "advancements.ic2.compress_uranium"
@@ -16,13 +16,13 @@
     "hidden": false
   },
   "criteria": {
-    "ic2:uranium": {
+    "ic2:uranium_fuel_rod": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
             "items": [
-              "ic2:uranium"
+              "ic2:uranium_fuel_rod"
             ]
           }
         ]
@@ -31,7 +31,7 @@
   },
   "requirements": [
     [
-      "ic2:uranium"
+      "ic2:uranium_fuel_rod"
     ]
   ]
 }

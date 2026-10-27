@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "c:dusts/diamond"
+            "items": "#c:dusts/diamond"
           }
         ]
       },

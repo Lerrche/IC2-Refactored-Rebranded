@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/optional/power/cable_tiers",
+  "display": {
+    "icon": {
+      "id": "ic2:glass_fibre_cable"
+    },
+    "title": {
+      "translate": "advancements.ic2.glass_fibre_cable_tier"
+    },
+    "description": {
+      "translate": "advancements.ic2.glass_fibre_cable_tier.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "glass_fibre_cable": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:glass_fibre_cable"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "glass_fibre_cable"
+    ]
+  ]
+}

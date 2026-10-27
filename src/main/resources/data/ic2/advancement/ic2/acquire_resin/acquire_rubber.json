@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/acquire_resin",
+  "display": {
+    "icon": {
+      "id": "ic2:rubber"
+    },
+    "title": {
+      "translate": "advancements.ic2.acquire_rubber"
+    },
+    "description": {
+      "translate": "advancements.ic2.acquire_rubber.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "ic2:rubber": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:rubber"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "ic2:rubber"
+    ]
+  ]
+}

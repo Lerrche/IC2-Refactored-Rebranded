@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:root",
+  "display": {
+    "icon": {
+      "id": "ic2:redstone_inverter_upgrade"
+    },
+    "title": {
+      "translate": "advancements.ic2.optional.upgrades.redstone_inverter_upgrade"
+    },
+    "description": {
+      "translate": "advancements.ic2.optional.upgrades.redstone_inverter_upgrade.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "redstone_inverter_upgrade": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:redstone_inverter_upgrade"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "redstone_inverter_upgrade"
+    ]
+  ]
+}

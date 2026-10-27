@@ -1,0 +1,89 @@
+{
+  "parent": "ic2:ic2/optional/kinetic/first_kinetic_generator",
+  "display": {
+    "icon": {
+      "id": "ic2:wooden_rotor_blade"
+    },
+    "title": {
+      "translate": "advancements.ic2.rotor_blade"
+    },
+    "description": {
+      "translate": "advancements.ic2.rotor_blade.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "wooden_rotor_blade": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:wooden_rotor_blade"
+            ]
+          }
+        ]
+      }
+    },
+    "iron_rotor_blade": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:iron_rotor_blade"
+            ]
+          }
+        ]
+      }
+    },
+    "bronze_rotor_blade": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:bronze_rotor_blade"
+            ]
+          }
+        ]
+      }
+    },
+    "steel_rotor_blade": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:steel_rotor_blade"
+            ]
+          }
+        ]
+      }
+    },
+    "carbon_rotor_blade": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:carbon_rotor_blade"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "wooden_rotor_blade",
+      "iron_rotor_blade",
+      "bronze_rotor_blade",
+      "steel_rotor_blade",
+      "carbon_rotor_blade"
+    ]
+  ]
+}

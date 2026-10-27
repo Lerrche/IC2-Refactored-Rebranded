@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/build_generator/build_compressor/acquire_refined_iron",
+  "display": {
+    "icon": {
+      "id": "ic2:circuit"
+    },
+    "title": {
+      "translate": "advancements.ic2.build_circuit"
+    },
+    "description": {
+      "translate": "advancements.ic2.build_circuit.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "ic2:circuit": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:circuit"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "ic2:circuit"
+    ]
+  ]
+}

@@ -1,8 +1,8 @@
 {
-  "parent": "ic2:ic2/build_generator/build_compressor/build_energy_crystal",
+  "parent": "ic2:ic2/build_generator/build_batbox/build_mfeu/build_mfsu",
   "display": {
     "icon": {
-      "item": "ic2:matter_generator"
+      "id": "ic2:matter_generator"
     },
     "title": {
       "translate": "advancements.ic2.build_matter_gen"

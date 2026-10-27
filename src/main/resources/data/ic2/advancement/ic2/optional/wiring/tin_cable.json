@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:root",
+  "display": {
+    "icon": {
+      "id": "ic2:tin_cable"
+    },
+    "title": {
+      "translate": "advancements.ic2.optional.wiring.tin_cable"
+    },
+    "description": {
+      "translate": "advancements.ic2.optional.wiring.tin_cable.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "tin_cable": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:tin_cable"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "tin_cable"
+    ]
+  ]
+}

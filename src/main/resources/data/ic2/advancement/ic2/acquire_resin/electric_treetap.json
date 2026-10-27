@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/acquire_resin",
+  "display": {
+    "icon": {
+      "id": "ic2:electric_treetap"
+    },
+    "title": {
+      "translate": "advancements.ic2.electric_treetap"
+    },
+    "description": {
+      "translate": "advancements.ic2.electric_treetap.desc"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "electric_treetap": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:electric_treetap"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "electric_treetap"
+    ]
+  ]
+}

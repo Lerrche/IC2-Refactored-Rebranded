@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:root",
+  "display": {
+    "icon": {
+      "id": "ic2:re_battery"
+    },
+    "title": {
+      "translate": "advancements.ic2.optional.storage.re_battery"
+    },
+    "description": {
+      "translate": "advancements.ic2.optional.storage.re_battery.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "re_battery": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:re_battery"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "re_battery"
+    ]
+  ]
+}

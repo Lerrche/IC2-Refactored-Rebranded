@@ -1,0 +1,50 @@
+{
+  "parent": "ic2:ic2/optional/steam/distilled_water",
+  "display": {
+    "icon": {
+      "id": "ic2:coolant_cell"
+    },
+    "title": {
+      "translate": "advancements.ic2.coolant"
+    },
+    "description": {
+      "translate": "advancements.ic2.coolant.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "coolant_cell": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:coolant_cell"
+            ]
+          }
+        ]
+      }
+    },
+    "hot_coolant_cell": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:hot_coolant_cell"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "coolant_cell",
+      "hot_coolant_cell"
+    ]
+  ]
+}

@@ -1,0 +1,63 @@
+{
+  "parent": "ic2:ic2/acquire_resin/acquire_insulated_cable",
+  "display": {
+    "icon": {
+      "id": "ic2:glass_fibre_cable"
+    },
+    "title": {
+      "translate": "advancements.ic2.cable_tiers"
+    },
+    "description": {
+      "translate": "advancements.ic2.cable_tiers.desc"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "gold_cable": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:gold_cable"
+            ]
+          }
+        ]
+      }
+    },
+    "iron_cable": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:iron_cable"
+            ]
+          }
+        ]
+      }
+    },
+    "glass_fibre_cable": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:glass_fibre_cable"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "gold_cable",
+      "iron_cable",
+      "glass_fibre_cable"
+    ]
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:root",
+  "display": {
+    "icon": {
+      "id": "ic2:reactor_heat_vent"
+    },
+    "title": {
+      "translate": "advancements.ic2.optional.nuclear.reactor_heat_vent"
+    },
+    "description": {
+      "translate": "advancements.ic2.optional.nuclear.reactor_heat_vent.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "reactor_heat_vent": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:reactor_heat_vent"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "reactor_heat_vent"
+    ]
+  ]
+}

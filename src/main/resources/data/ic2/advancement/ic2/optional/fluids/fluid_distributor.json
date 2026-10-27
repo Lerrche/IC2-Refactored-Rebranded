@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/optional/fluids/iron_tank",
+  "display": {
+    "icon": {
+      "id": "ic2:fluid_distributor"
+    },
+    "title": {
+      "translate": "advancements.ic2.optional.fluids.fluid_distributor"
+    },
+    "description": {
+      "translate": "advancements.ic2.optional.fluids.fluid_distributor.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "fluid_distributor": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:fluid_distributor"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "fluid_distributor"
+    ]
+  ]
+}

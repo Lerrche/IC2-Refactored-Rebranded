@@ -1,8 +1,8 @@
 {
-  "parent": "ic2:ic2/build_generator/build_compressor/root",
+  "parent": "ic2:ic2/build_generator/build_compressor/build_advanced_circuit",
   "display": {
     "icon": {
-      "item": "ic2:energy_crystal"
+      "id": "ic2:energy_crystal"
     },
     "title": {
       "translate": "advancements.ic2.build_energy_crystal"

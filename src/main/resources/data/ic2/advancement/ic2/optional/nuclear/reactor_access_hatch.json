@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:root",
+  "display": {
+    "icon": {
+      "id": "ic2:reactor_access_hatch"
+    },
+    "title": {
+      "translate": "advancements.ic2.optional.nuclear.reactor_access_hatch"
+    },
+    "description": {
+      "translate": "advancements.ic2.optional.nuclear.reactor_access_hatch.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "reactor_access_hatch": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:reactor_access_hatch"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "reactor_access_hatch"
+    ]
+  ]
+}

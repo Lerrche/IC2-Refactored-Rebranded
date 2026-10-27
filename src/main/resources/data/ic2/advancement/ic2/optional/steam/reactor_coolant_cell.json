@@ -1,0 +1,63 @@
+{
+  "parent": "ic2:ic2/optional/steam/coolant",
+  "display": {
+    "icon": {
+      "id": "ic2:reactor_coolant_cell"
+    },
+    "title": {
+      "translate": "advancements.ic2.reactor_coolant_cell"
+    },
+    "description": {
+      "translate": "advancements.ic2.reactor_coolant_cell.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "reactor_coolant_cell": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:reactor_coolant_cell"
+            ]
+          }
+        ]
+      }
+    },
+    "triple_reactor_coolant_cell": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:triple_reactor_coolant_cell"
+            ]
+          }
+        ]
+      }
+    },
+    "sextuple_reactor_coolant_cell": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:sextuple_reactor_coolant_cell"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "reactor_coolant_cell",
+      "triple_reactor_coolant_cell",
+      "sextuple_reactor_coolant_cell"
+    ]
+  ]
+}

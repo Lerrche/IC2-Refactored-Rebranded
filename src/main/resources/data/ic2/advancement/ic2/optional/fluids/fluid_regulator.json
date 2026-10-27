@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/optional/fluids/fluid_distributor",
+  "display": {
+    "icon": {
+      "id": "ic2:fluid_regulator"
+    },
+    "title": {
+      "translate": "advancements.ic2.optional.fluids.fluid_regulator"
+    },
+    "description": {
+      "translate": "advancements.ic2.optional.fluids.fluid_regulator.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "fluid_regulator": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:fluid_regulator"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "fluid_regulator"
+    ]
+  ]
+}

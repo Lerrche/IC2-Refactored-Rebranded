@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/optional/transformers/mv_transformer",
+  "display": {
+    "icon": {
+      "id": "ic2:hv_transformer"
+    },
+    "title": {
+      "translate": "advancements.ic2.High Voltage, High Stakes"
+    },
+    "description": {
+      "translate": "advancements.ic2.High Voltage, High Stakes.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "has_item": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:hv_transformer"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_item"
+    ]
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/build_generator/root",
+  "display": {
+    "icon": {
+      "id": "ic2:steam_generator"
+    },
+    "title": {
+      "translate": "advancements.ic2.steam_boiler"
+    },
+    "description": {
+      "translate": "advancements.ic2.steam_boiler.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "steam_generator": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:steam_generator"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "steam_generator"
+    ]
+  ]
+}

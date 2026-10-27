@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:root",
+  "display": {
+    "icon": {
+      "id": "ic2:uranium_fuel_rod"
+    },
+    "title": {
+      "translate": "advancements.ic2.optional.nuclear.uranium_fuel_rod"
+    },
+    "description": {
+      "translate": "advancements.ic2.optional.nuclear.uranium_fuel_rod.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "uranium_fuel_rod": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:uranium_fuel_rod"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "uranium_fuel_rod"
+    ]
+  ]
+}

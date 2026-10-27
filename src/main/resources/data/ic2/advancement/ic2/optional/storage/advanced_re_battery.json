@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/optional/storage/re_battery",
+  "display": {
+    "icon": {
+      "id": "ic2:advanced_re_battery"
+    },
+    "title": {
+      "translate": "advancements.ic2.optional.storage.advanced_re_battery"
+    },
+    "description": {
+      "translate": "advancements.ic2.optional.storage.advanced_re_battery.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "advanced_re_battery": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:advanced_re_battery"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "advanced_re_battery"
+    ]
+  ]
+}

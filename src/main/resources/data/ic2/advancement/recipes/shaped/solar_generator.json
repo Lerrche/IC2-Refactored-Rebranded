@@ -17,7 +17,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "c:dusts/coal"
+            "items": "#c:dusts/coal"
           }
         ]
       },

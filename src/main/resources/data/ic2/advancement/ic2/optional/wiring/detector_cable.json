@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/optional/wiring/tin_cable",
+  "display": {
+    "icon": {
+      "id": "ic2:detector_cable"
+    },
+    "title": {
+      "translate": "advancements.ic2.optional.wiring.detector_cable"
+    },
+    "description": {
+      "translate": "advancements.ic2.optional.wiring.detector_cable.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "detector_cable": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:detector_cable"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "detector_cable"
+    ]
+  ]
+}

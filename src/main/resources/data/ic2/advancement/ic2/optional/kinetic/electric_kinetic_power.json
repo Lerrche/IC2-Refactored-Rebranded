@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/optional/kinetic/first_kinetic_generator",
+  "display": {
+    "icon": {
+      "id": "ic2:electric_kinetic_generator"
+    },
+    "title": {
+      "translate": "advancements.ic2.electric_kinetic_power"
+    },
+    "description": {
+      "translate": "advancements.ic2.electric_kinetic_power.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "electric_kinetic_generator": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:electric_kinetic_generator"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "electric_kinetic_generator"
+    ]
+  ]
+}

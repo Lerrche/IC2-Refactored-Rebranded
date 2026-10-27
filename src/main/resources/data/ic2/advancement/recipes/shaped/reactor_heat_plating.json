@@ -5,7 +5,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "c:plates/copper"
+            "items": "#c:plates/copper"
           }
         ]
       },

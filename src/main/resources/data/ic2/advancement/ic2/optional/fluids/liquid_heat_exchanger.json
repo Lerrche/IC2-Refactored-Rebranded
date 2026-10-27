@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/optional/steam/heat_exchange",
+  "display": {
+    "icon": {
+      "id": "ic2:liquid_heat_exchanger"
+    },
+    "title": {
+      "translate": "advancements.ic2.optional.fluids.liquid_heat_exchanger"
+    },
+    "description": {
+      "translate": "advancements.ic2.optional.fluids.liquid_heat_exchanger.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "liquid_heat_exchanger": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:liquid_heat_exchanger"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "liquid_heat_exchanger"
+    ]
+  ]
+}

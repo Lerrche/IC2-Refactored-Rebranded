@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/optional/processing/macerator",
+  "display": {
+    "icon": {
+      "id": "ic2:metal_former"
+    },
+    "title": {
+      "translate": "advancements.ic2.metal_former"
+    },
+    "description": {
+      "translate": "advancements.ic2.metal_former.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "metal_former": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:metal_former"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "metal_former"
+    ]
+  ]
+}

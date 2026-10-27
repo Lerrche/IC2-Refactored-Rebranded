@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/optional/steam/distilled_water",
+  "display": {
+    "icon": {
+      "id": "ic2:solar_distiller"
+    },
+    "title": {
+      "translate": "advancements.ic2.solar_distiller"
+    },
+    "description": {
+      "translate": "advancements.ic2.solar_distiller.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "solar_distiller": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:solar_distiller"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "solar_distiller"
+    ]
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/optional/steam/steam_turbine_blade",
+  "display": {
+    "icon": {
+      "id": "ic2:steam_kinetic_generator"
+    },
+    "title": {
+      "translate": "advancements.ic2.steam_turbine"
+    },
+    "description": {
+      "translate": "advancements.ic2.steam_turbine.desc"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "steam_kinetic_generator": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:steam_kinetic_generator"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "steam_kinetic_generator"
+    ]
+  ]
+}

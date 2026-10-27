@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/build_generator/build_batbox/build_mfeu",
+  "display": {
+    "icon": {
+      "id": "ic2:mfe_chargepad"
+    },
+    "title": {
+      "translate": "advancements.ic2.optional.storage.mfe_chargepad"
+    },
+    "description": {
+      "translate": "advancements.ic2.optional.storage.mfe_chargepad.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "mfe_chargepad": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:mfe_chargepad"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "mfe_chargepad"
+    ]
+  ]
+}

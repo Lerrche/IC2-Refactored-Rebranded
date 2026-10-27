@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/optional/nuclear/uranium_fuel_rod",
+  "display": {
+    "icon": {
+      "id": "ic2:neutron_reflector"
+    },
+    "title": {
+      "translate": "advancements.ic2.optional.nuclear.neutron_reflector"
+    },
+    "description": {
+      "translate": "advancements.ic2.optional.nuclear.neutron_reflector.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "neutron_reflector": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:neutron_reflector"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "neutron_reflector"
+    ]
+  ]
+}

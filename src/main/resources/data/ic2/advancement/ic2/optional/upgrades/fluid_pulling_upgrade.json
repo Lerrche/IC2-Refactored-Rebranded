@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:root",
+  "display": {
+    "icon": {
+      "id": "ic2:fluid_pulling_upgrade"
+    },
+    "title": {
+      "translate": "advancements.ic2.optional.upgrades.fluid_pulling_upgrade"
+    },
+    "description": {
+      "translate": "advancements.ic2.optional.upgrades.fluid_pulling_upgrade.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "fluid_pulling_upgrade": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:fluid_pulling_upgrade"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "fluid_pulling_upgrade"
+    ]
+  ]
+}

@@ -17,7 +17,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "c:plates/bronze"
+            "items": "#c:plates/bronze"
           }
         ]
       },

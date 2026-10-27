@@ -1,0 +1,28 @@
+{
+  "display": {
+    "icon": {
+      "id": "ic2:wrench"
+    },
+    "title": {
+      "translate": "advancements.ic2.root"
+    },
+    "description": {
+      "translate": "advancements.ic2.root.desc"
+    },
+    "frame": "task",
+    "background": "ic2:textures/block/resource/advanced_machine.png",
+    "show_toast": false,
+    "announce_to_chat": false,
+    "hidden": false
+  },
+  "criteria": {
+    "root": {
+      "trigger": "minecraft:impossible"
+    }
+  },
+  "requirements": [
+    [
+      "root"
+    ]
+  ]
+}

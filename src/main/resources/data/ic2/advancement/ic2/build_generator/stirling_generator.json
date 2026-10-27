@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/build_generator/root",
+  "display": {
+    "icon": {
+      "id": "ic2:stirling_generator"
+    },
+    "title": {
+      "translate": "advancements.ic2.stirling_generator"
+    },
+    "description": {
+      "translate": "advancements.ic2.stirling_generator.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "stirling_generator": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:stirling_generator"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "stirling_generator"
+    ]
+  ]
+}

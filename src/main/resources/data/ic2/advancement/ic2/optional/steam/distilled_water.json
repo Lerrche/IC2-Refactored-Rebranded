@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/optional/steam/steam_boiler",
+  "display": {
+    "icon": {
+      "id": "ic2:distilled_water_cell"
+    },
+    "title": {
+      "translate": "advancements.ic2.distilled_water"
+    },
+    "description": {
+      "translate": "advancements.ic2.distilled_water.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "distilled_water_cell": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:distilled_water_cell"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "distilled_water_cell"
+    ]
+  ]
+}

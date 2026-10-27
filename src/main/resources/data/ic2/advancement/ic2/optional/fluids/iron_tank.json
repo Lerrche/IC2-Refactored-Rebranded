@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:root",
+  "display": {
+    "icon": {
+      "id": "ic2:iron_tank"
+    },
+    "title": {
+      "translate": "advancements.ic2.optional.fluids.iron_tank"
+    },
+    "description": {
+      "translate": "advancements.ic2.optional.fluids.iron_tank.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "iron_tank": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:iron_tank"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "iron_tank"
+    ]
+  ]
+}

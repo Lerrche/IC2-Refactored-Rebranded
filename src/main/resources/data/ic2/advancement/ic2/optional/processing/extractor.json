@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/optional/processing/macerator",
+  "display": {
+    "icon": {
+      "id": "ic2:extractor"
+    },
+    "title": {
+      "translate": "advancements.ic2.extractor"
+    },
+    "description": {
+      "translate": "advancements.ic2.extractor.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "extractor": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:extractor"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "extractor"
+    ]
+  ]
+}

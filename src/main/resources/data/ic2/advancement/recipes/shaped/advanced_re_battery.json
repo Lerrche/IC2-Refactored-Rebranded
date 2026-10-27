@@ -17,7 +17,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "c:dusts/lead"
+            "items": "#c:dusts/lead"
           }
         ]
       },
@@ -27,7 +27,7 @@
       "conditions": {
         "items": [
           {
-            "tag": "c:dusts/sulfur"
+            "items": "#c:dusts/sulfur"
           }
         ]
       },

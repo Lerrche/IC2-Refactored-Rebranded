@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/optional/processing/macerator",
+  "display": {
+    "icon": {
+      "id": "ic2:ore_washing_plant"
+    },
+    "title": {
+      "translate": "advancements.ic2.ore_washing_plant"
+    },
+    "description": {
+      "translate": "advancements.ic2.ore_washing_plant.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "ore_washing_plant": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:ore_washing_plant"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "ore_washing_plant"
+    ]
+  ]
+}

@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/build_generator/build_compressor/build_nuclear_reactor",
+  "display": {
+    "icon": {
+      "id": "ic2:rt_generator"
+    },
+    "title": {
+      "translate": "advancements.ic2.radioisotope_generator"
+    },
+    "description": {
+      "translate": "advancements.ic2.radioisotope_generator.desc"
+    },
+    "frame": "goal",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "rt_generator": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:rt_generator"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "rt_generator"
+    ]
+  ]
+}

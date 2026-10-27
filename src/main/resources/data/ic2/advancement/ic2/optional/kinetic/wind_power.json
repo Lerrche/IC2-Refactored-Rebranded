@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/optional/kinetic/first_kinetic_generator",
+  "display": {
+    "icon": {
+      "id": "ic2:wind_kinetic_generator"
+    },
+    "title": {
+      "translate": "advancements.ic2.wind_power"
+    },
+    "description": {
+      "translate": "advancements.ic2.wind_power.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "wind_kinetic_generator": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:wind_kinetic_generator"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "wind_kinetic_generator"
+    ]
+  ]
+}

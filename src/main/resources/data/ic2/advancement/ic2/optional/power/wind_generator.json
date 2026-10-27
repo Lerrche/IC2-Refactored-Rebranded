@@ -1,0 +1,37 @@
+{
+  "parent": "ic2:ic2/optional/power/solar_generator",
+  "display": {
+    "icon": {
+      "id": "ic2:wind_generator"
+    },
+    "title": {
+      "translate": "advancements.ic2.Let the Wind Work"
+    },
+    "description": {
+      "translate": "advancements.ic2.Let the Wind Work.desc"
+    },
+    "frame": "task",
+    "show_toast": true,
+    "announce_to_chat": true,
+    "hidden": false
+  },
+  "criteria": {
+    "has_item": {
+      "trigger": "minecraft:inventory_changed",
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "ic2:wind_generator"
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "requirements": [
+    [
+      "has_item"
+    ]
+  ]
+}
