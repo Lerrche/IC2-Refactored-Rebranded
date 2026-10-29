@@ -1108,6 +1108,9 @@
   "item.ic2.rubber": "橡胶",
   "item.ic2.rubber_boat": "橡胶船",
   "item.ic2.rubber_boots": "橡胶靴",
+  "item.ic2.static_boots": "静电靴",
+  "item.ic2.solar_helmet": "太阳能头盔",
+  "item.ic2.netherite_drill": "下界合金钻头",
   "item.ic2.scanner": "OD扫描器",
   "item.ic2.scrap": "废料",
   "item.ic2.scrap_box": "废料盒",
@@ -1263,5 +1266,7 @@
   "advancements.ic2.build_advanced_circuit": "进阶电路",
   "advancements.ic2.build_advanced_circuit.desc": "制作高级电路。它是高级机器与装备的重要组件。",
   "advancements.ic2.build_replicator": "复制机",
-  "advancements.ic2.build_replicator.desc": "制作复制机。复制物品需要兼容的样板来源、EU 和 UU 物质。"
+  "advancements.ic2.build_replicator.desc": "制作复制机。复制物品需要兼容的样板来源、EU 和 UU 物质。",
+  "advancements.ic2.build_netherite_drill": "Into the Deep",
+  "advancements.ic2.build_netherite_drill.desc": "Upgrade a Diamond Drill with Netherite in a Smithing Table."
 }

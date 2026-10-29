@@ -1,0 +1,22 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    " C ",
+    "CHC",
+    " S "
+  ],
+  "key": {
+    "C": {
+      "item": "ic2:copper_cable"
+    },
+    "H": {
+      "item": "minecraft:iron_helmet"
+    },
+    "S": {
+      "item": "ic2:solar_generator"
+    }
+  },
+  "result": {
+    "item": "ic2:solar_helmet"
+  }
+}

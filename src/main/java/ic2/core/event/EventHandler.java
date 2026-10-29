@@ -253,7 +253,7 @@ public final class EventHandler {
         return false;
       } else {
         Item armorItem = armor.getItem();
-        if (armorItem == Ic2Items.RUBBER_BOOTS) {
+        if (armorItem == Ic2Items.RUBBER_BOOTS || armorItem == Ic2Items.STATIC_BOOTS) {
           return ((ItemArmorHazmat) armorItem).absorbFall(armor, entity, distance);
         } else if (armorItem == Ic2Items.NANO_BOOTS) {
           return ((ItemArmorNanoSuit) armorItem).absorbFall(armor, distance);

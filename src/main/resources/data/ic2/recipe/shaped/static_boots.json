@@ -1,0 +1,22 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "CCC",
+    " B ",
+    " W "
+  ],
+  "key": {
+    "C": {
+      "item": "ic2:copper_cable"
+    },
+    "B": {
+      "item": "minecraft:iron_boots"
+    },
+    "W": {
+      "tag": "minecraft:wool"
+    }
+  },
+  "result": {
+    "item": "ic2:static_boots"
+  }
+}

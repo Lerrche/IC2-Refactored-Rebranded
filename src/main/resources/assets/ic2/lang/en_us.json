@@ -1141,6 +1141,9 @@
   "item.ic2.rubber": "Rubber",
   "item.ic2.rubber_boat": "Rubber Boat",
   "item.ic2.rubber_boots": "Rubber Boots",
+  "item.ic2.static_boots": "Static Boots",
+  "item.ic2.solar_helmet": "Solar Helmet",
+  "item.ic2.netherite_drill": "Netherite Drill",
   "item.ic2.scanner": "OD Scanner",
   "item.ic2.scrap": "Scrap",
   "item.ic2.scrap_box": "Scrap Box",
@@ -1510,5 +1513,7 @@
   "advancements.ic2.No More Bucket Runs": "No More Bucket Runs",
   "advancements.ic2.No More Bucket Runs.desc": "Craft a Fluid Ejector Upgrade. Automate fluid output to reduce manual handling and keep processing lines moving.",
   "advancements.ic2.Out the Other Side": "Out The Other Side",
-  "advancements.ic2.Out the Other Side.desc": "Craft an Ejector Upgrade. Configure machine output deliberately so products reach the next stage instead of filling the machine."
+  "advancements.ic2.Out the Other Side.desc": "Craft an Ejector Upgrade. Configure machine output deliberately so products reach the next stage instead of filling the machine.",
+  "advancements.ic2.build_netherite_drill": "Into the Deep",
+  "advancements.ic2.build_netherite_drill.desc": "Upgrade a Diamond Drill with Netherite in a Smithing Table."
 }

@@ -108,6 +108,8 @@ public class ItemDrill extends ItemElectricTool implements IMiningDrill, IHitSou
       return 6;
     } else if (item == Ic2Items.DIAMOND_DRILL) {
       return 20;
+    } else if (item == Ic2Items.NETHERITE_DRILL) {
+      return 60;
     } else if (item == Ic2Items.IRIDIUM_DRILL) {
       return 200;
     } else {
@@ -122,6 +124,8 @@ public class ItemDrill extends ItemElectricTool implements IMiningDrill, IHitSou
       return 200;
     } else if (item == Ic2Items.DIAMOND_DRILL) {
       return 50;
+    } else if (item == Ic2Items.NETHERITE_DRILL) {
+      return 30;
     } else if (item == Ic2Items.IRIDIUM_DRILL) {
       return 20;
     } else {
@@ -136,6 +140,8 @@ public class ItemDrill extends ItemElectricTool implements IMiningDrill, IHitSou
       return this.tryUsePower(stack, 50.0);
     } else if (item == Ic2Items.DIAMOND_DRILL) {
       return this.tryUsePower(stack, 80.0);
+    } else if (item == Ic2Items.NETHERITE_DRILL) {
+      return this.tryUsePower(stack, 240.0);
     } else if (item == Ic2Items.IRIDIUM_DRILL) {
       return this.tryUsePower(stack, 800.0);
     } else {

@@ -68,11 +68,11 @@ public class TileEntitySortingMachine extends TileEntityElectricMachine
 
     for (int i = 0; i < 42; i++) {
       ItemStack stack = this.filters[i / 7][i % 7];
-      if (stack != null) {
+      if (!StackUtil.isEmpty(stack)) {
         CompoundTag contentTag = new CompoundTag();
         contentTag.putByte("index", (byte) i);
-        // save() returns the merged tag instead of mutating the prefix
-        filtersTag.add(stack.save(net.minecraft.core.RegistryAccess.EMPTY, contentTag));
+        // ItemStack.save rejects empty stacks; only serialize filters that contain an item.
+        filtersTag.add(stack.save(registries, contentTag));
       }
     }
 

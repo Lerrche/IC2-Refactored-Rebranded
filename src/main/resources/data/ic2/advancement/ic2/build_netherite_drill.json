@@ -1,37 +1,32 @@
 {
-  "parent": "ic2:ic2/optional/transformers/mv_transformer",
+  "parent": "ic2:ic2/build_generator/build_compressor/build_energy_crystal/build_mining_laser",
   "display": {
     "icon": {
-      "id": "ic2:hv_transformer"
+      "id": "ic2:netherite_drill"
     },
     "title": {
-      "translate": "advancements.ic2.High Voltage, High Stakes"
+      "translate": "advancements.ic2.build_netherite_drill"
     },
     "description": {
-      "translate": "advancements.ic2.High Voltage, High Stakes.desc"
+      "translate": "advancements.ic2.build_netherite_drill.desc"
     },
-    "frame": "task",
+    "frame": "goal",
     "show_toast": true,
     "announce_to_chat": true,
     "hidden": false
   },
   "criteria": {
-    "has_item": {
+    "has_netherite_drill": {
       "trigger": "minecraft:inventory_changed",
       "conditions": {
         "items": [
           {
             "items": [
-              "ic2:hv_transformer"
+              "ic2:netherite_drill"
             ]
           }
         ]
       }
     }
-  },
-  "requirements": [
-    [
-      "has_item"
-    ]
-  ]
+  }
 }

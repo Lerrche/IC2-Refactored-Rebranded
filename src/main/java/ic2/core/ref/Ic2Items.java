@@ -19,6 +19,8 @@ import ic2.core.item.armor.ItemArmorLappack;
 import ic2.core.item.armor.ItemArmorNanoSuit;
 import ic2.core.item.armor.ItemArmorNightVisionGoggles;
 import ic2.core.item.armor.ItemArmorQuantumSuit;
+import ic2.core.item.armor.ItemSolarHelmet;
+import ic2.core.item.armor.ItemStaticBoots;
 import ic2.core.item.boat.BoatItem;
 import ic2.core.item.crafting.BlockCuttingBlade;
 import ic2.core.item.reactor.ItemReactorCondensator;
@@ -946,6 +948,10 @@ public final class Ic2Items {
       register(
           "diamond_drill",
           new ItemDrill(new Properties().stacksTo(1), 80, Tiers.DIAMOND, 30000, 100, 1, 16.0F));
+  public static final Item NETHERITE_DRILL =
+      register(
+          "netherite_drill",
+          new ItemDrill(new Properties().stacksTo(1), 120, Tiers.NETHERITE, 60000, 200, 2, 20.0F));
   public static final Item DRILL =
       register(
           "drill",
@@ -1365,6 +1371,10 @@ public final class Ic2Items {
               new Properties().rarity(Rarity.UNCOMMON)));
   public static final Item RUBBER_BOOTS =
       register("rubber_boots", new ItemArmorHazmat(EquipmentSlot.FEET, new Properties()));
+  public static final Item SOLAR_HELMET =
+      register("solar_helmet", new ItemSolarHelmet(new Properties()));
+  public static final Item STATIC_BOOTS =
+      register("static_boots", new ItemStaticBoots(new Properties()));
   public static final Item NIGHT_VISION_GOGGLES =
       register(
           "night_vision_goggles", new ItemArmorNightVisionGoggles(new Properties().durability(27)));
@@ -1404,6 +1414,8 @@ public final class Ic2Items {
     addToCreativeTab(Ic2ItemGroupType.COMBAT, () -> QUANTUM_HELMET);
     addToCreativeTab(Ic2ItemGroupType.COMBAT, () -> QUANTUM_LEGGINGS);
     addToCreativeTab(Ic2ItemGroupType.COMBAT, () -> RUBBER_BOOTS);
+    addToCreativeTab(Ic2ItemGroupType.COMBAT, () -> SOLAR_HELMET);
+    addToCreativeTab(Ic2ItemGroupType.COMBAT, () -> STATIC_BOOTS);
     addToCreativeTab(Ic2ItemGroupType.FARMING, () -> COFFEE_BEANS);
     addToCreativeTab(Ic2ItemGroupType.FARMING, () -> COFFEE_MUG);
     addToCreativeTab(Ic2ItemGroupType.FARMING, () -> COFFEE_POWDER);
@@ -1853,6 +1865,7 @@ public final class Ic2Items {
     addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> ADVANCED_CHARGING_RE_BATTERY);
     addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> CHARGING_ENERGY_CRYSTAL);
     addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> CHARGING_LAPOTRON_CRYSTAL);
+    addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> NETHERITE_DRILL);
     addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> STEEL_ROTOR);
     addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> TOOL_BOX);
     addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> TRANSFORMER_UPGRADE);

@@ -1,5 +1,7 @@
 package ic2.core.item.armor.jetpack;
 
+import ic2.api.item.ElectricItem;
+import ic2.api.item.IElectricItem;
 import ic2.core.IC2;
 import ic2.core.item.armor.ItemArmorJetpack;
 import ic2.core.ref.Ic2SoundEvents;
@@ -19,6 +21,12 @@ public class JetpackLogic {
 
   public static boolean useJetpack(
       Player player, boolean hoverMode, IJetpack jetpack, ItemStack stack) {
+
+    // Refill electric jetpacks from worn energy packs only when the jetpack is being used.
+    // This also works for jetpacks in Curios' back slot because chargeFromArmor scans Curios.
+    if (!player.level().isClientSide && stack.getItem() instanceof IElectricItem) {
+      ElectricItem.manager.chargeFromArmor(stack, player);
+    }
 
     if (jetpack.getChargeLevel(stack) <= 0.0) {
       return false;

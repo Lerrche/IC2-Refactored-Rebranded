@@ -193,7 +193,9 @@ public class ElectricItemManager implements IElectricItemManager {
   }
 
   private boolean transferFromSource(ItemStack target, LivingEntity entity, ItemStack source) {
-    if (source == null || source.isEmpty()) {
+    // A target may also appear in Curios' equipped-stack enumeration (e.g. a back-slot jetpack).
+    // Never treat the item being charged as a battery source for itself.
+    if (source == null || source == target || source.isEmpty()) {
       return false;
     }
 
