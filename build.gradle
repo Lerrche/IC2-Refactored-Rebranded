@@ -27,6 +27,13 @@ repositories {
     maven { url = "https://maven.createmod.net" } // Create, Ponder, Flywheel
     maven { url = "https://maven.ithundxr.dev/snapshots" } // Registrate
     maven { url = "https://maven.theillusivec4.top" } // Curios API
+    maven {
+        name = "ModMaven"
+        url = "https://modmaven.dev/"
+        content {
+            includeGroup "mekanism"
+        }
+    }
 }
 
 base {
@@ -125,6 +132,12 @@ dependencies {
     // Curios API is compile-only; the actual mod is loaded only in local dev runs.
     compileOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}:api"
     localRuntime "top.theillusivec4.curios:curios-neoforge:${curios_version}"
+
+    // Optional Mekanism integration (Minecraft 1.21.1 / NeoForge).
+    compileOnly "mekanism:Mekanism:${mekanism_version}:api"
+
+    // Available in development runs, but not bundled into IC2.
+    localRuntime "mekanism:Mekanism:${mekanism_version}"
 
     testImplementation 'org.junit.jupiter:junit-jupiter:5.10.2'
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'

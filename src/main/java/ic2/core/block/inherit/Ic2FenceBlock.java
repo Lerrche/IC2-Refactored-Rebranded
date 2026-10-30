@@ -11,8 +11,10 @@ import java.util.Map;
 import java.util.WeakHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.network.protocol.game.ClientboundSetEntityMotionPacket;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -27,14 +29,17 @@ import net.minecraft.world.level.block.FenceBlock;
 import net.minecraft.world.level.block.state.BlockBehaviour.Properties;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 
 public class Ic2FenceBlock extends FenceBlock {
   public static final Map<Direction, BooleanProperty> connectProperties = getConnectProperties();
   private static final Map<Player, Long> lastBoostTick = new WeakHashMap<>();
+  // Slightly exceeds gravity, so upward speed builds smoothly instead of jumping to full speed.
+  private static final double NORMAL_LIFT_ACCELERATION = 0.09;
+  private static final double MAX_LIFT_SPEED = 0.35;
   public final boolean canBoost;
 
   public Ic2FenceBlock(Properties settings, boolean canBoost) {
@@ -43,19 +48,17 @@ public class Ic2FenceBlock extends FenceBlock {
   }
 
   private static TileEntityMagnetizer getMagnetizer(
-      BlockGetter world, BlockPos pos, Direction side, BlockState state, boolean checkPower) {
+      BlockGetter world, BlockPos pos, Direction side, BlockState state) {
     if (!state.is(Ic2Blocks.MAGNETIZER)) {
       return null;
     }
 
-    if (world.getBlockEntity(pos) instanceof TileEntityMagnetizer ret) {
-      if (side != null && !side.getOpposite().equals(ret.getFacing())) {
+    if (world.getBlockEntity(pos) instanceof TileEntityMagnetizer magnetizer) {
+      // The machine's front must face the iron-fence column.
+      if (side != null && side.getOpposite() != magnetizer.getFacing()) {
         return null;
       }
-
-      if (!checkPower || ret.canBoost()) {
-        return ret;
-      }
+      return magnetizer;
     }
 
     return null;
@@ -70,24 +73,45 @@ public class Ic2FenceBlock extends FenceBlock {
         || ItemWrapper.isMetalArmor(shoes, player);
   }
 
+  /**
+   * Called from PlayerTickEvent.Post. Scanning after vanilla movement means the lift velocity is
+   * not immediately replaced by the player's normal travel/ground-collision update.
+   */
   public static void onPlayerTick(Player player) {
     Level level = player.level();
-    if (level.isClientSide) {
+    if (level.isClientSide
+        || player.isSpectator()
+        || (player.isCreative() && player.getAbilities().flying)
+        || !hasMetalShoes(player)) {
       return;
     }
 
-    BlockPos playerPos = player.blockPosition();
+    // A player approaches the iron fence from beside it. Check the player's real bounds with a
+    // small horizontal/vertical margin instead of requiring the player's block position to be
+    // exactly in the fence column.
+    AABB searchBounds = player.getBoundingBox().inflate(0.65, 1.0, 0.65);
+    int minX = Mth.floor(searchBounds.minX);
+    int maxX = Mth.floor(searchBounds.maxX);
+    int minY = Mth.floor(searchBounds.minY);
+    int maxY = Mth.floor(searchBounds.maxY);
+    int minZ = Mth.floor(searchBounds.minZ);
+    int maxZ = Mth.floor(searchBounds.maxZ);
 
-    for (int dy = 0; dy <= 20; dy++) {
-      BlockPos checkPos = playerPos.below(dy);
-      BlockState state = level.getBlockState(checkPos);
-      if (state.getBlock() instanceof Ic2FenceBlock fence && fence.canBoost) {
-        fence.handleMagnetizerBoost(level, checkPos, player);
-        return;
-      }
+    for (int x = minX; x <= maxX; x++) {
+      for (int y = minY; y <= maxY; y++) {
+        for (int z = minZ; z <= maxZ; z++) {
+          BlockPos fencePos = new BlockPos(x, y, z);
+          if (!searchBounds.intersects(new AABB(fencePos))) {
+            continue;
+          }
 
-      if (dy > 0 && !state.isAir() && !(state.getBlock() instanceof Ic2FenceBlock)) {
-        break;
+          BlockState state = level.getBlockState(fencePos);
+          if (state.getBlock() instanceof Ic2FenceBlock fence
+              && fence.canBoost
+              && fence.handleMagnetizerBoost(level, fencePos, player)) {
+            return;
+          }
+        }
       }
     }
   }
@@ -96,14 +120,16 @@ public class Ic2FenceBlock extends FenceBlock {
     return CrossCollisionBlock.PROPERTY_BY_DIRECTION;
   }
 
+  @Override
   public BlockState getStateForPlacement(BlockPlaceContext ctx) {
     FluidState fluidState = ctx.getLevel().getFluidState(ctx.getClickedPos());
     return this.getActualState(
-        (BlockState) this.defaultBlockState().setValue(WATERLOGGED, fluidState.is(Fluids.WATER)),
+        this.defaultBlockState().setValue(WATERLOGGED, fluidState.is(Fluids.WATER)),
         ctx.getLevel(),
         ctx.getClickedPos());
   }
 
+  @Override
   public BlockState updateShape(
       BlockState state,
       Direction direction,
@@ -111,10 +137,9 @@ public class Ic2FenceBlock extends FenceBlock {
       LevelAccessor world,
       BlockPos pos,
       BlockPos neighborPos) {
-    if ((Boolean) state.getValue(WATERLOGGED)) {
+    if (state.getValue(WATERLOGGED)) {
       world.scheduleTick(pos, Fluids.WATER, Fluids.WATER.getTickDelay(world));
     }
-
     return this.getActualState(state, world, pos);
   }
 
@@ -136,18 +161,16 @@ public class Ic2FenceBlock extends FenceBlock {
           neighborState.isFaceSturdy(world, neighborPos, facing.getOpposite()),
           facing.getOpposite())) {
         connects = true;
-      } else if (isPole
-          && getMagnetizer(world, neighborPos, facing, neighborState, false) != null) {
+      } else if (isPole && getMagnetizer(world, neighborPos, facing, neighborState) != null) {
         magnetizerConnected = true;
         connects = true;
       }
 
-      ret = (BlockState) ret.setValue((Property) connectProperties.get(facing), connects);
+      ret = ret.setValue(connectProperties.get(facing), connects);
     }
 
     if (!isPole && magnetizerConnected) {
       ret = state;
-
       for (Direction facing : Util.HORIZONTAL_DIRS) {
         BlockPos neighborPos = pos.relative(facing);
         BlockState neighborState = world.getBlockState(neighborPos);
@@ -157,7 +180,7 @@ public class Ic2FenceBlock extends FenceBlock {
                     neighborState,
                     neighborState.isFaceSturdy(world, neighborPos, facing.getOpposite()),
                     facing.getOpposite());
-        ret = (BlockState) ret.setValue((Property) connectProperties.get(facing), connects);
+        ret = ret.setValue(connectProperties.get(facing), connects);
       }
     }
 
@@ -172,176 +195,101 @@ public class Ic2FenceBlock extends FenceBlock {
     return state.getBlock() instanceof Ic2FenceBlock;
   }
 
-  public void entityInside(BlockState state, Level world, BlockPos pos, Entity entity) {
-    if (this.canBoost) {
-      this.handleMagnetizerBoost(world, pos, entity);
+  private boolean handleMagnetizerBoost(Level world, BlockPos pos, Player player) {
+    if (world.isClientSide
+        || player.isSpectator()
+        || (player.isCreative() && player.getAbilities().flying)
+        || !hasMetalShoes(player)) {
+      return false;
     }
-  }
 
-  private void handleMagnetizerBoost(Level world, BlockPos pos, Entity rawEntity) {
-    if (world.isClientSide || !(rawEntity instanceof Player player)) {
-      return;
+    List<TileEntityMagnetizer> connectedMagnetizers = this.getMagnetizers(world, pos);
+    if (connectedMagnetizers.isEmpty()) {
+      return false;
     }
 
     long tick = world.getGameTime();
-    if (tick == lastBoostTick.getOrDefault(player, -1L)) {
-      return;
+    if (tick == lastBoostTick.getOrDefault(player, Long.MIN_VALUE)) {
+      return true;
+    }
+
+    List<TileEntityMagnetizer> poweredMagnetizers = new ArrayList<>();
+    for (TileEntityMagnetizer magnetizer : connectedMagnetizers) {
+      if (magnetizer.canBoost()) {
+        poweredMagnetizers.add(magnetizer);
+      }
+    }
+    if (poweredMagnetizers.isEmpty()) {
+      return false;
     }
 
     lastBoostTick.put(player, tick);
-    boolean powered = this.isPowered(world, pos);
-    boolean metalShoes = hasMetalShoes(player);
-    boolean descending = player.isShiftKeyDown();
-    Vec3 velocity = player.getDeltaMovement();
-    boolean slow = velocity.y >= -0.25 || velocity.y < 1.6;
-    if (slow) {
-      player.fallDistance = 0.0F;
+    double multiplier = 1.0 / poweredMagnetizers.size();
+    for (TileEntityMagnetizer magnetizer : poweredMagnetizers) {
+      magnetizer.boost(multiplier);
     }
 
-    if (!powered) {
-      if (descending && !slow && metalShoes) {
-        player.setDeltaMovement(velocity.multiply(1.0, 0.9, 1.0));
-      }
-    } else if (descending) {
-      if (!slow) {
-        player.setDeltaMovement(velocity.multiply(1.0, 0.8, 1.0));
-      }
+    Vec3 velocity = player.getDeltaMovement();
+    if (player.isShiftKeyDown()) {
+      // Sneaking lets the player descend while the fence continues to dampen the fall.
+      player.setDeltaMovement(velocity.x, velocity.y < 0.0 ? velocity.y * 0.8 : -0.08, velocity.z);
     } else {
-      player.setDeltaMovement(velocity.add(0.0, 0.075, 0.0));
-      velocity = player.getDeltaMovement();
-      if (velocity.y() > 0.0) {
-        player.setDeltaMovement(velocity.multiply(1.0, 1.03, 1.0));
-      }
-
-      double maxSpeed = IC2.keyboard.isAltKeyDown(player) ? 0.1 : (metalShoes ? 1.5 : 0.5);
-      velocity = player.getDeltaMovement();
-      player.setDeltaMovement(velocity.x, Math.min(velocity.y(), maxSpeed), velocity.z);
+      double maxSpeed = IC2.keyboard.isAltKeyDown(player) ? 0.1 : MAX_LIFT_SPEED;
+      // Apply a small lift impulse every tick. Vanilla gravity removes most of it, so the
+      // remaining upward speed builds gradually over several seconds instead of jumping
+      // immediately to a high elevator speed.
+      double liftSpeed = Math.min(velocity.y + NORMAL_LIFT_ACCELERATION, maxSpeed);
+      player.setDeltaMovement(velocity.x, liftSpeed, velocity.z);
+      player.fallDistance = 0.0F;
       player.setOnGround(false);
       player.hasImpulse = true;
     }
 
-    if (!world.isClientSide) {
-      for (TileEntityMagnetizer magnetizer : this.getMagnetizers(world, pos, false)) {
-        IC2.network.get(true).updateTileEntityField(magnetizer, "energy");
-      }
-    }
-  }
-
-  private boolean isPowered(Level world, BlockPos start) {
-    if (!this.canBoost) {
-      return false;
+    // A ServerPlayer's own client controls its local movement prediction. Explicitly send the
+    // updated velocity so the client does not immediately replace the server-side lift with its
+    // pre-boost velocity from the next movement packet. Other tracking clients continue to receive
+    // the normal entity motion/position updates from the server.
+    if (player instanceof ServerPlayer serverPlayer) {
+      serverPlayer.connection.send(new ClientboundSetEntityMotionPacket(serverPlayer));
     }
 
-    List<TileEntityMagnetizer> magnetizers = this.getMagnetizers(world, start, true);
-    if (magnetizers.isEmpty()) {
-      return false;
+    for (TileEntityMagnetizer magnetizer : poweredMagnetizers) {
+      IC2.network.get(true).updateTileEntityField(magnetizer, "energy");
     }
-
-    double multiplier = 1.0 / magnetizers.size();
-
-    for (TileEntityMagnetizer magnetizer : magnetizers) {
-      magnetizer.boost(multiplier);
-    }
-
     return true;
   }
 
-  private List<TileEntityMagnetizer> getMagnetizers(
-      BlockGetter world, BlockPos start, boolean checkPower) {
-    int maxRange = 20;
-    List<TileEntityMagnetizer> ret = new ArrayList<>();
-    BlockPos center = new BlockPos(start);
-    new BlockPos(0, 0, 0);
+  private List<TileEntityMagnetizer> getMagnetizers(BlockGetter world, BlockPos start) {
+    List<TileEntityMagnetizer> magnetizers = new ArrayList<>();
+    // Four upgrade slots can each hold a full stack of 64 augmentations.
+    final int maxSearchDistance = 20 + 4 * 64;
 
-    for (Direction facing : Util.HORIZONTAL_DIRS) {
-      BlockPos nPos = center.relative(facing);
-      BlockState state = world.getBlockState(nPos);
-      if (this.isIc2Fence(state)) {
-        continue;
-      }
+    // Find machines attached to any segment of this uninterrupted vertical fence pole.
+    for (Direction vertical : new Direction[] {Direction.DOWN, Direction.UP}) {
+      for (int distance = 0; distance <= maxSearchDistance; distance++) {
+        BlockPos fencePos = start.relative(vertical, distance);
+        BlockState fenceState = world.getBlockState(fencePos);
+        if (!(fenceState.getBlock() instanceof Ic2FenceBlock fence) || !fence.canBoost) {
+          break;
+        }
 
-      TileEntityMagnetizer te;
-      if ((te = getMagnetizer(world, nPos, facing, state, checkPower)) != null) {
-        ret.add(te);
-      }
-    }
+        for (Direction side : Util.HORIZONTAL_DIRS) {
+          BlockPos neighborPos = fencePos.relative(side);
+          BlockState neighborState = world.getBlockState(neighborPos);
+          if (this.isIc2Fence(neighborState)) {
+            continue;
+          }
 
-    if (!ret.isEmpty()) {
-      return ret;
-    }
-
-    int minDir = 0;
-    int maxDir = 2;
-
-    for (int dy = 1; dy <= 20; dy++) {
-      boolean abort = false;
-      int dir = minDir;
-
-      label79:
-      while (dir < maxDir) {
-        int offset = dir * 2 - 1;
-        center = center.atY(start.getY() + offset * dy);
-        BlockState centerState = world.getBlockState(center);
-        if (centerState.getBlock() instanceof Ic2FenceBlock
-            && ((Ic2FenceBlock) centerState.getBlock()).canBoost) {
-          int oldSize = ret.size();
-          Direction[] var16 = Util.HORIZONTAL_DIRS;
-          int var17 = var16.length;
-          int var18 = 0;
-
-          while (true) {
-            if (var18 < var17) {
-              Direction facing = var16[var18];
-              BlockPos nPos = center.relative(facing);
-              BlockState state = world.getBlockState(nPos);
-              if (!this.isIc2Fence(state)) {
-                TileEntityMagnetizer te;
-                if ((te = getMagnetizer(world, nPos, facing, state, checkPower)) != null) {
-                  abort = true;
-                  ret.add(te);
-                }
-
-                var18++;
-                continue;
-              }
-
-              if (dir == 0) {
-                minDir = 1;
-              } else {
-                maxDir = 1;
-              }
-
-              if (minDir == maxDir) {
-                abort = true;
-              }
-
-              while (ret.size() > oldSize) {
-                ret.remove(ret.size() - 1);
-              }
-            }
-
-            dir++;
-            continue label79;
+          TileEntityMagnetizer magnetizer = getMagnetizer(world, neighborPos, side, neighborState);
+          if (magnetizer != null
+              && distance <= magnetizer.getDistance()
+              && !magnetizers.contains(magnetizer)) {
+            magnetizers.add(magnetizer);
           }
         }
-
-        if (dir == 0) {
-          minDir = 1;
-        } else {
-          maxDir = 1;
-        }
-
-        if (minDir == maxDir) {
-          abort = true;
-        }
-        break;
-      }
-
-      if (abort) {
-        break;
       }
     }
 
-    return ret;
+    return magnetizers;
   }
 }

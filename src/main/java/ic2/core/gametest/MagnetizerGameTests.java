@@ -9,12 +9,13 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
-import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
@@ -36,12 +37,12 @@ public class MagnetizerGameTests {
 
     Player player = boostPlayerOnFence(helper);
 
-    // 0.075 upwards boost, then scaled by 1.03 while moving up
+    // The first boost starts gently; subsequent ticks build speed against vanilla gravity.
     Ic2GameTestAssertions.assertNear(
         helper,
         player.getDeltaMovement().y,
-        0.075 * 1.03,
-        "player velocity after one magnetizer boost");
+        0.09,
+        "player velocity after the first magnetizer boost");
     Ic2GameTestAssertions.assertNear(
         helper, te.getComponent(Energy.class).getEnergy(), 98.0, "boosting should consume 2 EU");
 
@@ -74,9 +75,13 @@ public class MagnetizerGameTests {
     TileEntityMagnetizer te = setupMagnetizedFence(helper);
     te.getComponent(Energy.class).addEnergy(100.0);
 
+    for (int y = FENCE_POS.getY() + 1; y <= FENCE_POS.getY() + 5; y++) {
+      helper.setBlock(new BlockPos(FENCE_POS.getX(), y, FENCE_POS.getZ()), Ic2Blocks.IRON_FENCE);
+    }
     BlockPos fencePos = helper.absolutePos(FENCE_POS);
     Player player = helper.makeMockPlayer(GameType.SURVIVAL);
     player.setPos(fencePos.getX() + 0.5, fencePos.getY() + 5.0, fencePos.getZ() + 0.5);
+    player.setItemSlot(EquipmentSlot.FEET, new ItemStack(Items.IRON_BOOTS));
     player.setDeltaMovement(Vec3.ZERO);
 
     Ic2FenceBlock.onPlayerTick(player);
@@ -84,7 +89,7 @@ public class MagnetizerGameTests {
     Ic2GameTestAssertions.assertNear(
         helper,
         player.getDeltaMovement().y,
-        0.075 * 1.03,
+        0.09,
         "player velocity after a boost from above the fence");
     Ic2GameTestAssertions.assertNear(
         helper, te.getComponent(Energy.class).getEnergy(), 98.0, "boosting should consume 2 EU");
@@ -93,18 +98,121 @@ public class MagnetizerGameTests {
   }
 
   @GameTest(template = EMPTY)
+  public static void magnetizerLiftsPlayerStandingBesideFence(GameTestHelper helper) {
+    TileEntityMagnetizer te = setupMagnetizedFence(helper);
+    te.getComponent(Energy.class).addEnergy(100.0);
+
+    BlockPos fencePos = helper.absolutePos(FENCE_POS);
+    Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+    // The player is beside the fence, with the edge of their bounding box touching it.
+    player.setPos(fencePos.getX() - 0.3, fencePos.getY(), fencePos.getZ() + 0.5);
+    player.setItemSlot(EquipmentSlot.FEET, new ItemStack(Items.IRON_BOOTS));
+    player.setDeltaMovement(Vec3.ZERO);
+
+    Ic2FenceBlock.onPlayerTick(player);
+
+    helper.assertTrue(
+        player.getDeltaMovement().y > 0.08,
+        "the gentle magnetizer impulse should establish upward velocity");
+    Ic2GameTestAssertions.assertNear(
+        helper,
+        te.getComponent(Energy.class).getEnergy(),
+        98.0,
+        "side approach should consume 2 EU");
+    helper.succeed();
+  }
+
+  @GameTest(template = TALL)
+  public static void magnetizerDetectsMachineAlongVerticalFenceColumn(GameTestHelper helper) {
+    for (int y = FENCE_POS.getY(); y <= FENCE_POS.getY() + 4; y++) {
+      helper.setBlock(new BlockPos(FENCE_POS.getX(), y, FENCE_POS.getZ()), Ic2Blocks.IRON_FENCE);
+    }
+
+    BlockPos magnetizerPos =
+        new BlockPos(MAGNETIZER_POS.getX(), FENCE_POS.getY() + 4, MAGNETIZER_POS.getZ());
+    helper.setBlock(
+        magnetizerPos,
+        Ic2Blocks.MAGNETIZER
+            .defaultBlockState()
+            .setValue(Ic2TileEntityBlock.horizontalFacingProperty, Direction.WEST));
+    TileEntityMagnetizer te = getTe(helper, magnetizerPos, TileEntityMagnetizer.class);
+    te.getComponent(Energy.class).addEnergy(100.0);
+
+    BlockPos lowerFencePos = helper.absolutePos(FENCE_POS);
+    Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+    player.setPos(lowerFencePos.getX() + 0.5, lowerFencePos.getY(), lowerFencePos.getZ() + 0.5);
+    player.setItemSlot(EquipmentSlot.FEET, new ItemStack(Items.IRON_BOOTS));
+    player.setDeltaMovement(Vec3.ZERO);
+
+    Ic2FenceBlock.onPlayerTick(player);
+
+    Ic2GameTestAssertions.assertNear(
+        helper,
+        player.getDeltaMovement().y,
+        0.09,
+        "a lower fence in the same column should detect the magnetizer above it");
+    Ic2GameTestAssertions.assertNear(
+        helper,
+        te.getComponent(Energy.class).getEnergy(),
+        98.0,
+        "column detection should consume 2 EU");
+    helper.succeed();
+  }
+
+  @GameTest(template = EMPTY)
+  public static void magnetizerDoesNotBoostPlayersWithoutMetalBoots(GameTestHelper helper) {
+    TileEntityMagnetizer te = setupMagnetizedFence(helper);
+    te.getComponent(Energy.class).addEnergy(100.0);
+
+    Player player = boostPlayerOnFence(helper, false);
+
+    Ic2GameTestAssertions.assertNear(
+        helper,
+        player.getDeltaMovement().y,
+        0.0,
+        "players without metal boots must not be boosted");
+    Ic2GameTestAssertions.assertNear(
+        helper,
+        te.getComponent(Energy.class).getEnergy(),
+        100.0,
+        "a magnetizer must not consume energy for a player without metal boots");
+    helper.succeed();
+  }
+
+  @GameTest(template = EMPTY)
+  public static void magnetizerBoostCanFindFenceAbovePlayer(GameTestHelper helper) {
+    TileEntityMagnetizer te = setupMagnetizedFence(helper);
+    te.getComponent(Energy.class).addEnergy(100.0);
+
+    BlockPos fencePos = helper.absolutePos(FENCE_POS);
+    Player player = helper.makeMockPlayer(GameType.SURVIVAL);
+    player.setPos(fencePos.getX() + 0.5, fencePos.getY() - 1.0, fencePos.getZ() + 0.5);
+    player.setItemSlot(EquipmentSlot.FEET, new ItemStack(Items.IRON_BOOTS));
+    player.setDeltaMovement(Vec3.ZERO);
+
+    Ic2FenceBlock.onPlayerTick(player);
+
+    Ic2GameTestAssertions.assertNear(
+        helper,
+        player.getDeltaMovement().y,
+        0.09,
+        "player below the fence column should receive the upward boost");
+    helper.succeed();
+  }
+
+  @GameTest(template = EMPTY)
   public static void magnetizerBoostAppliesOnlyOncePerTick(GameTestHelper helper) {
     TileEntityMagnetizer te = setupMagnetizedFence(helper);
     te.getComponent(Energy.class).addEnergy(100.0);
 
-    // the collision handler and the player tick hook may both fire in the same tick
+    // Repeated calls during one tick must not consume EU or apply the lift twice.
     Player player = boostPlayerOnFence(helper);
     Ic2FenceBlock.onPlayerTick(player);
 
     Ic2GameTestAssertions.assertNear(
         helper,
         player.getDeltaMovement().y,
-        0.075 * 1.03,
+        0.09,
         "player velocity must reflect a single boost per tick");
     Ic2GameTestAssertions.assertNear(
         helper,
@@ -112,6 +220,33 @@ public class MagnetizerGameTests {
         98.0,
         "a deduplicated boost must only consume 2 EU");
 
+    helper.succeed();
+  }
+
+  @GameTest(template = EMPTY)
+  public static void magnetizerDoesNotAffectCreativeFlight(GameTestHelper helper) {
+    TileEntityMagnetizer te = setupMagnetizedFence(helper);
+    te.getComponent(Energy.class).addEnergy(100.0);
+
+    BlockPos fencePos = helper.absolutePos(FENCE_POS);
+    Player player = helper.makeMockPlayer(GameType.CREATIVE);
+    player.setPos(fencePos.getX() + 0.5, fencePos.getY(), fencePos.getZ() + 0.5);
+    player.setItemSlot(EquipmentSlot.FEET, new ItemStack(Items.IRON_BOOTS));
+    player.getAbilities().flying = true;
+    player.setDeltaMovement(new Vec3(0.0, 0.3, 0.0));
+
+    Ic2FenceBlock.onPlayerTick(player);
+
+    Ic2GameTestAssertions.assertNear(
+        helper,
+        player.getDeltaMovement().y,
+        0.3,
+        "creative flight velocity must remain unchanged by the magnetizer");
+    Ic2GameTestAssertions.assertNear(
+        helper,
+        te.getComponent(Energy.class).getEnergy(),
+        100.0,
+        "a magnetizer must not consume energy for a creative-flying player");
     helper.succeed();
   }
 
@@ -153,14 +288,19 @@ public class MagnetizerGameTests {
   }
 
   private static Player boostPlayerOnFence(GameTestHelper helper) {
-    ServerLevel level = helper.getLevel();
+    return boostPlayerOnFence(helper, true);
+  }
+
+  private static Player boostPlayerOnFence(GameTestHelper helper, boolean metalBoots) {
     BlockPos fencePos = helper.absolutePos(FENCE_POS);
     Player player = helper.makeMockPlayer(GameType.SURVIVAL);
     player.setPos(fencePos.getX() + 0.5, fencePos.getY(), fencePos.getZ() + 0.5);
+    if (metalBoots) {
+      player.setItemSlot(EquipmentSlot.FEET, new ItemStack(Items.IRON_BOOTS));
+    }
     player.setDeltaMovement(Vec3.ZERO);
 
-    BlockState fenceState = level.getBlockState(fencePos);
-    ((Ic2FenceBlock) fenceState.getBlock()).entityInside(fenceState, level, fencePos, player);
+    Ic2FenceBlock.onPlayerTick(player);
     return player;
   }
 

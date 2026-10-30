@@ -269,8 +269,9 @@ public final class StackUtil {
   }
 
   public static boolean checkItemEqualityStrict(ItemStack a, ItemStack b) {
+    // Item state such as fluid contents can live in 1.21 data components rather than custom NBT.
     return isEmpty(a) && isEmpty(b)
-        || !isEmpty(a) && !isEmpty(b) && ItemStack.isSameItem(a, b) && checkNbtEqualityStrict(a, b);
+        || !isEmpty(a) && !isEmpty(b) && ItemStack.isSameItemSameComponents(a, b);
   }
 
   private static boolean checkNbtEquality(ItemStack a, ItemStack b) {

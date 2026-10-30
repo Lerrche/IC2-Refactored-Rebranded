@@ -48,7 +48,11 @@ public final class Ic2Ae2Plugin {
 
   private static final Map<Level, Queue<ChunkPos>> pendingChunks = new HashMap<>();
 
+  private static final Map<Level, Queue<BlockPos>> pendingPositions = new HashMap<>();
+
   private static final int POSITIONS_PER_TICK = 32;
+
+  private static final int PLACED_POSITIONS_PER_TICK = 256;
 
   private static boolean ae2GridApiAvailable;
 
@@ -147,6 +151,7 @@ public final class Ic2Ae2Plugin {
   private static void unregisterAllInWorld(Level world) {
     Map<BlockPos, Ae2EnergySink> worldSinks = sinks.remove(world);
     pendingChunks.remove(world);
+    pendingPositions.remove(world);
     if (worldSinks == null) return;
     for (Ae2EnergySink sink : worldSinks.values()) {
       EnergyNet.instance.removeTile(sink);
@@ -177,17 +182,38 @@ public final class Ic2Ae2Plugin {
     }
   }
 
+  private static void queueNearbyPositions(Level world, BlockPos center) {
+    Queue<BlockPos> queue = pendingPositions.computeIfAbsent(world, level -> new ArrayDeque<>());
+    queue.add(center.immutable());
+    for (Direction direction : Direction.values()) {
+      queue.add(center.relative(direction).immutable());
+    }
+  }
+
+  private static void processPendingPositions(ServerLevel world) {
+    Queue<BlockPos> queue = pendingPositions.get(world);
+    if (queue == null || queue.isEmpty()) return;
+    int processed = 0;
+    while (processed < PLACED_POSITIONS_PER_TICK && !queue.isEmpty()) {
+      BlockPos pos = queue.poll();
+      if (world.hasChunkAt(pos) && isEnergyAcceptor(world, pos)) {
+        registerSink(world, pos);
+      }
+      processed++;
+    }
+    if (queue.isEmpty()) {
+      pendingPositions.remove(world);
+    }
+  }
+
   public static final class ForgeEventHandler {
 
     @SubscribeEvent
     public void onBlockPlace(BlockEvent.EntityPlaceEvent event) {
-      if (event.getEntity() == null) return;
-      Level world = event.getEntity().level();
-      if (world.isClientSide) return;
-      BlockPos pos = event.getPos();
-      if (isEnergyAcceptor(world, pos)) {
-        registerSink(world, pos);
-      }
+      if (!(event.getLevel() instanceof Level world) || world.isClientSide) return;
+      // Also inspect adjacent positions: an IC2 cable is commonly placed after the AE2
+      // machine/energy acceptor, so the AE2 sink must be discovered when the cable is placed.
+      queueNearbyPositions(world, event.getPos());
     }
 
     @SubscribeEvent
@@ -234,6 +260,7 @@ public final class Ic2Ae2Plugin {
       if (event.getLevel().isClientSide()) return;
       if (!(event.getLevel() instanceof ServerLevel serverLevel)) return;
       processPendingChunks(serverLevel);
+      processPendingPositions(serverLevel);
     }
 
     @SubscribeEvent

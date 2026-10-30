@@ -46,7 +46,7 @@ public class TileEntityMagnetizer extends TileEntityElectricMachine
     this.energy.setCapacity(this.upgradeSlot.getEnergyStorage(100, 0, 0));
   }
 
-  private int distance() {
+  public int getDistance() {
     return 20 + this.upgradeSlot.augmentation;
   }
 

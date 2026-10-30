@@ -224,12 +224,10 @@ public final class EventHandler {
     }
   }
 
-  public static void onPlayerTickStart(Player player) {
-    Ic2FenceBlock.onPlayerTick(player);
-  }
-
   public static void onPlayerTick(Player player) {
     JetpackHandler.onPlayerTick(player);
+    // Apply Magnetizer movement after vanilla player physics has completed for this tick.
+    Ic2FenceBlock.onPlayerTick(player);
   }
 
   public static void onLivingSpecialSpawn(LivingEntity rawEntity) {

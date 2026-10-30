@@ -19,14 +19,18 @@ import ic2.core.item.ElectricItemManager;
 import ic2.core.ref.Ic2Blocks;
 import ic2.core.ref.Ic2Fluids;
 import ic2.core.ref.Ic2Items;
+import ic2.core.util.StackUtil;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.gametest.framework.GameTest;
 import net.minecraft.gametest.framework.GameTestHelper;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.material.Fluid;
@@ -59,6 +63,21 @@ public class FluidMachineGameTests {
     helper.assertTrue(
         handler.getFluidInTank(0).isEmpty(),
         "a stacked fluid container should not expose drainable tank contents");
+    helper.succeed();
+  }
+
+  @GameTest(template = EMPTY)
+  public static void strictStackEqualityIncludesDataComponents(GameTestHelper helper) {
+    ItemStack emptyLike = new ItemStack(Items.PAPER);
+    ItemStack namedVariant = new ItemStack(Items.PAPER);
+    namedVariant.set(DataComponents.CUSTOM_NAME, Component.literal("component variant"));
+
+    helper.assertFalse(
+        StackUtil.checkItemEqualityStrict(emptyLike, namedVariant),
+        "stacks with different data components must not merge as identical items");
+    helper.assertTrue(
+        StackUtil.checkItemEqualityStrict(emptyLike, emptyLike.copy()),
+        "copies with identical data components should still compare equal");
     helper.succeed();
   }
 

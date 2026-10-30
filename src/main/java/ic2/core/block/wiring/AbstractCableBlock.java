@@ -17,6 +17,7 @@ import ic2.core.block.tileentity.Ic2TileEntity;
 import ic2.core.energy.EnergyBridgeMath;
 import ic2.core.item.tool.ItemToolCutter;
 import ic2.core.ref.Ic2Fluids;
+import ic2.forge.Ic2ForgeEnergyBridge;
 import it.unimi.dsi.fastutil.ints.Int2ReferenceMap;
 import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
 import java.util.EnumMap;
@@ -633,6 +634,7 @@ public abstract class AbstractCableBlock extends PipeBlock
     }
 
     EnergyNet.instance.addLocatableTile(new AbstractCableBlock.Conductor(state, world, pos));
+    Ic2ForgeEnergyBridge.onCableAdded(world, pos);
   }
 
   protected void removeFromEnet(BlockState state, Level world, BlockPos pos) {
@@ -644,6 +646,7 @@ public abstract class AbstractCableBlock extends PipeBlock
     if (tile != null) {
       EnergyNet.instance.removeTile(tile);
     }
+    Ic2ForgeEnergyBridge.onCableRemoved(world, pos);
   }
 
   private final class Conductor
