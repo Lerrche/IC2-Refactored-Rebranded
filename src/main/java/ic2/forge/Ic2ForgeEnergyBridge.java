@@ -38,6 +38,7 @@ public final class Ic2ForgeEnergyBridge {
   /** Positions whose block entities/capabilities may not be ready until the next server tick. */
   private static final Map<Level, Set<BlockPos>> pendingPositions = new HashMap<>();
   private static final int EXTERNAL_SINK_TIER = 4;
+  private static final int MAX_PENDING_POSITIONS_PER_TICK = 64;
 
   private Ic2ForgeEnergyBridge() {}
 
@@ -104,6 +105,25 @@ public final class Ic2ForgeEnergyBridge {
     }
   }
 
+  /**
+   * Queues only loaded neighbors when a source disappears; unloaded targets cannot have live sinks.
+   */
+  private static void queueAdjacentLoadedPositions(Level world, BlockPos pos) {
+    Set<BlockPos> queued = pendingPositions.get(world);
+    for (Direction direction : Direction.values()) {
+      BlockPos neighborPos = pos.relative(direction).immutable();
+      if (world.hasChunkAt(neighborPos)) {
+        queuePosition(world, neighborPos);
+      } else if (queued != null) {
+        // The source is gone, so an unloaded target no longer needs a deferred registration.
+        queued.remove(neighborPos);
+      }
+    }
+    if (queued != null && queued.isEmpty()) {
+      pendingPositions.remove(world);
+    }
+  }
+
   /** Performs the one-time registration check only on faces touching IC2 energy sources. */
   private static boolean hasReceivingCapability(
       Level world, BlockPos pos, EnumSet<Direction> connectedSides) {
@@ -148,9 +168,7 @@ public final class Ic2ForgeEnergyBridge {
     if (world == null || world.isClientSide) {
       return;
     }
-    for (Direction direction : Direction.values()) {
-      queuePosition(world, cablePos.relative(direction));
-    }
+    queueAdjacentLoadedPositions(world, cablePos);
   }
 
   private static boolean isSinkRegistered(Level world, BlockPos pos) {
@@ -206,14 +224,30 @@ public final class Ic2ForgeEnergyBridge {
   }
 
   private static void processPendingPositions(ServerLevel world) {
-    Set<BlockPos> queued = pendingPositions.remove(world);
+    Set<BlockPos> queued = pendingPositions.get(world);
     if (queued == null || queued.isEmpty()) {
       return;
     }
-    for (BlockPos pos : queued) {
-      if (world.hasChunkAt(pos)) {
-        registerSink(world, pos);
+
+    // A chunk can contain many IC2 emitters (or cables). Process only a small number of
+    // adjacent positions per tick so loading a large base cannot stall the world join.
+    Iterator<BlockPos> iterator = queued.iterator();
+    int processed = 0;
+    while (iterator.hasNext() && processed < MAX_PENDING_POSITIONS_PER_TICK) {
+      BlockPos pos = iterator.next();
+      // Keep positions in unloaded chunks queued. The source chunk may load before the
+      // receiving machine's chunk; its pending registration must survive until that chunk loads.
+      if (!world.hasChunkAt(pos)) {
+        continue;
       }
+
+      iterator.remove();
+      registerSink(world, pos);
+      processed++;
+    }
+
+    if (queued.isEmpty()) {
+      pendingPositions.remove(world);
     }
   }
 
@@ -270,7 +304,10 @@ public final class Ic2ForgeEnergyBridge {
       // IC2 generators add themselves to the energy net during their load callback. Defer the
       // adjacent sink checks until the next server tick so that registration has completed.
       BlockEntity placedEntity = world.getBlockEntity(placedPos);
-      if (placedEntity instanceof IEnergyEmitter) {
+      if (placedEntity instanceof IEnergyEmitter
+          || placedEntity instanceof Ic2TileEntity
+          || placedEntity instanceof IEnergyTile) {
+        // Queue IC2 tile positions even if their EnergyNet registration completes after this event.
         queueAdjacentPositions(world, placedPos);
       }
     }
@@ -278,9 +315,17 @@ public final class Ic2ForgeEnergyBridge {
     @SubscribeEvent
     public void onBlockBreak(BlockEvent.BreakEvent event) {
       if (event.getLevel() instanceof Level world && !world.isClientSide) {
-        unregisterSink(world, event.getPos());
-        // If the removed block was an IC2 emitter, neighboring external sinks must be detached.
-        queueAdjacentPositions(world, event.getPos());
+        BlockPos brokenPos = event.getPos();
+        BlockEntity blockEntity = world.getBlockEntity(brokenPos);
+        boolean wasEnergySource =
+            blockEntity instanceof IEnergyEmitter
+                || (blockEntity instanceof Ic2TileEntity && isIc2EmitterAt(world, brokenPos));
+
+        unregisterSink(world, brokenPos);
+        // Only a removed IC2 energy source can invalidate neighboring external sinks.
+        if (wasEnergySource) {
+          queueAdjacentLoadedPositions(world, brokenPos);
+        }
       }
     }
 
@@ -289,14 +334,13 @@ public final class Ic2ForgeEnergyBridge {
       if (event.getChunk() instanceof LevelChunk chunk && !chunk.getLevel().isClientSide) {
         Level world = chunk.getLevel();
         for (BlockEntity blockEntity : chunk.getBlockEntities().values()) {
-          BlockPos pos = blockEntity.getBlockPos();
+          // Do not inspect every third-party machine in the chunk. Only IC2 energy tiles can
+          // create new direct-adjacency registrations; their six neighbors are checked later.
           if (blockEntity instanceof IEnergyEmitter) {
-            // Also handles the case where this source chunk loads after the machine's chunk.
-            queueAdjacentPositions(world, pos);
-          } else if (isExternalEnergyTarget(world, pos)
-              && hasAdjacentIc2EnergySource(world, pos)) {
-            // Handles a machine chunk loading after its neighboring IC2 source chunk.
-            queuePosition(world, pos);
+            queueAdjacentPositions(world, blockEntity.getBlockPos());
+          } else if (blockEntity instanceof Ic2TileEntity
+              && isIc2EmitterAt(world, blockEntity.getBlockPos())) {
+            queueAdjacentPositions(world, blockEntity.getBlockPos());
           }
         }
       }
@@ -308,7 +352,10 @@ public final class Ic2ForgeEnergyBridge {
         Level world = chunk.getLevel();
         for (BlockEntity blockEntity : chunk.getBlockEntities().values()) {
           if (blockEntity instanceof IEnergyEmitter) {
-            queueAdjacentPositions(world, blockEntity.getBlockPos());
+            queueAdjacentLoadedPositions(world, blockEntity.getBlockPos());
+          } else if (blockEntity instanceof Ic2TileEntity
+              && isIc2EmitterAt(world, blockEntity.getBlockPos())) {
+            queueAdjacentLoadedPositions(world, blockEntity.getBlockPos());
           }
         }
         unregisterChunk(world, chunk.getPos());
