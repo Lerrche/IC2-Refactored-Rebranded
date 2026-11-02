@@ -28,7 +28,7 @@
       "tag": "c:rubber"
     },
     "F": {
-      "item": "ic2:advanced_circuit"
+      "tag": "ic2:circuits/advanced"
     }
   },
   "result": {

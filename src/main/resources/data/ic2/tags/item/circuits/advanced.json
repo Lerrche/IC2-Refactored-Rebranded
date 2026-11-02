@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "ic2:advanced_circuit",
+    {
+      "id": "mekanism:advanced_control_circuit",
+      "required": false
+    }
+  ]
+}

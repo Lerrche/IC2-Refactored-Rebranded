@@ -35,8 +35,10 @@ import net.neoforged.neoforge.event.tick.LevelTickEvent;
 /** Bridges IC2's EU network directly to external FE and Mekanism energy receivers. */
 public final class Ic2ForgeEnergyBridge {
   private static final Map<Level, Map<BlockPos, ForgeEnergySink>> sinks = new HashMap<>();
+
   /** Positions whose block entities/capabilities may not be ready until the next server tick. */
   private static final Map<Level, Set<BlockPos>> pendingPositions = new HashMap<>();
+
   private static final int EXTERNAL_SINK_TIER = 4;
   private static final int MAX_PENDING_POSITIONS_PER_TICK = 64;
 
@@ -76,8 +78,8 @@ public final class Ic2ForgeEnergyBridge {
   }
 
   /**
-   * Returns faces touching either an IC2 cable or an IC2 energy emitter. The direction is from
-   * the external target toward the IC2 energy source, matching IC2's sink-side convention.
+   * Returns faces touching either an IC2 cable or an IC2 energy emitter. The direction is from the
+   * external target toward the IC2 energy source, matching IC2's sink-side convention.
    */
   private static EnumSet<Direction> getConnectedEnergySides(Level world, BlockPos targetPos) {
     EnumSet<Direction> connectedSides = EnumSet.noneOf(Direction.class);
@@ -131,8 +133,7 @@ public final class Ic2ForgeEnergyBridge {
       return false;
     }
     for (Direction side : connectedSides) {
-      IEnergyStorage storage =
-          world.getCapability(Capabilities.EnergyStorage.BLOCK, pos, side);
+      IEnergyStorage storage = world.getCapability(Capabilities.EnergyStorage.BLOCK, pos, side);
       if (storage != null && storage.canReceive()) {
         return true;
       }
@@ -398,8 +399,7 @@ public final class Ic2ForgeEnergyBridge {
     // NeoForge capability invalidations are picked up promptly.
     private long capabilityCacheTick = Long.MIN_VALUE;
     private final Map<Direction, Object> mekanismHandlers = new EnumMap<>(Direction.class);
-    private final Map<Direction, IEnergyStorage> receivingStorages =
-        new EnumMap<>(Direction.class);
+    private final Map<Direction, IEnergyStorage> receivingStorages = new EnumMap<>(Direction.class);
 
     private ForgeEnergySink(Level world, BlockPos pos, EnumSet<Direction> connectedSides) {
       this.world = world;
@@ -439,8 +439,7 @@ public final class Ic2ForgeEnergyBridge {
           mekanismHandlers.put(side, handler);
         }
 
-        IEnergyStorage storage =
-            world.getCapability(Capabilities.EnergyStorage.BLOCK, pos, side);
+        IEnergyStorage storage = world.getCapability(Capabilities.EnergyStorage.BLOCK, pos, side);
         if (storage != null) {
           receivingStorages.put(side, storage);
         }
@@ -494,9 +493,7 @@ public final class Ic2ForgeEnergyBridge {
         Object handler = getMekanismHandler(side);
         if (MekanismEnergyCompat.canReceiveFrom(handler, side)) {
           mekanismDemand =
-              Math.max(
-                  mekanismDemand,
-                  MekanismEnergyCompat.getDemandedJoules(handler, side));
+              Math.max(mekanismDemand, MekanismEnergyCompat.getDemandedJoules(handler, side));
         }
       }
 
@@ -548,8 +545,7 @@ public final class Ic2ForgeEnergyBridge {
       IEnergyStorage storage = getReceivingStorage(side);
       if (storage != null) {
         long availableFe = EnergyBridgeMath.euToFeFloor(amount);
-        long freeFe =
-            Math.max(0L, (long) storage.getMaxEnergyStored() - storage.getEnergyStored());
+        long freeFe = Math.max(0L, (long) storage.getMaxEnergyStored() - storage.getEnergyStored());
         int toSend = EnergyBridgeMath.clampToIntEnergy(Math.min(availableFe, freeFe));
         if (toSend > 0) {
           int acceptedFe = Math.min(toSend, Math.max(0, storage.receiveEnergy(toSend, false)));
@@ -570,8 +566,7 @@ public final class Ic2ForgeEnergyBridge {
         return amount;
       }
       long acceptedJoules = MekanismEnergyCompat.insertJoules(handler, offeredJoules, side);
-      double acceptedEu =
-          Math.min(amount, acceptedJoules / MekanismEnergyCompat.JOULES_PER_EU);
+      double acceptedEu = Math.min(amount, acceptedJoules / MekanismEnergyCompat.JOULES_PER_EU);
       return Math.max(0.0, amount - acceptedEu);
     }
 

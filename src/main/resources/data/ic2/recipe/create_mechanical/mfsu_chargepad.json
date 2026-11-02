@@ -18,7 +18,7 @@
       "tag": "c:rubber"
     },
     "C": {
-      "item": "ic2:circuit"
+      "tag": "ic2:circuits/basic"
     },
     "P": {
       "item": "minecraft:stone_pressure_plate"

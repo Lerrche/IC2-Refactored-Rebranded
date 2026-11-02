@@ -10,7 +10,7 @@
       "item": "ic2:reactor_chamber"
     },
     "c": {
-      "item": "ic2:advanced_circuit"
+      "tag": "ic2:circuits/advanced"
     },
     "G": {
       "item": "ic2:generator"

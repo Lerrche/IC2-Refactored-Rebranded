@@ -193,7 +193,8 @@ public final class MekanismEnergyCompat {
           && SIDED_HANDLER_API.isInstance(handler)
           && INSERT_SIDED_ENERGY != null) {
         remainder =
-            ((Number) INSERT_SIDED_ENERGY.invoke(handler, amount, side, ACTION_EXECUTE)).longValue();
+            ((Number) INSERT_SIDED_ENERGY.invoke(handler, amount, side, ACTION_EXECUTE))
+                .longValue();
       } else {
         remainder = ((Number) INSERT_ENERGY.invoke(handler, amount, ACTION_EXECUTE)).longValue();
       }

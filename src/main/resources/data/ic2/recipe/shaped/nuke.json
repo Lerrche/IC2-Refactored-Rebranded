@@ -10,7 +10,7 @@
       "item": "ic2:thick_neutron_reflector"
     },
     "C": {
-      "item": "ic2:advanced_circuit"
+      "tag": "ic2:circuits/advanced"
     },
     "M": {
       "item": "ic2:advanced_machine"

@@ -19,7 +19,7 @@
       "item": "ic2:ejector_upgrade"
     },
     "B": {
-      "item": "ic2:circuit"
+      "tag": "ic2:circuits/basic"
     },
     "C": {
       "tag": "c:chests/wooden"

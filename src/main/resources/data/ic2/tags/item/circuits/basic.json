@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "ic2:circuit",
+    {
+      "id": "mekanism:basic_control_circuit",
+      "required": false
+    }
+  ]
+}

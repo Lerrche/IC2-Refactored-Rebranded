@@ -624,6 +624,18 @@ public class LiquidUtil {
   public static Ic2FluidStack drainWorldFluidBlock(Level world, BlockPos pos, boolean simulate) {
     BlockState state = world.getBlockState(pos);
     Block block = state.getBlock();
+    // Waterlogged blocks are only pumpable when they are part of a renewable source.
+    // Keep those blocks waterlogged after extraction: unlike liquid blocks, waterlogged block
+    // states do not naturally refill themselves, so clearing the property would destroy the
+    // infinite-source behavior. Isolated waterlogged decoration is never drained.
+    if (PumpUtil.isInfiniteWaterSource(world, pos)
+        && state.hasProperty(
+            net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED)
+        && state.getValue(
+            net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED)) {
+      return Ic2FluidStack.create(Fluids.WATER, 1000);
+    }
+
     Ic2FluidStack drained = FluidHandler.drainWorldFluid(state, world, pos, simulate);
     if (drained != null) {
       return drained;

@@ -16,7 +16,7 @@
         "items": [
           {
             "items": [
-              "ic2:circuit"
+              "#ic2:circuits/basic"
             ]
           }
         ]

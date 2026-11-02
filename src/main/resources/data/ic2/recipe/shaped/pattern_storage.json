@@ -16,7 +16,7 @@
       "item": "ic2:advanced_machine"
     },
     "D": {
-      "item": "ic2:advanced_circuit"
+      "tag": "ic2:circuits/advanced"
     },
     "E": {
       "item": "ic2:mining_laser"

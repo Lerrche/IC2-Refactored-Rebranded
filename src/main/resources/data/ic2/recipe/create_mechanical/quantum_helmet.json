@@ -28,7 +28,7 @@
       "item": "ic2:reinforced_glass"
     },
     "C": {
-      "item": "ic2:advanced_circuit"
+      "tag": "ic2:circuits/advanced"
     }
   },
   "result": {

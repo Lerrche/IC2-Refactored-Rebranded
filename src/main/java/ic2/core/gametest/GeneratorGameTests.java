@@ -35,6 +35,9 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.neoforged.neoforge.capabilities.Capabilities;
+import net.neoforged.neoforge.fluids.FluidStack;
+import net.neoforged.neoforge.fluids.capability.IFluidHandler;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -133,8 +136,44 @@ public class GeneratorGameTests {
           helper.assertTrue(
               water.fuel > 0, "water generator should have gained fuel from the bucket");
           helper.assertTrue(
+              water.outputSlot.get(0).getItem() == Items.BUCKET,
+              "water generator should return the empty bucket instead of deleting it");
+          helper.assertTrue(
+              water.getActive(), "water mill should activate without opening its GUI");
+          helper.assertTrue(
               batbox.energy.getEnergy() >= 10.0,
               "batbox should receive water mill energy, has " + batbox.energy.getEnergy());
+        });
+  }
+
+  // water mill accepts standard NeoForge fluid capability transfers from Mekanism/Create pipes.
+  @GameTest(template = EMPTY, timeoutTicks = 200)
+  public static void waterGeneratorAcceptsPipedWater(GameTestHelper helper) {
+    BlockPos pos = new BlockPos(1, 1, 1);
+    helper.setBlock(pos, Ic2Blocks.WATER_GENERATOR);
+    TileEntityWaterGenerator water = getTe(helper, pos, TileEntityWaterGenerator.class);
+    IFluidHandler pipeHandler =
+        water
+            .getLevel()
+            .getCapability(
+                Capabilities.FluidHandler.BLOCK,
+                water.getBlockPos(),
+                water.getBlockState(),
+                water,
+                Direction.NORTH);
+    helper.assertTrue(pipeHandler != null, "water mill should expose a fluid capability to pipes");
+    int accepted =
+        pipeHandler.fill(
+            new FluidStack(net.minecraft.world.level.material.Fluids.WATER, 1000),
+            IFluidHandler.FluidAction.EXECUTE);
+    helper.assertValueEqual(accepted, 1000, "water mill should accept one bucket from a pipe");
+    helper.assertValueEqual(water.waterTank.getFluidAmount(), 1000, "piped water stored in mill");
+
+    helper.succeedWhen(
+        () -> {
+          helper.assertTrue(water.fuel > 0, "water mill should convert pipe-fed water into fuel");
+          helper.assertTrue(
+              water.getActive(), "water mill should activate automatically after pipe insertion");
         });
   }
 
@@ -152,17 +191,20 @@ public class GeneratorGameTests {
       }
     }
 
-    helper.setBlock(new BlockPos(1, 2, 1), Blocks.WATER);
     TileEntityWaterGenerator water =
         getTe(helper, new BlockPos(1, 1, 1), TileEntityWaterGenerator.class);
-    water.updateWaterCount();
-    helper.assertValueEqual(water.water, 1, "water blocks seen by the water mill");
+    // Add the water after the mill has loaded. The mill must discover it itself; no GUI opening or
+    // direct updateWaterCount() call should be needed.
+    helper.setBlock(new BlockPos(1, 2, 1), Blocks.WATER);
 
     helper.succeedWhen(
-        () ->
-            helper.assertTrue(
-                getEnergy(water) > 0.0,
-                "water mill should generate from ambient water, has " + getEnergy(water)));
+        () -> {
+          helper.assertValueEqual(
+              water.water, 1, "water mill should refresh its nearby-water count automatically");
+          helper.assertTrue(
+              getEnergy(water) > 0.0,
+              "water mill should generate from ambient water, has " + getEnergy(water));
+        });
   }
 
   // wind mill: output depends on altitude, so run it high above the test platform where the wind

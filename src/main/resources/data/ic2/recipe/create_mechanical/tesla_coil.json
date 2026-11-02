@@ -19,7 +19,7 @@
       "item": "minecraft:redstone"
     },
     "C": {
-      "item": "ic2:circuit"
+      "tag": "ic2:circuits/basic"
     },
     "I": {
       "item": "ic2:iron_casing"

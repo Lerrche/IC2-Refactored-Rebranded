@@ -10,7 +10,7 @@
       "item": "ic2:foam_sprayer"
     },
     "B": {
-      "item": "ic2:circuit"
+      "tag": "ic2:circuits/basic"
     },
     "C": {
       "item": "ic2:empty_cell"

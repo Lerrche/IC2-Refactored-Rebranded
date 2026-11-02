@@ -19,7 +19,7 @@
       "item": "ic2:luminator"
     },
     "E": {
-      "item": "ic2:advanced_circuit"
+      "tag": "ic2:circuits/advanced"
     },
     "F": {
       "item": "ic2:advanced_machine"

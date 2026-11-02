@@ -13,6 +13,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.neoforged.neoforge.gametest.GameTestHolder;
 import net.neoforged.neoforge.gametest.PrefixGameTestTemplate;
 
@@ -101,6 +103,48 @@ public class PumpGameTests {
         });
   }
 
+  @GameTest(template = EMPTY, timeoutTicks = 200)
+  public static void pumpDrainsWaterloggedSlab(GameTestHelper helper) {
+    BlockState slab =
+        Blocks.OAK_SLAB.defaultBlockState().setValue(BlockStateProperties.WATERLOGGED, true);
+    TileEntityPump te = setupPumpOverState(helper, slab);
+    te.dischargeSlot.put(
+        0, ElectricItemManager.getCharged(Ic2Items.RE_BATTERY, Double.POSITIVE_INFINITY));
+    te.containerSlot.put(0, new ItemStack(Items.BUCKET));
+
+    helper.succeedWhen(
+        () -> {
+          helper.assertTrue(
+              te.outputSlot.get(0).getItem() == Items.WATER_BUCKET,
+              "the pump should collect water from a waterlogged slab, has " + te.outputSlot.get(0));
+          BlockState drained = helper.getBlockState(WATER_POS);
+          helper.assertTrue(
+              drained.is(Blocks.OAK_SLAB) && !drained.getValue(BlockStateProperties.WATERLOGGED),
+              "the pump should preserve the slab while removing its water, found " + drained);
+        });
+  }
+
+  @GameTest(template = EMPTY, timeoutTicks = 200)
+  public static void pumpDrainsWaterloggedStair(GameTestHelper helper) {
+    BlockState stair =
+        Blocks.OAK_STAIRS.defaultBlockState().setValue(BlockStateProperties.WATERLOGGED, true);
+    TileEntityPump te = setupPumpOverState(helper, stair);
+    te.dischargeSlot.put(
+        0, ElectricItemManager.getCharged(Ic2Items.RE_BATTERY, Double.POSITIVE_INFINITY));
+    te.containerSlot.put(0, new ItemStack(Items.BUCKET));
+
+    helper.succeedWhen(
+        () -> {
+          helper.assertTrue(
+              te.outputSlot.get(0).getItem() == Items.WATER_BUCKET,
+              "the pump should collect water from waterlogged stairs, has " + te.outputSlot.get(0));
+          BlockState drained = helper.getBlockState(WATER_POS);
+          helper.assertTrue(
+              drained.is(Blocks.OAK_STAIRS) && !drained.getValue(BlockStateProperties.WATERLOGGED),
+              "the pump should preserve the stairs while removing their water, found " + drained);
+        });
+  }
+
   @GameTest(template = EMPTY, timeoutTicks = 100)
   public static void pumpWithoutEnergyDoesNothing(GameTestHelper helper) {
     TileEntityPump te = setupPumpOverWater(helper);
@@ -119,13 +163,17 @@ public class PumpGameTests {
   }
 
   private static TileEntityPump setupPumpOverWater(GameTestHelper helper) {
-    // enclose the water source so it cannot flow away
+    return setupPumpOverState(helper, Blocks.WATER.defaultBlockState());
+  }
+
+  private static TileEntityPump setupPumpOverState(GameTestHelper helper, BlockState fluidState) {
+    // Enclose the fluid source so it cannot flow away before the pump processes it.
     helper.setBlock(new BlockPos(1, 0, 1), Blocks.STONE);
     helper.setBlock(new BlockPos(0, 1, 1), Blocks.STONE);
     helper.setBlock(new BlockPos(2, 1, 1), Blocks.STONE);
     helper.setBlock(new BlockPos(1, 1, 0), Blocks.STONE);
     helper.setBlock(new BlockPos(1, 1, 2), Blocks.STONE);
-    helper.setBlock(WATER_POS, Blocks.WATER);
+    helper.setBlock(WATER_POS, fluidState);
     helper.setBlock(
         PUMP_POS,
         Ic2Blocks.PUMP

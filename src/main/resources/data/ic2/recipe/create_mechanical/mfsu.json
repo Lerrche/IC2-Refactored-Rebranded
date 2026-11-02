@@ -19,7 +19,7 @@
       "item": "ic2:advanced_machine"
     },
     "C": {
-      "item": "ic2:advanced_circuit"
+      "tag": "ic2:circuits/advanced"
     },
     "L": {
       "item": "ic2:lapotron_crystal"

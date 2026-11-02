@@ -10,7 +10,7 @@
       "item": "ic2:steel_ingot"
     },
     "B": {
-      "item": "ic2:circuit"
+      "tag": "ic2:circuits/basic"
     },
     "C": {
       "item": "ic2:re_battery"

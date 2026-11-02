@@ -22,7 +22,7 @@
       "item": "minecraft:bucket"
     },
     "W": {
-      "item": "ic2:circuit"
+      "tag": "ic2:circuits/basic"
     },
     "I": {
       "tag": "c:plates/iron"

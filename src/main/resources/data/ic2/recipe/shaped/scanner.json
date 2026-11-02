@@ -16,7 +16,7 @@
       "item": "minecraft:glowstone_dust"
     },
     "C": {
-      "item": "ic2:circuit"
+      "tag": "ic2:circuits/basic"
     },
     "P": {
       "item": "ic2:gold_casing"

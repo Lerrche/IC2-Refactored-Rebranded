@@ -13,7 +13,7 @@
   ],
   "key": {
     "A": {
-      "item": "ic2:circuit"
+      "tag": "ic2:circuits/basic"
     },
     "B": {
       "item": "minecraft:chest"

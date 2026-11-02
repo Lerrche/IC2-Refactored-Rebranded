@@ -12,7 +12,7 @@
   ],
   "key": {
     "C": {
-      "item": "ic2:circuit"
+      "tag": "ic2:circuits/basic"
     },
     "R": {
       "item": "minecraft:redstone"

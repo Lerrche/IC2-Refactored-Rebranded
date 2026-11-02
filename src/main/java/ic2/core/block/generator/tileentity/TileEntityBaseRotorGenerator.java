@@ -13,7 +13,10 @@ public abstract class TileEntityBaseRotorGenerator extends TileEntityBaseGenerat
       ResourceLocation.fromNamespaceAndPath("ic2", "textures/item/rotor/iron_rotor_model.png");
   private final int rotorDiameter;
   private float angle = 0.0F;
-  private long lastcheck;
+  // A rotor block entity is recreated when its chunk is loaded. Never let the first render
+  // integrate from timestamp zero: converting the current epoch milliseconds to float loses
+  // enough precision that subsequent small angle increments can stop changing the value.
+  private long lastcheck = System.currentTimeMillis();
 
   public TileEntityBaseRotorGenerator(
       BlockEntityType<? extends TileEntityBaseRotorGenerator> type,
@@ -40,16 +43,16 @@ public abstract class TileEntityBaseRotorGenerator extends TileEntityBaseGenerat
 
   @Override
   public float getAngle() {
-    if (this.shouldRotorRotate()) {
+    long now = System.currentTimeMillis();
+    // Rendering may be skipped while the player is far away or the game is paused. Clamp the
+    // catch-up interval so re-entering render distance cannot cause a large angle jump.
+    long elapsedMillis = Math.max(0L, Math.min(now - this.lastcheck, 1000L));
+    if (this.shouldRotorRotate() && elapsedMillis > 0L) {
       this.angle =
-          this.angle
-              + (float) (System.currentTimeMillis() - this.lastcheck)
-                  * 0.4F
-                  * this.rotorSpeedFactor();
-      this.angle %= 360.0F;
+          (this.angle + (float) elapsedMillis * rotationSpeed * this.rotorSpeedFactor()) % 360.0F;
     }
 
-    this.lastcheck = System.currentTimeMillis();
+    this.lastcheck = now;
     return this.angle;
   }
 

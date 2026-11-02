@@ -22,7 +22,7 @@
       "item": "ic2:double_insulated_gold_cable"
     },
     "A": {
-      "item": "ic2:advanced_circuit"
+      "tag": "ic2:circuits/advanced"
     }
   },
   "result": {

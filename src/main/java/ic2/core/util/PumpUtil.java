@@ -11,7 +11,9 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.LiquidBlock;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 
 public class PumpUtil {
   private static final int MAX_TRACE_STEPS = 64;
@@ -88,6 +90,13 @@ public class PumpUtil {
   }
 
   public static BlockPos searchFluidSource(Level world, BlockPos startPos, boolean simulate) {
+    // Check the immediate work area for renewable sources before tracing any flowing liquid.
+    // This gives infinite pools priority even when a stream is closer to the pump intake.
+    BlockPos infiniteSource = findInfiniteSourceNear(world, startPos, FALLBACK_RADIUS);
+    if (infiniteSource != null) {
+      return infiniteSource;
+    }
+
     MutableBlockPos pos = new MutableBlockPos();
     pos.set(startPos.getX(), startPos.getY(), startPos.getZ());
 
@@ -134,7 +143,7 @@ public class PumpUtil {
           if (!visited.contains(pos)) {
             int newDecay = getFlowDecay(world, pos);
             if (newDecay >= 0) {
-              if (newDecay == 0) {
+              if (newDecay == 0 && isInfiniteWaterSource(world, pos)) {
                 return pos.immutable();
               }
               break label103;
@@ -145,7 +154,7 @@ public class PumpUtil {
           if (!visited.contains(pos)) {
             int newDecay = getFlowDecay(world, pos);
             if (newDecay >= 0) {
-              if (newDecay == 0) {
+              if (newDecay == 0 && isInfiniteWaterSource(world, pos)) {
                 return pos.immutable();
               }
               break label103;
@@ -156,7 +165,7 @@ public class PumpUtil {
           if (!visited.contains(pos)) {
             int newDecay = getFlowDecay(world, pos);
             if (newDecay >= 0) {
-              if (newDecay == 0) {
+              if (newDecay == 0 && isInfiniteWaterSource(world, pos)) {
                 return pos.immutable();
               }
               break label103;
@@ -173,7 +182,7 @@ public class PumpUtil {
             break label85;
           }
 
-          if (newDecay == 0) {
+          if (newDecay == 0 && isInfiniteWaterSource(world, pos)) {
             return pos.immutable();
           }
         }
@@ -246,26 +255,95 @@ public class PumpUtil {
   private static BlockPos scanAreaForSource(Level world, BlockPos center, boolean simulate) {
     MutableBlockPos cPos = new MutableBlockPos();
 
+    // Renewable sources always win over flowing/finite water. This prevents the pump from
+    // consuming nearby waterlogged decoration when a proper infinite source is available.
+    for (int ix = -FALLBACK_RADIUS; ix <= FALLBACK_RADIUS; ix++) {
+      for (int iz = -FALLBACK_RADIUS; iz <= FALLBACK_RADIUS; iz++) {
+        cPos.set(center.getX() + ix, center.getY(), center.getZ() + iz);
+        if (isInfiniteWaterSource(world, cPos)) {
+          return cPos.immutable();
+        }
+      }
+    }
+
+    // Preserve the old finite-fluid fallback for ordinary flowing liquid blocks only.
     for (int ix = -FALLBACK_RADIUS; ix <= FALLBACK_RADIUS; ix++) {
       for (int iz = -FALLBACK_RADIUS; iz <= FALLBACK_RADIUS; iz++) {
         cPos.set(center.getX() + ix, center.getY(), center.getZ() + iz);
         BlockState state = world.getBlockState(cPos);
         int decay = getFlowDecay(state, world, cPos);
-        if (decay < 0) {
+        if (decay < 0 || isWaterlogged(state)) {
           continue;
         }
-
         if (decay == 0) {
           return cPos.immutable();
         }
-
         if (!simulate) {
           applyFallbackFluidStep(world, cPos, state);
         }
       }
     }
-
     return null;
+  }
+
+  private static BlockPos findInfiniteSourceNear(Level world, BlockPos center, int radius) {
+    MutableBlockPos candidate = new MutableBlockPos();
+    for (int y = -1; y <= 1; y++) {
+      for (int x = -radius; x <= radius; x++) {
+        for (int z = -radius; z <= radius; z++) {
+          candidate.set(center.getX() + x, center.getY() + y, center.getZ() + z);
+          if (isInfiniteWaterSource(world, candidate)) {
+            return candidate.immutable();
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  /**
+   * A renewable source is a source-fluid block with at least two horizontally adjacent source
+   * blocks and a solid floor. Waterlogged blocks participate in the same test. A lone waterlogged
+   * slab/stair is deliberately not considered an infinite source.
+   */
+  public static boolean isInfiniteWaterSource(Level world, BlockPos pos) {
+    BlockState state = world.getBlockState(pos);
+    if (!isWaterSource(state, world, pos)) {
+      return false;
+    }
+    if (!world.getBlockState(pos.below()).isFaceSturdy(world, pos.below(), Direction.UP)) {
+      return false;
+    }
+
+    int adjacentSources = 0;
+    for (Direction direction : Util.HORIZONTAL_DIRS) {
+      BlockPos neighbor = pos.relative(direction);
+      if (isWaterSource(world.getBlockState(neighbor), world, neighbor)) {
+        adjacentSources++;
+        if (adjacentSources >= 2) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  private static boolean isWaterSource(BlockState state, Level world, BlockPos pos) {
+    if (isWaterlogged(state)) {
+      return true;
+    }
+    if (state.getBlock() instanceof LiquidBlock
+        && state.getFluidState().isSource()
+        && state.getFluidState().is(net.minecraft.world.level.material.Fluids.WATER)) {
+      return true;
+    }
+    return FluidHandler.getWorldFluidLevel(state, world, pos) == 0
+        && state.getFluidState().is(net.minecraft.world.level.material.Fluids.WATER);
+  }
+
+  private static boolean isWaterlogged(BlockState state) {
+    return state.hasProperty(BlockStateProperties.WATERLOGGED)
+        && state.getValue(BlockStateProperties.WATERLOGGED);
   }
 
   private static void applyFallbackFluidStep(Level world, BlockPos pos, BlockState state) {
@@ -281,7 +359,7 @@ public class PumpUtil {
       } else {
         world.removeBlock(pos, false);
       }
-    } else {
+    } else if (!isWaterlogged(state)) {
       world.removeBlock(pos, false);
     }
   }
@@ -293,6 +371,16 @@ public class PumpUtil {
 
   protected static int getFlowDecay(BlockState state, Level world, BlockPos pos) {
     Block block = state.getBlock();
+
+    // Waterlogged slabs, stairs, fences, and other SimpleWaterloggedBlock implementations hold
+    // a full bucket's worth of water even though they are not LiquidBlock instances. Treat them
+    // as a source so the pump's normal source search can discover them.
+    if (block instanceof SimpleWaterloggedBlock
+        && state.hasProperty(BlockStateProperties.WATERLOGGED)
+        && state.getValue(BlockStateProperties.WATERLOGGED)) {
+      return 0;
+    }
+
     int level = FluidHandler.getWorldFluidLevel(state, world, pos);
     if (level >= 0) {
       return level;
