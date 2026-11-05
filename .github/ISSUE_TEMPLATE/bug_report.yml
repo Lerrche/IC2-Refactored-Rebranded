@@ -1,0 +1,56 @@
+name: Bug Report
+description: Create a report to help us fix a bug or unexpected behavior.
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this bug report!
+  - type: input
+    id: mc-version
+    attributes:
+      label: Minecraft Version
+      description: The Minecraft version where the issue occurred (e.g. 1.21.1).
+      placeholder: 1.21.1
+    validations:
+      required: true
+  - type: input
+    id: neo-version
+    attributes:
+      label: NeoForge Version
+      description: The NeoForge version in use (e.g. 21.1.234).
+      placeholder: 21.1.234
+    validations:
+      required: true
+  - type: input
+    id: mod-version
+    attributes:
+      label: IC2R Mod Version
+      description: The version of IC2 Rebranded (e.g. 1.0.3).
+      placeholder: 1.0.3
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Bug Description
+      description: A clear and concise description of what the bug is.
+    validations:
+      required: true
+  - type: textarea
+    id: reproduction
+    attributes:
+      label: Steps to Reproduce
+      description: Step-by-step instructions to reproduce the issue.
+      placeholder: |
+        1. Place down '...'
+        2. Interact with '...'
+        3. See error
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Crash Log / Stack Trace
+      description: Please paste crash reports or relevant log excerpts (or link to a pastebin / gist).
+      render: text

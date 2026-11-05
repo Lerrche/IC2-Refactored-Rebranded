@@ -1,0 +1,6 @@
+﻿{
+    "textures":  {
+                     "layer0":  "gravisuite:item/advancedlappack"
+                 },
+    "parent":  "minecraft:item/generated"
+}

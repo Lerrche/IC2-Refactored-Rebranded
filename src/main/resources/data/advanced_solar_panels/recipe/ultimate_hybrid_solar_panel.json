@@ -1,0 +1,37 @@
+{
+  "key": {
+    "C": [
+      {
+        "tag": "c:circuits/advanced"
+      },
+      {
+        "tag": "c:circuit/advanced"
+      },
+      {
+        "item": "ic2:advanced_circuit"
+      }
+    ],
+    "S": {
+      "item": "ic2:coal_chunk"
+    },
+    "D": {
+      "item": "advanced_solar_panels:enriched_sunnarium"
+    },
+    "A": {
+      "item": "advanced_solar_panels:hybrid_solar_panel"
+    },
+    "X": {
+      "item": "advanced_solar_panels:sunnarium_alloy"
+    }
+  },
+  "pattern": [
+    "XCX",
+    "SAS",
+    "XDX"
+  ],
+  "result": {
+    "id": "advanced_solar_panels:ultimate_hybrid_solar_panel",
+    "count": 1
+  },
+  "type": "minecraft:crafting_shaped"
+}

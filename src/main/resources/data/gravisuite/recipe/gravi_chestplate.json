@@ -1,0 +1,29 @@
+﻿{
+    "key":  {
+                "D":  {
+                          "item":  "gravisuite:cooling_core"
+                      },
+                "S":  {
+                          "item":  "gravisuite:superconductor"
+                      },
+                "B":  {
+                          "item":  "gravisuite:gravitation_engine"
+                      },
+                "C":  {
+                          "item":  "gravisuite:ultimate_lappack"
+                      },
+                "A":  {
+                          "item":  "ic2:quantum_chestplate"
+                      }
+            },
+    "pattern":  [
+                    "SAS",
+                    "DBD",
+                    "SCS"
+                ],
+    "result":  {
+                   "id":  "gravisuite:gravi_chestplate",
+                   "count":  1
+               },
+    "type":  "minecraft:crafting_shaped"
+}

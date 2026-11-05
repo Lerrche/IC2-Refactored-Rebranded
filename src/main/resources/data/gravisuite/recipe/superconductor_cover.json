@@ -1,0 +1,23 @@
+﻿{
+    "key":  {
+                "C":  {
+                          "item":  "ic2:carbon_plate"
+                      },
+                "P":  {
+                          "item":  "ic2:iridium"
+                      },
+                "A":  {
+                          "item":  "ic2:alloy"
+                      }
+            },
+    "pattern":  [
+                    "APA",
+                    "CCC",
+                    "APA"
+                ],
+    "result":  {
+                   "id":  "gravisuite:superconductor_cover",
+                   "count":  3
+               },
+    "type":  "minecraft:crafting_shaped"
+}

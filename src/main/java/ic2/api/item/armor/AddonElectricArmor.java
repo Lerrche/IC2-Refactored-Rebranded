@@ -1,11 +1,14 @@
 package ic2.api.item.armor;
 
+import ic2.api.item.ElectricItem;
 import ic2.api.item.IAddonArmorEffect;
 import ic2.core.item.armor.ItemArmorElectric;
 import net.minecraft.core.Holder;
 import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 
 /** Configurable electric armor base for IC2R add-ons. */
 public class AddonElectricArmor extends ItemArmorElectric implements IAddonArmorEffect {
@@ -47,7 +50,15 @@ public class AddonElectricArmor extends ItemArmorElectric implements IAddonArmor
   }
 
   @Override
-  public boolean canProvideEnergy(net.minecraft.world.item.ItemStack stack) {
+  public boolean canProvideEnergy(ItemStack stack) {
     return this.canProvideEnergy;
+  }
+
+  public boolean hasEnergy(ItemStack stack, double amount) {
+    return ElectricItem.manager.canUse(stack, amount);
+  }
+
+  public boolean useEnergy(ItemStack stack, double amount, LivingEntity entity) {
+    return ElectricItem.manager.use(stack, amount, entity);
   }
 }

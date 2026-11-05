@@ -1,0 +1,12 @@
+﻿{
+    "ingredients":  [
+                        {
+                            "item":  "advanced_solar_panels:sunnarium"
+                        }
+                    ],
+    "result":  {
+                   "id":  "advanced_solar_panels:sunnarium_part",
+                   "count":  9
+               },
+    "type":  "minecraft:crafting_shapeless"
+}

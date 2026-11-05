@@ -1,0 +1,37 @@
+{
+  "key": {
+    "C": [
+      {
+        "tag": "c:circuits/advanced"
+      },
+      {
+        "tag": "c:circuit/advanced"
+      },
+      {
+        "item": "ic2:advanced_circuit"
+      }
+    ],
+    "S": {
+      "item": "advanced_solar_panels:sunnarium"
+    },
+    "D": {
+      "item": "ic2:lapotron_crystal"
+    },
+    "A": {
+      "item": "advanced_solar_panels:advanced_solar_panel"
+    },
+    "X": {
+      "item": "ic2:carbon_plate"
+    }
+  },
+  "pattern": [
+    "XCX",
+    "SAS",
+    "XDX"
+  ],
+  "result": {
+    "id": "advanced_solar_panels:hybrid_solar_panel",
+    "count": 1
+  },
+  "type": "minecraft:crafting_shaped"
+}

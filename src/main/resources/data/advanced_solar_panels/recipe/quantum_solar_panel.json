@@ -1,0 +1,29 @@
+﻿{
+    "key":  {
+                "Q":  {
+                          "item":  "advanced_solar_panels:quantum_core"
+                      },
+                "S":  {
+                          "item":  "advanced_solar_panels:enriched_sunnarium_alloy"
+                      },
+                "D":  {
+                          "item":  "advanced_solar_panels:quantum_core"
+                      },
+                "A":  {
+                          "item":  "advanced_solar_panels:ultimate_hybrid_solar_panel"
+                      },
+                "X":  {
+                          "item":  "advanced_solar_panels:irradiant_reinforced_plate"
+                      }
+            },
+    "pattern":  [
+                    "XQX",
+                    "SAS",
+                    "XDX"
+                ],
+    "result":  {
+                   "id":  "advanced_solar_panels:quantum_solar_panel",
+                   "count":  1
+               },
+    "type":  "minecraft:crafting_shaped"
+}

@@ -1,0 +1,23 @@
+﻿{
+    "key":  {
+                "C":  {
+                          "item":  "advanced_solar_panels:mt_core"
+                      },
+                "M":  {
+                          "item":  "ic2:advanced_machine"
+                      },
+                "X":  {
+                          "item":  "advanced_solar_panels:irradiant_reinforced_plate"
+                      }
+            },
+    "pattern":  [
+                    "XCX",
+                    "CMC",
+                    "XCX"
+                ],
+    "result":  {
+                   "id":  "advanced_solar_panels:molecular_transformer",
+                   "count":  1
+               },
+    "type":  "minecraft:crafting_shaped"
+}

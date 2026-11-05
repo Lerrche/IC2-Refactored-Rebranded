@@ -1,0 +1,23 @@
+﻿{
+    "key":  {
+                "C":  {
+                          "item":  "ic2:carbon_plate"
+                      },
+                "L":  {
+                          "item":  "gravisuite:advanced_lappack"
+                      },
+                "P":  {
+                          "item":  "ic2:iridium"
+                      }
+            },
+    "pattern":  [
+                    "CPC",
+                    "LCL",
+                    "CPC"
+                ],
+    "result":  {
+                   "id":  "gravisuite:ultimate_lappack",
+                   "count":  1
+               },
+    "type":  "minecraft:crafting_shaped"
+}

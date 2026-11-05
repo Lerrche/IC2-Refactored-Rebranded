@@ -44,6 +44,7 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Getting Started: getting-started.md
+  - Add-on Creation Guide: addon-development-guide.md
   - Registration: registration.md
   - Examples:
       - Overview: examples/index.md

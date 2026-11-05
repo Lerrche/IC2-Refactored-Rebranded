@@ -1,0 +1,23 @@
+﻿{
+    "key":  {
+                "C":  {
+                          "item":  "ic2:carbon_plate"
+                      },
+                "J":  {
+                          "item":  "gravisuite:advanced_jetpack"
+                      },
+                "N":  {
+                          "item":  "ic2:nano_chestplate"
+                      }
+            },
+    "pattern":  [
+                    "CNC",
+                    " J ",
+                    "   "
+                ],
+    "result":  {
+                   "id":  "gravisuite:advanced_nano_chestplate",
+                   "count":  1
+               },
+    "type":  "minecraft:crafting_shaped"
+}

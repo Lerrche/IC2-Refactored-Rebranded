@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "#c:circuits/basic",
+    "ic2:circuit"
+  ]
+}

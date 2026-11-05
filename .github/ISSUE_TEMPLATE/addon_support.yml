@@ -1,0 +1,42 @@
+name: Add-on API Support / Feature Request
+description: Request a new API hook, base class, or ask a question about developing an IC2R add-on.
+labels: ["api", "addon-dev"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Developing an add-on for IC2 Rebranded? We want to make it as smooth as possible!
+  - type: input
+    id: addon-name
+    attributes:
+      label: Add-on Name / Mod ID
+      placeholder: my_ic2_addon
+    validations:
+      required: false
+  - type: dropdown
+    id: category
+    attributes:
+      label: API Category
+      options:
+        - Energy Net / Conductor Cables
+        - Machine / Generator Block Entities
+        - Electric Items / Tools / Armors
+        - Upgrades / Modules
+        - Recipe Integration / Data Generation
+        - Wrench & Rotation Support
+        - Documentation / Examples
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: description
+    attributes:
+      label: Feature / Support Request
+      description: What capability or hook do you need? How would it help your add-on?
+    validations:
+      required: true
+  - type: textarea
+    id: proposed-api
+    attributes:
+      label: Proposed API Design (optional)
+      description: If you have an idea of what the method or interface should look like, share it here.

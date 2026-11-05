@@ -44,12 +44,20 @@ The example shows the helper's supported pattern. Your project still needs the c
 ## Methods confirmed in `Ic2AddonContent`
 
 - `create(String namespace)` — creates the helper for your mod ID.
+- `registerCreativeModeTab(...)` — registers a custom Creative Mode tab.
 - `registerItem(String name, Supplier<? extends T> factory)` — registers a custom item.
 - `registerBlock(String name, Function<BlockBehaviour.Properties, ? extends T> factory, BlockBehaviour.Properties properties)` — registers a block using a factory and properties.
 - `registerSimpleBlock(String name, BlockBehaviour.Properties properties)` — registers a plain block.
+- `registerWrenchableBlock(...)` — registers an `AddonWrenchableBlock` with horizontal rotation and wrench dismantling drops.
 - `registerBlockItem(String name, Supplier<? extends Block> block)` — registers a block item with default item properties.
 - `registerBlockItem(String name, Supplier<? extends Block> block, Item.Properties properties)` — registers a block item with custom properties.
 - `registerElectricItem(...)` — registers an `AddonElectricItem` with charge parameters.
+- `registerElectricTool(...)` — registers an `AddonElectricTool` (active tools, wrenches, treetaps).
+- `registerUpgradeItem(...)` — registers an `AddonUpgradeItem` with fluent configuration.
+- `registerElectricMiningTool(...)` — registers drills and mining tools.
+- `registerElectricWeapon(...)` — registers electric weapons.
+- `registerElectricArmor(...)` — registers electric armor.
+- `registerJetpack(...)` — registers electric jetpacks.
 - `id(String path)` — creates a `ResourceLocation` in your namespace.
 - `namespace()` — returns the namespace.
 - `register(IEventBus modEventBus)` — attaches its deferred registers to the mod event bus.

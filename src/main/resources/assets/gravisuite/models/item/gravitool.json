@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:item/handheld",
+  "textures": {
+    "layer0": "gravisuite:item/wrench"
+  },
+  "overrides": [
+    { "predicate": { "gravisuite:mode": 0.0 }, "model": "gravisuite:item/gravitool_hoe" },
+    { "predicate": { "gravisuite:mode": 0.25 }, "model": "gravisuite:item/gravitool_treetap" },
+    { "predicate": { "gravisuite:mode": 0.5 }, "model": "gravisuite:item/gravitool_wrench" },
+    { "predicate": { "gravisuite:mode": 0.75 }, "model": "gravisuite:item/gravitool_screwdriver" }
+  ]
+}

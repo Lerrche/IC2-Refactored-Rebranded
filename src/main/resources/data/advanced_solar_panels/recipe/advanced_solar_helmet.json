@@ -1,0 +1,20 @@
+﻿{
+    "key":  {
+                "H":  {
+                          "item":  "ic2:nano_helmet"
+                      },
+                "S":  {
+                          "item":  "advanced_solar_panels:advanced_solar_panel"
+                      }
+            },
+    "pattern":  [
+                    " S ",
+                    " H ",
+                    "   "
+                ],
+    "result":  {
+                   "id":  "advanced_solar_panels:advanced_solar_helmet",
+                   "count":  1
+               },
+    "type":  "minecraft:crafting_shaped"
+}

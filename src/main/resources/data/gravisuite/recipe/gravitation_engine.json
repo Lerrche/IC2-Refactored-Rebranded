@@ -1,0 +1,26 @@
+﻿{
+    "key":  {
+                "C":  {
+                          "item":  "gravisuite:cooling_core"
+                      },
+                "T":  {
+                          "item":  "ic2:tesla_coil"
+                      },
+                "S":  {
+                          "item":  "gravisuite:superconductor"
+                      },
+                "H":  {
+                          "item":  "ic2:hv_transformer"
+                      }
+            },
+    "pattern":  [
+                    "TST",
+                    "CHC",
+                    "TST"
+                ],
+    "result":  {
+                   "id":  "gravisuite:gravitation_engine",
+                   "count":  1
+               },
+    "type":  "minecraft:crafting_shaped"
+}

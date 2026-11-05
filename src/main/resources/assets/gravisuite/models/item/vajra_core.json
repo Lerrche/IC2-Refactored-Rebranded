@@ -1,0 +1,6 @@
+﻿{
+    "textures":  {
+                     "layer0":  "gravisuite:item/vajracore"
+                 },
+    "parent":  "minecraft:item/generated"
+}

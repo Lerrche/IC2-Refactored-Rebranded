@@ -1,0 +1,23 @@
+﻿{
+    "key":  {
+                "C":  {
+                          "item":  "ic2:carbon_plate"
+                      },
+                "I":  {
+                          "item":  "advanced_solar_panels:iridium_iron_plate"
+                      },
+                "A":  {
+                          "item":  "ic2:alloy"
+                      }
+            },
+    "pattern":  [
+                    "ACA",
+                    "CIC",
+                    "ACA"
+                ],
+    "result":  {
+                   "id":  "advanced_solar_panels:reinforced_iridium_iron_plate",
+                   "count":  1
+               },
+    "type":  "minecraft:crafting_shaped"
+}

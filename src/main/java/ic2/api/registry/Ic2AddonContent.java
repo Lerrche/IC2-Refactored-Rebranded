@@ -1,10 +1,17 @@
 package ic2.api.registry;
 
+import ic2.api.block.AddonWrenchableBlock;
+import ic2.api.item.AddonElectricTool;
+import ic2.api.upgrade.AddonUpgradeItem;
 import java.util.Objects;
+import java.util.function.BiFunction;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.flag.FeatureFlags;
@@ -12,7 +19,9 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.BlockItem;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -20,6 +29,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.bus.api.IEventBus;
 import net.neoforged.neoforge.registries.DeferredBlock;
 import net.neoforged.neoforge.registries.DeferredHolder;
@@ -42,6 +52,7 @@ public final class Ic2AddonContent {
   private final DeferredRegister<RecipeType<?>> recipeTypes;
   private final DeferredRegister<RecipeSerializer<?>> recipeSerializers;
   private final DeferredRegister<MenuType<?>> menuTypes;
+  private final DeferredRegister<CreativeModeTab> creativeTabs;
   private boolean registered;
 
   private Ic2AddonContent(String namespace) {
@@ -53,6 +64,7 @@ public final class Ic2AddonContent {
     this.recipeTypes = DeferredRegister.create(Registries.RECIPE_TYPE, namespace);
     this.recipeSerializers = DeferredRegister.create(Registries.RECIPE_SERIALIZER, namespace);
     this.menuTypes = DeferredRegister.create(Registries.MENU, namespace);
+    this.creativeTabs = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, namespace);
   }
 
   /** Creates a content registry for an add-on's mod id (for example {@code my_ic2_addon}). */
@@ -271,6 +283,61 @@ public final class Ic2AddonContent {
     return registerBlockItem(name, block, new Item.Properties());
   }
 
+  /** Registers a custom Creative Mode tab in this add-on's namespace. */
+  public DeferredHolder<CreativeModeTab, CreativeModeTab> registerCreativeModeTab(
+      String name,
+      Supplier<ItemStack> iconSupplier,
+      CreativeModeTab.DisplayItemsGenerator displayItemsGenerator) {
+    ensureNotRegistered();
+    return this.creativeTabs.register(
+        name,
+        () ->
+            CreativeModeTab.builder()
+                .title(Component.translatable("itemGroup." + this.namespace + "." + name))
+                .icon(iconSupplier)
+                .displayItems(displayItemsGenerator)
+                .build());
+  }
+
+  /**
+   * Registers a wrenchable machine or energy block with horizontal facing and safe wrench
+   * dismantling drops.
+   */
+  public DeferredBlock<AddonWrenchableBlock> registerWrenchableBlock(
+      String name,
+      BlockBehaviour.Properties properties,
+      BiFunction<BlockPos, BlockState, ? extends BlockEntity> factory) {
+    ensureNotRegistered();
+    return this.blocks.registerBlock(
+        name, props -> new AddonWrenchableBlock(props, factory), properties);
+  }
+
+  /** Registers a custom configurable machine upgrade item using a configuration builder. */
+  public DeferredItem<AddonUpgradeItem> registerUpgradeItem(
+      String name, Item.Properties properties, Consumer<AddonUpgradeItem.Builder> configurator) {
+    ensureNotRegistered();
+    AddonUpgradeItem.Builder builder = AddonUpgradeItem.builder(properties);
+    configurator.accept(builder);
+    return this.items.register(name, builder::build);
+  }
+
+  /**
+   * Registers a configurable electric tool (e.g. electric wrench, tree tap, shears, or multipurpose
+   * tool).
+   */
+  public DeferredItem<AddonElectricTool> registerElectricTool(
+      String name,
+      Item.Properties properties,
+      double capacity,
+      double transferLimit,
+      int tier,
+      double energyPerOperation) {
+    ensureNotRegistered();
+    return this.items.register(
+        name,
+        () -> new AddonElectricTool(properties, capacity, transferLimit, tier, energyPerOperation));
+  }
+
   /**
    * Adds this add-on's blocks and items to its mod event bus. Call once from the mod constructor.
    */
@@ -284,6 +351,7 @@ public final class Ic2AddonContent {
     this.recipeTypes.register(modEventBus);
     this.recipeSerializers.register(modEventBus);
     this.menuTypes.register(modEventBus);
+    this.creativeTabs.register(modEventBus);
   }
 
   /** Builds a resource id inside this add-on's namespace. */

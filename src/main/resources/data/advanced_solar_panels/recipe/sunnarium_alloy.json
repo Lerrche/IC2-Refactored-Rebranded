@@ -1,0 +1,20 @@
+﻿{
+    "key":  {
+                "A":  {
+                          "item":  "ic2:alloy"
+                      },
+                "S":  {
+                          "item":  "advanced_solar_panels:sunnarium_part"
+                      }
+            },
+    "pattern":  [
+                    "SSS",
+                    "SAS",
+                    "SSS"
+                ],
+    "result":  {
+                   "id":  "advanced_solar_panels:sunnarium_alloy",
+                   "count":  1
+               },
+    "type":  "minecraft:crafting_shaped"
+}

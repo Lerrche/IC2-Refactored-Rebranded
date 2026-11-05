@@ -4,7 +4,21 @@ An unofficial continuation of the IndustrialCraft 2 port for Minecraft 1.21.1 on
 
 I started this project to build on the existing port with compatibility work, quality-of-life fixes, and a more approachable API for people who want to make add-ons. I did **not** create the original port and do not claim ownership of the original IC2 code or assets.
 
-## Documentation
+## Documentation & Add-on Creation
+
+- **[Complete Add-on Creation Guide](docs/addon-development-guide.md)**: Master guide for creating custom machines, generators, energy storage, electric tools, and recipes.
+- **[Online Web Documentation](https://lerrche.github.io/IC2-Refactored-Rebranded/)**: Full online docs and guides.
+- **[Add-on API Reference](docs/api-reference.md)**: Concise index of all add-on API classes and helpers.
+- **[Compilable Example Add-on](src/test/java/ic2/api/example/ExampleAddonMod.java)**: Live, fully working reference mod demonstrating blocks, tools, upgrades, and FE capabilities.
+
+### Add-on Development Highlights
+- **`Ic2AddonContent`**: 1-line registration for blocks, items, custom Creative Mode tabs, menus, and recipe types.
+- **`AddonWrenchableBlock`**: Machine & battery block base with placement facing and IC2 Wrench rotation/dismantling.
+- **`AddonMachineBlockEntity`**: EU-powered processing machine base with progress and operation tracking.
+- **`AddonGeneratorBlockEntity` & `AddonEnergyStorageBlockEntity`**: Generator and battery bases with built-in Forge Energy (FE) bridge (`1 EU = 2 FE`).
+- **`AddonElectricTool`**: Extensible electric tool base with automated discharge/charge management.
+- **`AddonUpgradeItem`**: Fluent builder for creating machine upgrades (speed, storage, tier boost).
+- **`AddonRecipeBuilder`**: Programmatic builder generating JSON recipes for all IC2 machine types (Macerator, Compressor, Centrifuge, Blast Furnace, etc.).
 
 **[Read the IC2 Refactored Add-on API documentation](https://lerrche.github.io/IC2-Refactored-Rebranded/)**
 

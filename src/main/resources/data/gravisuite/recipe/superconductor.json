@@ -1,0 +1,23 @@
+﻿{
+    "key":  {
+                "C":  {
+                          "item":  "ic2:glass_fibre_cable"
+                      },
+                "S":  {
+                          "item":  "gravisuite:superconductor_cover"
+                      },
+                "G":  {
+                          "item":  "minecraft:gold_ingot"
+                      }
+            },
+    "pattern":  [
+                    "SSS",
+                    "CGC",
+                    "SSS"
+                ],
+    "result":  {
+                   "id":  "gravisuite:superconductor",
+                   "count":  1
+               },
+    "type":  "minecraft:crafting_shaped"
+}

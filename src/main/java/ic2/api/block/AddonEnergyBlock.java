@@ -20,7 +20,7 @@ import org.jetbrains.annotations.Nullable;
  * subclassing this class.
  */
 public class AddonEnergyBlock extends BaseEntityBlock {
-  private final BiFunction<BlockPos, BlockState, ? extends BlockEntity> factory;
+  protected final BiFunction<BlockPos, BlockState, ? extends BlockEntity> factory;
   private final MapCodec<AddonEnergyBlock> codec;
 
   public AddonEnergyBlock(
@@ -30,6 +30,18 @@ public class AddonEnergyBlock extends BaseEntityBlock {
     this.factory = Objects.requireNonNull(factory, "factory");
     this.codec =
         simpleCodec(blockProperties -> new AddonEnergyBlock(blockProperties, this.factory));
+  }
+
+  /**
+   * Helper function returning light emission when a boolean block state property is true.
+   *
+   * @param property The boolean property to check on the block state
+   * @param lightLevel The light level to emit when active (1 to 15)
+   * @return A ToIntFunction suitable for {@link BlockBehaviour.Properties#lightLevel}
+   */
+  public static java.util.function.ToIntFunction<BlockState> litWhenActive(
+      net.minecraft.world.level.block.state.properties.BooleanProperty property, int lightLevel) {
+    return state -> (state.hasProperty(property) && state.getValue(property)) ? lightLevel : 0;
   }
 
   /** Keep the supplied block-entity factory when the standard block codec rebuilds this block. */

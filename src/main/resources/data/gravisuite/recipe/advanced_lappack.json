@@ -1,0 +1,34 @@
+{
+  "key": {
+    "C": [
+      {
+        "tag": "c:circuits/advanced"
+      },
+      {
+        "tag": "c:circuit/advanced"
+      },
+      {
+        "item": "ic2:advanced_circuit"
+      }
+    ],
+    "E": {
+      "item": "ic2:energy_crystal"
+    },
+    "P": {
+      "item": "ic2:carbon_plate"
+    },
+    "L": {
+      "item": "ic2:lappack"
+    }
+  },
+  "pattern": [
+    "PCP",
+    "ELE",
+    " C "
+  ],
+  "result": {
+    "id": "gravisuite:advanced_lappack",
+    "count": 1
+  },
+  "type": "minecraft:crafting_shaped"
+}

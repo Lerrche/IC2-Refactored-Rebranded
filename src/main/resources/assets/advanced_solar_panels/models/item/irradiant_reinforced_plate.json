@@ -1,0 +1,6 @@
+﻿{
+    "textures":  {
+                     "layer0":  "advanced_solar_panels:item/irradiantreinforcedplate"
+                 },
+    "parent":  "minecraft:item/generated"
+}

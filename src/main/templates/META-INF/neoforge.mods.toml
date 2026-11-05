@@ -44,3 +44,35 @@ type="optional"
 versionRange="[2.0.6,)"
 ordering="AFTER"
 side="BOTH"
+
+[[mods]]
+modId="gravisuite"
+version="${mod_version}"
+displayName="Gravitation Suite"
+authors="SeNtiMeL, Chocohead, HalfCooler"
+description='''
+Gravitation Suite port for IC2 Rebranded on Minecraft 1.21.1 / NeoForge.
+'''
+
+[[dependencies.gravisuite]]
+modId="ic2"
+type="required"
+versionRange="[1.0.3,)"
+ordering="AFTER"
+side="BOTH"
+
+[[mods]]
+modId="advanced_solar_panels"
+version="${mod_version}"
+displayName="Advanced Solar Panels"
+authors="Icedfire, SeNtiMeL, Chocohead, HalfCooler"
+description='''
+Advanced Solar Panels port for IC2 Rebranded on Minecraft 1.21.1 / NeoForge.
+'''
+
+[[dependencies.advanced_solar_panels]]
+modId="ic2"
+type="required"
+versionRange="[1.0.3,)"
+ordering="AFTER"
+side="BOTH"

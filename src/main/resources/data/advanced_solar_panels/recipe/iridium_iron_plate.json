@@ -1,0 +1,20 @@
+﻿{
+    "key":  {
+                "P":  {
+                          "item":  "ic2:iridium"
+                      },
+                "I":  {
+                          "item":  "minecraft:iron_ingot"
+                      }
+            },
+    "pattern":  [
+                    "III",
+                    "IPI",
+                    "III"
+                ],
+    "result":  {
+                   "id":  "advanced_solar_panels:iridium_iron_plate",
+                   "count":  1
+               },
+    "type":  "minecraft:crafting_shaped"
+}

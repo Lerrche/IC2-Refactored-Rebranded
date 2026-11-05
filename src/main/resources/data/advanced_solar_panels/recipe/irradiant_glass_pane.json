@@ -1,0 +1,23 @@
+﻿{
+    "key":  {
+                "G":  {
+                          "item":  "ic2:glass_fibre_cable"
+                      },
+                "R":  {
+                          "item":  "minecraft:redstone"
+                      },
+                "I":  {
+                          "item":  "advanced_solar_panels:irradiant_uranium"
+                      }
+            },
+    "pattern":  [
+                    "GGG",
+                    "RIR",
+                    "GGG"
+                ],
+    "result":  {
+                   "id":  "advanced_solar_panels:irradiant_glass_pane",
+                   "count":  6
+               },
+    "type":  "minecraft:crafting_shaped"
+}

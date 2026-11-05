@@ -1,0 +1,6 @@
+﻿{
+    "textures":  {
+                     "layer0":  "advanced_solar_panels:item/sunnariumalloy"
+                 },
+    "parent":  "minecraft:item/generated"
+}

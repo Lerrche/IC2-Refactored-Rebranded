@@ -1,0 +1,7 @@
+{
+  "replace": false,
+  "values": [
+    "#c:circuits/advanced",
+    "ic2:advanced_circuit"
+  ]
+}

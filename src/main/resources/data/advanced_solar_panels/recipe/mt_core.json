@@ -1,0 +1,31 @@
+{
+  "key": {
+    "Q": [
+      {
+        "tag": "c:circuits/advanced"
+      },
+      {
+        "tag": "c:circuit/advanced"
+      },
+      {
+        "item": "ic2:advanced_circuit"
+      }
+    ],
+    "R": {
+      "item": "advanced_solar_panels:irradiant_glass_pane"
+    },
+    "I": {
+      "item": "advanced_solar_panels:sunnarium_alloy"
+    }
+  },
+  "pattern": [
+    "RIR",
+    "IQI",
+    "RIR"
+  ],
+  "result": {
+    "id": "advanced_solar_panels:mt_core",
+    "count": 1
+  },
+  "type": "minecraft:crafting_shaped"
+}

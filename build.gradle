@@ -40,7 +40,11 @@ base {
     archivesName = "${mod_id}-neoforge"
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+java {
+    toolchain.languageVersion = JavaLanguageVersion.of(21)
+    withSourcesJar()
+    withJavadocJar()
+}
 
 spotless {
     java {
@@ -110,6 +114,7 @@ configurations {
 dependencies {
     compileOnly "mezz.jei:jei-1.21.1-neoforge-api:${jei_version}"
     runtimeOnly "mezz.jei:jei-1.21.1-neoforge:${jei_version}"
+    testCompileOnly "mezz.jei:jei-1.21.1-neoforge-api:${jei_version}"
 
     compileOnly "org.appliedenergistics:appliedenergistics2:${ae2_version}:api"
 
@@ -200,6 +205,11 @@ publishing {
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8'
     options.compilerArgs += ['-Xmaxerrs', '100000']
+}
+
+tasks.withType(Javadoc).configureEach {
+    options.encoding = 'UTF-8'
+    options.addStringOption('Xdoclint:none', '-quiet')
 }
 
 idea {

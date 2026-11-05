@@ -1,0 +1,6 @@
+﻿{
+    "textures":  {
+                     "layer0":  "gravisuite:item/advancednanochestplate"
+                 },
+    "parent":  "minecraft:item/generated"
+}

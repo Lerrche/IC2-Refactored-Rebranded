@@ -70,7 +70,7 @@ public class AddonElectricJetpack extends AddonElectricArmor implements IJetpack
 
   @Override
   public boolean isJetpackActive(ItemStack stack) {
-    return ElectricItem.manager.getCharge(stack) >= this.energyPerTick;
+    return ElectricItem.manager.getCharge(stack) > 0;
   }
 
   @Override

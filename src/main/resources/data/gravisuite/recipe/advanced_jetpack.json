@@ -1,0 +1,26 @@
+﻿{
+    "key":  {
+                "C":  {
+                          "item":  "ic2:carbon_plate"
+                      },
+                "L":  {
+                          "item":  "gravisuite:advanced_lappack"
+                      },
+                "J":  {
+                          "item":  "ic2:jetpack_electric"
+                      },
+                "B":  {
+                          "item":  "gravisuite:engine_booster"
+                      }
+            },
+    "pattern":  [
+                    "CJC",
+                    "BLB",
+                    " C "
+                ],
+    "result":  {
+                   "id":  "gravisuite:advanced_jetpack",
+                   "count":  1
+               },
+    "type":  "minecraft:crafting_shaped"
+}

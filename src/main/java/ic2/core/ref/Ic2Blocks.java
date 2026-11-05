@@ -142,6 +142,13 @@ import net.minecraft.world.level.block.state.properties.WoodType;
 import net.minecraft.world.level.material.MapColor;
 
 public final class Ic2Blocks {
+  public static final java.util.function.ToIntFunction<BlockState> ACTIVE_LIGHT_13 =
+      state ->
+          (state.hasProperty(Ic2TileEntityBlock.ACTIVE)
+                  && state.getValue(Ic2TileEntityBlock.ACTIVE))
+              ? 13
+              : 0;
+
   public static final Block LEAD_ORE =
       register(
           "lead_ore",
@@ -517,7 +524,8 @@ public final class Ic2Blocks {
                   .mapColor(MapColor.COLOR_LIGHT_GRAY)
                   .strength(2.0F, 10.0F)
                   .requiresCorrectToolForDrops()
-                  .sound(SoundType.METAL),
+                  .sound(SoundType.METAL)
+                  .lightLevel(ACTIVE_LIGHT_13),
               TileEntityGenerator.class,
               true,
               Ic2TileEntityBlock.DefaultDrop.Self,
@@ -531,7 +539,8 @@ public final class Ic2Blocks {
                   .mapColor(MapColor.COLOR_LIGHT_GRAY)
                   .strength(2.0F, 10.0F)
                   .requiresCorrectToolForDrops()
-                  .sound(SoundType.METAL),
+                  .sound(SoundType.METAL)
+                  .lightLevel(ACTIVE_LIGHT_13),
               TileEntityGeoGenerator.class,
               true,
               Ic2TileEntityBlock.DefaultDrop.Generator,
@@ -573,7 +582,8 @@ public final class Ic2Blocks {
                   .mapColor(MapColor.COLOR_LIGHT_GRAY)
                   .strength(2.0F, 10.0F)
                   .requiresCorrectToolForDrops()
-                  .sound(SoundType.METAL),
+                  .sound(SoundType.METAL)
+                  .lightLevel(ACTIVE_LIGHT_13),
               TileEntitySemifluidGenerator.class,
               true,
               Ic2TileEntityBlock.DefaultDrop.Generator,
@@ -601,7 +611,8 @@ public final class Ic2Blocks {
                   .mapColor(MapColor.COLOR_LIGHT_GRAY)
                   .strength(2.0F, 10.0F)
                   .requiresCorrectToolForDrops()
-                  .sound(SoundType.METAL),
+                  .sound(SoundType.METAL)
+                  .lightLevel(ACTIVE_LIGHT_13),
               TileEntityStirlingGenerator.class,
               true,
               Ic2TileEntityBlock.DefaultDrop.Generator,
@@ -657,7 +668,8 @@ public final class Ic2Blocks {
                   .mapColor(MapColor.COLOR_LIGHT_GRAY)
                   .strength(2.0F, 10.0F)
                   .requiresCorrectToolForDrops()
-                  .sound(SoundType.METAL),
+                  .sound(SoundType.METAL)
+                  .lightLevel(ACTIVE_LIGHT_13),
               TileEntityFluidHeatGenerator.class,
               true,
               Ic2TileEntityBlock.DefaultDrop.Self,
@@ -685,7 +697,8 @@ public final class Ic2Blocks {
                   .mapColor(MapColor.COLOR_LIGHT_GRAY)
                   .strength(2.0F, 10.0F)
                   .requiresCorrectToolForDrops()
-                  .sound(SoundType.METAL),
+                  .sound(SoundType.METAL)
+                  .lightLevel(ACTIVE_LIGHT_13),
               TileEntitySolidHeatGenerator.class,
               true,
               Ic2TileEntityBlock.DefaultDrop.Self,
@@ -1094,7 +1107,8 @@ public final class Ic2Blocks {
                   .mapColor(MapColor.COLOR_LIGHT_GRAY)
                   .strength(2.0F, 10.0F)
                   .requiresCorrectToolForDrops()
-                  .sound(SoundType.METAL),
+                  .sound(SoundType.METAL)
+                  .lightLevel(ACTIVE_LIGHT_13),
               TileEntityElectricFurnace.class,
               true,
               Ic2TileEntityBlock.DefaultDrop.Self,
@@ -1121,7 +1135,8 @@ public final class Ic2Blocks {
               Properties.of()
                   .strength(5.0F, 10.0F)
                   .requiresCorrectToolForDrops()
-                  .sound(SoundType.METAL),
+                  .sound(SoundType.METAL)
+                  .lightLevel(ACTIVE_LIGHT_13),
               TileEntityIronFurnace.class,
               true,
               Ic2TileEntityBlock.DefaultDrop.Self,
@@ -1177,7 +1192,8 @@ public final class Ic2Blocks {
                   .mapColor(MapColor.COLOR_LIGHT_GRAY)
                   .strength(2.0F, 10.0F)
                   .requiresCorrectToolForDrops()
-                  .sound(SoundType.METAL),
+                  .sound(SoundType.METAL)
+                  .lightLevel(ACTIVE_LIGHT_13),
               TileEntityBlastFurnace.class,
               true,
               Ic2TileEntityBlock.DefaultDrop.Machine,
@@ -1233,7 +1249,8 @@ public final class Ic2Blocks {
                   .mapColor(MapColor.COLOR_LIGHT_GRAY)
                   .strength(2.0F, 10.0F)
                   .requiresCorrectToolForDrops()
-                  .sound(SoundType.METAL),
+                  .sound(SoundType.METAL)
+                  .lightLevel(ACTIVE_LIGHT_13),
               TileEntityInduction.class,
               true,
               Ic2TileEntityBlock.DefaultDrop.AdvMachine,
@@ -1889,7 +1906,8 @@ public final class Ic2Blocks {
                   .mapColor(MapColor.COLOR_LIGHT_GRAY)
                   .strength(2.0F, 10.0F)
                   .requiresCorrectToolForDrops()
-                  .sound(SoundType.STONE),
+                  .sound(SoundType.STONE)
+                  .lightLevel(ACTIVE_LIGHT_13),
               TileEntityCokeKiln.class,
               true,
               Ic2TileEntityBlock.DefaultDrop.Self,

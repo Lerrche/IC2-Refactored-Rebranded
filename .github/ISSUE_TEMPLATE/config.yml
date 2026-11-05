@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: IC2 Refactored Documentation
+    url: https://lerrche.github.io/IC2-Refactored-Rebranded/
+    about: Read the official add-on development and usage guide.
+  - name: GitHub Discussions / Community
+    url: https://github.com/Lerrche/IC2-Refactored-Rebranded/discussions
+    about: Ask questions and connect with the community.

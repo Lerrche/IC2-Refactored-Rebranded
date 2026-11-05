@@ -1,0 +1,40 @@
+{
+  "key": {
+    "V": {
+      "item": "gravisuite:vajra_core"
+    },
+    "A": {
+      "item": "ic2:alloy"
+    },
+    "C": [
+      {
+        "tag": "c:circuits/advanced"
+      },
+      {
+        "tag": "c:circuit/advanced"
+      },
+      {
+        "item": "ic2:advanced_circuit"
+      }
+    ],
+    "E": {
+      "item": "ic2:energy_storage_upgrade"
+    },
+    "P": {
+      "item": "ic2:iridium"
+    },
+    "L": {
+      "item": "gravisuite:ultimate_lappack"
+    }
+  },
+  "pattern": [
+    "PEP",
+    "CVC",
+    "ALA"
+  ],
+  "result": {
+    "id": "gravisuite:vajra",
+    "count": 1
+  },
+  "type": "minecraft:crafting_shaped"
+}

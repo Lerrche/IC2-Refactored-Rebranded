@@ -96,7 +96,7 @@ public abstract class AddonEnergyBlockEntity extends BlockEntity
       double inputEuPerTick,
       double outputEuPerTick) {
     super(type, pos, state);
-    if (tier < 0 || tier > 3) throw new IllegalArgumentException("tier must be between 0 and 3");
+    if (tier < 0 || tier > 5) throw new IllegalArgumentException("tier must be between 0 and 5");
     if (!Double.isFinite(capacityEu) || capacityEu <= 0)
       throw new IllegalArgumentException("capacityEu must be finite and positive");
     if (!Double.isFinite(inputEuPerTick) || inputEuPerTick < 0)

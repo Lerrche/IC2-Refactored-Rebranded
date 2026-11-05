@@ -1194,6 +1194,8 @@
   "item.ic2.tin_plate": "Tin Plate",
   "item.ic2.tool_box": "Tool Box",
   "item.ic2.tooltip.jetpack.toggle": "Press %s+%s to toggle Hover Mode",
+  "item.ic2.tooltip.jetpack.boost": "Press %s+%s to boost",
+  "item.ic2.jetpack.tooltip.boost": "Press %s+%s to boost",
   "item.ic2.tooltip.mode.switch": "Press %s+%s to switch mode",
   "item.ic2.tooltip.night_vision.toggle": "Press %s + %s to toggle Night Vision",
   "item.ic2.tooltip.speed.toggle": "Press %s + %s to toggle Speed Boost",

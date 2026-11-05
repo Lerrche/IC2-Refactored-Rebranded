@@ -1,0 +1,20 @@
+﻿{
+    "key":  {
+                "U":  {
+                          "item":  "ic2:re_enriched_uranium"
+                      },
+                "G":  {
+                          "item":  "minecraft:glowstone_dust"
+                      }
+            },
+    "pattern":  [
+                    "GGG",
+                    "GUG",
+                    "GGG"
+                ],
+    "result":  {
+                   "id":  "advanced_solar_panels:irradiant_uranium",
+                   "count":  1
+               },
+    "type":  "minecraft:crafting_shaped"
+}
