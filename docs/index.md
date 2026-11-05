@@ -1,24 +1,58 @@
-# IC2 Refactored Add-on API
+# IndustrialCraft 2: Refactored — Add-on API
 
-Welcome! This site documents the add-on-facing helpers and reusable electric-content base classes available in this IC2 Refactored source snapshot for **Minecraft 1.21.1 and NeoForge**.
+Welcome to the documentation for **IC2 Refactored (IC2 Rebranded)** on **Minecraft 1.21.1** with **NeoForge**!
 
-The aim is to help you build an add-on without having to reverse-engineer every implementation class. The API is still evolving, so treat the source as the final authority when behavior or signatures are unclear.
+This documentation provides everything you need to create custom add-ons: custom machines, generators, energy storage, electric tools, nano/quantum armor, flying jetpacks, machine upgrades, and recipes.
 
-## Start here
+---
 
-- [Getting started](getting-started.md) — environment and dependency setup.
-- [Registration](registration.md) — register blocks and items under your own mod ID.
-- [Examples](examples/index.md) — small patterns you can adapt.
-- [Energy API](energy/index.md) — storage and generators.
-- [Electric items](items/electric-items.md) — chargeable items, weapons, armor, and jetpacks.
-- [API reference](api-reference.md) — verified API entry points.
-- [Building the mod](building.md) — format, build, and locate the JAR.
+## Quick Navigation
 
-## A few rules of thumb
+<div class="grid cards" markdown>
 
-1. Use your own mod ID for add-on content and resources.
-2. Prefer classes in `ic2.api.*` where they cover your use case. Some reusable base classes extend IC2R internals and are more version-sensitive.
-3. Register your own blocks, items, and block-entity types. The helper classes do not automatically create all models, textures, menus, recipes, or loot tables.
-4. Run `spotlessApply` before `build`, as described in [Building the mod](building.md).
+-   :material-book-open-page-variant: **[Add-on Creation Guide](addon-development-guide.md)**
 
-[Open the source repository](https://github.com/Lerrche/IC2-Refactored-Rebranded) · [Original IC2R port](https://github.com/neo-industrial-mc/IC2R)
+    ---
+
+    Step-by-step numbered guides covering registration, machines, generators, tools, armor, and upgrades.
+
+-   :material-flash: **[Energy System & FE Interop](energy-system.md)**
+
+    ---
+
+    Energy Units (EU), Voltage Tiers (LV to EV), cable loss, and automatic Forge Energy (FE) cross-mod bridge.
+
+-   :material-code-tags: **[Complete Example Add-on](example-addon.md)**
+
+    ---
+
+    A full, copy-pasteable reference mod template demonstrating all core features in one place.
+
+-   :material-database-search: **[API Reference](api-reference.md)**
+
+    ---
+
+    A concise index of all verified helper classes, interfaces, and methods in `ic2.api.*`.
+
+</div>
+
+---
+
+## Why Develop for IC2 Rebranded?
+
+- **1-Line Registration**: With `Ic2AddonContent`, you can register blocks, items, block entities, menus, recipes, and creative tabs without managing dozens of separate `DeferredRegister` objects.
+- **Built-in Wrench Support**: `AddonWrenchableBlock` automatically provides rotation, dismantle drops, and facing states compatible with IC2 wrenches.
+- **Dynamic Lighting**: Generators and furnaces automatically emit block light when actively operating with `AddonEnergyBlock.litWhenActive(...)`.
+- **Automatic Forge Energy (FE) Bridge**: Every add-on energy machine and generator can connect seamlessly to modern tech mods (Mekanism, Thermal, Ender IO) with 1 line of code (`1 EU = 2 FE`).
+- **Data-Driven Machine Recipes**: Generate recipes for Macerators, Compressors, Extractors, and Blast Furnaces programmatically using `AddonRecipeBuilder`.
+
+---
+
+## Getting Started in 3 Steps
+
+1. Check out the **[Getting Started Guide](getting-started.md)** to configure your `build.gradle` and `neoforge.mods.toml`.
+2. Follow **[Chapter 1: Registration with `Ic2AddonContent`](guides/registration.md)**.
+3. Explore the **[Complete Example Add-on Mod](example-addon.md)** to copy a working template.
+
+[View the Source Code on GitHub](https://github.com/Lerrche/IC2-Refactored-Rebranded){ .md-button .md-button--primary }
+[Original IC2R Port by neo-industrial-mc](https://github.com/neo-industrial-mc/IC2R){ .md-button }

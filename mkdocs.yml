@@ -44,22 +44,20 @@ markdown_extensions:
 nav:
   - Home: index.md
   - Getting Started: getting-started.md
-  - Add-on Creation Guide: addon-development-guide.md
-  - Registration: registration.md
-  - Examples:
-      - Overview: examples/index.md
-      - Register Items and Blocks: examples/registration.md
-      - Electric Item: examples/electric-item.md
-      - Electric Weapon: examples/electric-weapon.md
-      - Generator Base: examples/generator.md
-  - Energy API:
-      - Overview: energy/index.md
-      - Storage Block Entities: energy/storage.md
-      - Generators: energy/generators.md
-  - Electric Items:
-      - Electric Items and Batteries: items/electric-items.md
-      - Armor and Jetpacks: items/armor.md
-  - API Reference: api-reference.md
-  - Compatibility: compatibility.md
-  - Building the Mod: building.md
-  - Contributing: contributing.md
+  - Add-on Guides:
+      - Overview: addon-development-guide.md
+      - 1. Registration & Setup: guides/registration.md
+      - 2. Custom Machines: guides/machines.md
+      - 3. Custom Generators: guides/generators.md
+      - 4. Energy Storage Blocks: guides/storage.md
+      - 5. Electric Tools & Weapons: guides/tools.md
+      - 6. Electric Armor & Jetpacks: guides/armor.md
+      - 7. Machine Upgrades: guides/upgrades.md
+      - 8. Recipes & DataGen: guides/recipes.md
+  - Energy System & FE: energy-system.md
+  - Complete Example Add-on: example-addon.md
+  - Reference:
+      - API Reference: api-reference.md
+      - Compatibility: compatibility.md
+      - Building the Mod: building.md
+      - Contributing: contributing.md

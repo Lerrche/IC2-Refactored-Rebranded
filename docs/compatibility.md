@@ -1,21 +1,23 @@
-# Compatibility notes
+# Compatibility Notes
 
-## Minecraft and NeoForge versions
+## Minecraft and NeoForge Versions
 
-This documentation targets Minecraft 1.21.1. Use the NeoForge version configured by the IC2R checkout you build against. Do not assume a class compiled against another Minecraft or NeoForge version will be binary compatible.
+This documentation targets **Minecraft 1.21.1** on **NeoForge**. Always use the NeoForge version specified in the root `gradle.properties` / `build.gradle` of this repository.
 
-## Public API vs implementation
+## Public API vs Implementation
 
-Prefer documented `ic2.api.*` classes. The reusable block-entity bases currently extend classes in `ic2.core.*`; they are useful but coupled to IC2R internals and may change between revisions. Avoid depending on unrelated internal classes unless you accept that maintenance cost.
+- **Use `ic2.api.*` wherever possible**: Classes in `ic2.api.*` (`Ic2AddonContent`, `AddonWrenchableBlock`, `AddonMachineBlockEntity`, `AddonGeneratorBlockEntity`, `AddonEnergyStorageBlockEntity`, `AddonElectricTool`, `AddonUpgradeItem`, `AddonRecipeBuilder`, `ElectricItem.manager`) are specifically designed for add-ons and provide stable, clean interfaces.
+- **Avoid depending on `ic2.core.*` internals**: Internal classes are subject to refactoring between mod versions.
 
-## Energy interop
+## Energy Interoperability (EU & FE)
 
-IC2R's native energy system uses EU. Other mods may expose FE or another energy unit. Never assume a 1:1 mapping without checking the adapter. A robust bridge should document its conversion ratio, rounding behavior, transfer limits, and buffer policy, and should avoid creating energy through repeated rounding or duplicate transfers.
+IC2 Rebranded includes a built-in bidirectional Forge Energy (FE) bridge:
+- **Conversion Ratio**: $1\text{ EU} = 2\text{ FE}$ ($1\text{ FE} = 0.5\text{ EU}$).
+- All `AddonEnergyBlockEntity`, `AddonMachineBlockEntity`, `AddonGeneratorBlockEntity`, and `AddonEnergyStorageBlockEntity` instances support FE automatically when registered with `AddonEnergyCapabilities.registerEnergyStorage(event, blockEntityType.get())`.
 
-## Common problems
+## Common Troubleshooting Tips
 
-- **Missing IC2R classes:** make sure IC2R is on the add-on's compile classpath and present at runtime.
-- **Content doesn't appear:** verify the mod ID/namespace, registry event bus, asset paths, and language keys.
-- **Block entity crashes:** verify the registered `BlockEntityType` matches your subclass and block.
-- **Wrong textures/models:** registration does not generate resource files.
-- **Build fails on formatting:** run `spotlessApply`, then rerun `build` and inspect the first real error if it still fails.
+- **Missing IC2 Classes**: Ensure `implementation "me.halfcooler.ic2r.core:ic2r-neoforge:1.0.3"` is in your add-on's `build.gradle`, and `ic2` is declared as a required dependency in `neoforge.mods.toml`.
+- **Block/Item Not Showing Up**: Ensure `CONTENT.register(modEventBus)` is called in your mod constructor, and items are added to your Creative Mode Tab or vanilla tags.
+- **Wrench Not Rotating Block**: Ensure you registered your block with `CONTENT.registerWrenchableBlock(...)`.
+- **Code Style / Build Failures**: Run `.\gradlew.bat spotlessApply` before running `build`.

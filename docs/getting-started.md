@@ -1,47 +1,107 @@
-# Getting started
+# Getting Started
 
-## Requirements
+This guide explains how to set up your Minecraft 1.21.1 / NeoForge development environment to create an IC2 Rebranded add-on.
 
-- Java 21
-- Minecraft 1.21.1
-- NeoForge for Minecraft 1.21.1
-- A Java IDE or editor
-- IC2 Refactored installed as a development/runtime dependency for your add-on
+---
 
-Use the NeoForge version expected by the IC2R build you are targeting. Do not assume every IC2R fork or release uses the same NeoForge patch version.
+## 1. Prerequisites
 
-## Create an add-on project
+- **Java Development Kit (JDK) 21** or higher.
+- A modern IDE: **IntelliJ IDEA** (recommended) or VS Code.
+- A standard NeoForge 1.21.1 mod project.
 
-Start with a NeoForge 1.21.1 mod project, give it its own unique mod ID (for example `example_ic2_addon`), and add IC2 Refactored to the development environment using the dependency approach your project uses. The add-on's `neoforge.mods.toml` should declare IC2R as a dependency if your code calls its API during initialization.
+---
 
-The exact Maven coordinate or local dependency setup can vary by how you distribute/build IC2R; this repository's `publishing` block alone does not guarantee a published artifact is available to everyone. If you are developing against source locally, use a local project dependency or the built JAR.
+## 2. Setting Up `build.gradle`
 
-## Recommended package layout
+In your add-on project's `build.gradle`, include the NeoForge mod development plugin and declare your dependency on IC2 Rebranded:
 
-```text
-src/main/java/example/addon/
-  ExampleIc2Addon.java
-  content/AddonContent.java
-  item/AlloyCell.java
-  item/AlloyWeapon.java
-  block/energy/ExampleGeneratorBlockEntity.java
-src/main/resources/
-  META-INF/neoforge.mods.toml
-  assets/example_ic2_addon/lang/en_us.json
-  assets/example_ic2_addon/models/item/...
-  assets/example_ic2_addon/textures/item/...
-  data/example_ic2_addon/recipe/...
+```groovy
+plugins {
+    id 'java-library'
+    id 'net.neoforged.moddev' version '2.0.141'
+}
+
+group = 'com.example.myaddon'
+version = '1.0.0'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+neoForge {
+    version = '21.1.93' // Target NeoForge 1.21.1
+
+    runs {
+        client {
+            client()
+        }
+        server {
+            server()
+        }
+    }
+
+    mods {
+        myaddon {
+            sourceSet sourceSets.main
+        }
+    }
+}
+
+repositories {
+    mavenCentral()
+    // Local flatDir or your team Maven repository
+    flatDir {
+        dirs 'libs'
+    }
+}
+
+dependencies {
+    // Depend on IC2 Rebranded JAR (in your libs/ folder or Maven)
+    implementation "me.halfcooler.ic2r.core:ic2r-neoforge:1.0.3"
+}
 ```
 
-This is an example layout, not a required API structure.
+---
 
-## Build IC2R
+## 3. Configuring `neoforge.mods.toml`
 
-From the repository root, run:
+Declare IC2 as a required dependency in `src/main/resources/META-INF/neoforge.mods.toml` so NeoForge ensures IC2 loads before your add-on:
 
-```powershell
-.\gradlew.bat spotlessApply
-.\gradlew.bat build
+```toml
+modLoader = "javafml"
+loaderVersion = "[4,)"
+license = "MIT"
+
+[[mods]]
+modId = "myaddon"
+version = "1.0.0"
+displayName = "My IC2 Addon"
+description = "A custom add-on for IC2 Rebranded."
+
+# Require IC2 Rebranded
+[[dependencies.myaddon]]
+modId = "ic2"
+type = "required"
+versionRange = "[1.0.3,)"
+ordering = "AFTER"
+side = "BOTH"
+
+# Require Minecraft
+[[dependencies.myaddon]]
+modId = "minecraft"
+type = "required"
+versionRange = "[1.21.1,1.22)"
+ordering = "NONE"
+side = "BOTH"
 ```
 
-See [Building the mod](building.md) for Linux/macOS commands and where to find the JAR.
+---
+
+## 4. Next Steps
+
+Once your project builds, proceed to:
+1. **[Chapter 1: Registration with `Ic2AddonContent`](guides/registration.md)** to register your first items, blocks, and creative mode tab.
+2. **[Complete Example Add-on Mod](example-addon.md)** to see a full working mod template.
