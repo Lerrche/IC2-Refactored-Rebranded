@@ -10,13 +10,6 @@ I started this project to build on the existing port with compatibility work, qu
 
 The docs cover project setup, content registration, electric items, energy storage, generators, examples, and API notes. They're a work in progress, so check the actual source when something is marked experimental or incomplete.
 
-## Project goals
-
-- Improve compatibility between IC2 energy systems and other tech mods.
-- Make it easier to create add-ons with custom items, machines, generators, and energy storage.
-- Add quality-of-life improvements and fixes on top of the existing port.
-- Keep integration examples and API notes in one place for other developers.
-
 ## Requirements
 
 - Minecraft 1.21.1
