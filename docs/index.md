@@ -8,33 +8,25 @@ This documentation provides everything you need to create custom add-ons: custom
 
 ## Quick Navigation
 
-<div class="grid cards" markdown>
+| Resource | Description |
+|---|---|
+| **[Add-on Creation Guide](addon-development-guide.md)** | Master overview and 8 numbered guide chapters covering registration, machines, generators, tools, armor, and upgrades. |
+| **[Energy System & FE Interop](energy-system.md)** | Deep dive into Energy Units (EU), Voltage Tiers (LV to EV), cable loss, and the automatic Forge Energy (FE) cross-mod bridge. |
+| **[Complete Example Add-on](example-addon.md)** | A full, copy-pasteable reference mod template (`ExampleAddonMod.java`) demonstrating all core features in one place. |
+| **[API Reference](api-reference.md)** | A concise index of all verified helper classes, interfaces, and methods in `ic2.api.*`. |
 
--   :material-book-open-page-variant: **[Add-on Creation Guide](addon-development-guide.md)**
+---
 
-    ---
+## Guide Chapters at a Glance
 
-    Step-by-step numbered guides covering registration, machines, generators, tools, armor, and upgrades.
-
--   :material-flash: **[Energy System & FE Interop](energy-system.md)**
-
-    ---
-
-    Energy Units (EU), Voltage Tiers (LV to EV), cable loss, and automatic Forge Energy (FE) cross-mod bridge.
-
--   :material-code-tags: **[Complete Example Add-on](example-addon.md)**
-
-    ---
-
-    A full, copy-pasteable reference mod template demonstrating all core features in one place.
-
--   :material-database-search: **[API Reference](api-reference.md)**
-
-    ---
-
-    A concise index of all verified helper classes, interfaces, and methods in `ic2.api.*`.
-
-</div>
+1. **[Registration & Setup](guides/registration.md)**: 1-line content registration with `Ic2AddonContent`, creative tabs, and materials.
+2. **[Custom Machines](guides/machines.md)**: Building EU-consuming machines with `AddonMachineBlockEntity` and `AddonWrenchableBlock`.
+3. **[Custom Generators](guides/generators.md)**: Creating solid-fuel, fluid, and solar generators with dynamic block lighting (`litWhenActive`).
+4. **[Energy Storage Blocks](guides/storage.md)**: Building battery accumulators (BatBox, CESU, MFE) with charge and discharge slots.
+5. **[Electric Tools & Weapons](guides/tools.md)**: Drills, chainsaws, wrenches, and nanosabers using `AddonElectricTool` and `ElectricItem.manager`.
+6. **[Electric Armor & Jetpacks](guides/armor.md)**: Quantum/Nano armor suits, wearable Lappacks, and flying jetpacks with hover and boost keys.
+7. **[Machine Upgrades](guides/upgrades.md)**: Overclock/speed, storage buffer, and transformer voltage upgrades using `AddonUpgradeItem`.
+8. **[Recipes & DataGen](guides/recipes.md)**: Programmatic recipe generation with `AddonRecipeBuilder` and circuit tag conventions.
 
 ---
 
@@ -51,8 +43,10 @@ This documentation provides everything you need to create custom add-ons: custom
 ## Getting Started in 3 Steps
 
 1. Check out the **[Getting Started Guide](getting-started.md)** to configure your `build.gradle` and `neoforge.mods.toml`.
-2. Follow **[Chapter 1: Registration with `Ic2AddonContent`](guides/registration.md)**.
-3. Explore the **[Complete Example Add-on Mod](example-addon.md)** to copy a working template.
+2. Follow **[Chapter 1: Registration with `Ic2AddonContent`](guides/registration.md)** to register your first items and blocks.
+3. Explore the **[Complete Example Add-on Mod](example-addon.md)** to copy a full working template.
 
-[View the Source Code on GitHub](https://github.com/Lerrche/IC2-Refactored-Rebranded){ .md-button .md-button--primary }
-[Original IC2R Port by neo-industrial-mc](https://github.com/neo-industrial-mc/IC2R){ .md-button }
+---
+
+- **GitHub Repository**: [Lerrche/IC2-Refactored-Rebranded](https://github.com/Lerrche/IC2-Refactored-Rebranded)
+- **Original IC2R Port**: [neo-industrial-mc/IC2R](https://github.com/neo-industrial-mc/IC2R)
