@@ -171,7 +171,61 @@ public class EventHandlerClient {
   }
 
   public static void onGuiCreate(
-      Screen screen, List<GuiEventListener> widgets, Consumer<GuiEventListener> widgetAdder) {}
+      Screen screen, List<GuiEventListener> widgets, Consumer<GuiEventListener> widgetAdder) {
+    if (screen instanceof net.minecraft.client.gui.screens.options.SoundOptionsScreen soundScreen) {
+      for (net.minecraft.client.gui.components.events.GuiEventListener child :
+          soundScreen.children()) {
+        if (child instanceof net.minecraft.client.gui.components.OptionsList optionsList) {
+          net.minecraft.client.OptionInstance<Double> machineOption =
+              new net.minecraft.client.OptionInstance<>(
+                  "ic2.soundCategory.machinery",
+                  net.minecraft.client.OptionInstance.noTooltip(),
+                  (comp, val) ->
+                      val == 0.0
+                          ? net.minecraft.network.chat.Component.translatable(
+                              "options.generic_value",
+                              comp,
+                              net.minecraft.network.chat.Component.translatable("options.off"))
+                          : net.minecraft.network.chat.Component.translatable(
+                              "options.percent_value", comp, (int) (val * 100.0)),
+                  net.minecraft.client.OptionInstance.UnitDouble.INSTANCE,
+                  ic2.core.init.IC2ClientConfig.getMachineVolumeDouble(),
+                  newVal -> ic2.core.init.IC2ClientConfig.setMachineVolume(newVal));
+
+          net.minecraft.client.Options opt = SideProxyClient.mc.options;
+          try {
+            java.lang.reflect.Method clearMethod =
+                net.minecraft.client.gui.components.AbstractSelectionList.class.getDeclaredMethod(
+                    "clearEntries");
+            clearMethod.setAccessible(true);
+            clearMethod.invoke(optionsList);
+          } catch (Exception ignored) {
+            optionsList.children().clear();
+          }
+          optionsList.addBig(
+              opt.getSoundSourceOptionInstance(net.minecraft.sounds.SoundSource.MASTER));
+          optionsList.addSmall(
+              opt.getSoundSourceOptionInstance(net.minecraft.sounds.SoundSource.MUSIC),
+              opt.getSoundSourceOptionInstance(net.minecraft.sounds.SoundSource.RECORDS));
+          optionsList.addSmall(
+              opt.getSoundSourceOptionInstance(net.minecraft.sounds.SoundSource.WEATHER),
+              opt.getSoundSourceOptionInstance(net.minecraft.sounds.SoundSource.BLOCKS));
+          optionsList.addSmall(
+              opt.getSoundSourceOptionInstance(net.minecraft.sounds.SoundSource.HOSTILE),
+              opt.getSoundSourceOptionInstance(net.minecraft.sounds.SoundSource.NEUTRAL));
+          optionsList.addSmall(
+              opt.getSoundSourceOptionInstance(net.minecraft.sounds.SoundSource.PLAYERS),
+              opt.getSoundSourceOptionInstance(net.minecraft.sounds.SoundSource.AMBIENT));
+          optionsList.addSmall(
+              opt.getSoundSourceOptionInstance(net.minecraft.sounds.SoundSource.VOICE),
+              machineOption);
+          optionsList.addBig(opt.soundDevice());
+          optionsList.addSmall(opt.showSubtitles(), opt.directionalAudio());
+          break;
+        }
+      }
+    }
+  }
 
   private static final GuiOverlayer guiOverlayer = new GuiOverlayer(SideProxyClient.mc);
 

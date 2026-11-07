@@ -21,8 +21,14 @@ import java.util.Set;
 import java.util.function.Supplier;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.monster.Ravager;
@@ -450,6 +456,43 @@ public final class Ic2TileEntityBlock extends Block
     } else {
       return be.getCullingShape();
     }
+  }
+
+  @Override
+  protected ItemInteractionResult useItemOn(
+      ItemStack stack,
+      BlockState state,
+      Level world,
+      BlockPos pos,
+      Player player,
+      InteractionHand hand,
+      BlockHitResult hit) {
+    if (isHammer(stack)) {
+      Ic2TileEntity te = getTe(world, pos);
+      if (te instanceof TileEntityBase base) {
+        base.toggleMuted(player);
+        world.playSound(null, pos, SoundEvents.ANVIL_PLACE, SoundSource.BLOCKS, 0.5F, 1.5F);
+        return ItemInteractionResult.sidedSuccess(world.isClientSide);
+      }
+    }
+    return super.useItemOn(stack, state, world, pos, player, hand, hit);
+  }
+
+  public static boolean isHammer(ItemStack stack) {
+    if (stack.isEmpty()) {
+      return false;
+    }
+    if (stack.getItem() == ic2.core.ref.Ic2Items.FORGE_HAMMER
+        || stack.is(ic2.core.ref.Ic2ItemTags.FORGE_HAMMERS)) {
+      return true;
+    }
+    if (stack.is(ItemTags.create(ResourceLocation.parse("c:tools/hammers")))
+        || stack.is(ItemTags.create(ResourceLocation.parse("c:hammers")))
+        || stack.is(ItemTags.create(ResourceLocation.parse("c:tools/hammer")))) {
+      return true;
+    }
+    String path = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
+    return path.contains("hammer");
   }
 
   @Override

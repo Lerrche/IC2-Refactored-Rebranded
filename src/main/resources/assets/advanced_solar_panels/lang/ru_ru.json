@@ -1,0 +1,56 @@
+{
+  "itemGroup.advanced_solar_panels.main": "Advanced Solar Panels",
+
+  "block.advanced_solar_panels.advanced_solar_panel": "Улучшенная солнечная панель",
+  "block.advanced_solar_panels.hybrid_solar_panel": "Гибридная солнечная панель",
+  "block.advanced_solar_panels.ultimate_hybrid_solar_panel": "Ультимативная гибридная солнечная панель",
+  "block.advanced_solar_panels.quantum_solar_panel": "Квантовая солнечная панель",
+  "block.advanced_solar_panels.molecular_transformer": "Молекулярный преобразователь",
+  "block.advanced_solar_panels.quantum_generator": "Квантовый генератор",
+
+  "advanced_solar_panels.machines.molecular_transformer": "Молекулярный преобразователь",
+  "advanced_solar_panels.machines.quantum_generator": "Квантовый генератор",
+  "advanced_solar_panels.machines.advanced_solar_panel": "Улучшенная солнечная панель",
+  "advanced_solar_panels.machines.hybrid_solar_panel": "Гибридная солнечная панель",
+  "advanced_solar_panels.machines.ultimate_solar_panel": "Ультимативная гибридная солнечная панель",
+  "advanced_solar_panels.machines.quantum_solar_panel": "Квантовая солнечная панель",
+
+  "item.advanced_solar_panels.advanced_solar_helmet": "Улучшенный солнечный шлем",
+  "item.advanced_solar_panels.hybrid_solar_helmet": "Гибридный солнечный шлем",
+  "item.advanced_solar_panels.ultimate_solar_helmet": "Ультимативный гибридный солнечный шлем",
+
+  "item.advanced_solar_panels.sunnarium": "Саннариум",
+  "item.advanced_solar_panels.sunnarium_part": "Кусочек саннариума",
+  "item.advanced_solar_panels.sunnarium_alloy": "Саннариумный сплав",
+  "item.advanced_solar_panels.enriched_sunnarium": "Обогащенный саннариум",
+  "item.advanced_solar_panels.enriched_sunnarium_alloy": "Обогащенный саннариумный сплав",
+  "item.advanced_solar_panels.irradiant_uranium": "Светящийся уран",
+  "item.advanced_solar_panels.irradiant_glass_pane": "Светящаяся стеклянная панель",
+  "item.advanced_solar_panels.iridium_iron_plate": "Иридиево-железная пластина",
+  "item.advanced_solar_panels.reinforced_iridium_iron_plate": "Укрепленная иридиево-железная пластина",
+  "item.advanced_solar_panels.irradiant_reinforced_plate": "Светящаяся укрепленная пластина",
+  "item.advanced_solar_panels.mt_core": "Ядро МП",
+  "item.advanced_solar_panels.quantum_core": "Квантовое ядро",
+
+  "advsolar.tooltip.day_gen": "Генерация днем: %s EU/t",
+  "advsolar.tooltip.night_gen": "Генерация ночью: %s EU/t",
+  "advsolar.tooltip.storage": "Внутренний накопитель: %s EU",
+  "advsolar.tooltip.output": "Макс. выход: %s EU/t (Тир %s)",
+  "advsolar.tooltip.solar_helmet.generation": "День: %s EU/t | Ночь: %s EU/t",
+  "advanced_solar_panels.tooltip.solar_helmet.generation": "День: %s EU/t | Ночь: %s EU/t",
+  "advsolar.mt.progress": "Прогресс преобразования: %s%% (%s / %s EU)",
+  "advsolar.mt.idle": "Ожидание подходящего сырья...",
+
+  "advanced_solar_panels.gui.input": "Вход:",
+  "advanced_solar_panels.gui.output": "Выход:",
+  "advanced_solar_panels.gui.maxOutput": "Макс. выход:",
+  "advanced_solar_panels.gui.energyPerOperation": "Энергия:",
+  "advanced_solar_panels.gui.energyPerTick": "EU вход:",
+  "advanced_solar_panels.gui.progress": "Прогресс:",
+  "advanced_solar_panels.gui.tier": "Тир:",
+  "advanced_solar_panels.gui.max": "МАКС",
+  "advanced_solar_panels.gui.storage": "Накопитель:",
+  "advanced_solar_panels.gui.generating": "Генерация:",
+
+  "jei.advanced_solar_panels.molecular_transformer": "Молекулярный преобразователь"
+}

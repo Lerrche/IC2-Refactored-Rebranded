@@ -1,7 +1,7 @@
 {
   "type": "ic2:macerator",
   "ingredient": {
-    "item": "minecraft:raw_copper"
+    "tag": "c:raw_materials/copper"
   },
   "result": {
     "item": "ic2:crushed_copper",

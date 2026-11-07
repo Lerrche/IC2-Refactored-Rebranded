@@ -1,4 +1,7 @@
-{
+﻿{
+  "ic2.soundCategory.machinery": "Machinery",
+  "ic2.message.machine.muted": "Machine muted",
+  "ic2.message.machine.unmuted": "Machine unmuted",
   "advancements.ic2.acquire_insulated_cable": "Don't let yourself zapped!",
   "advancements.ic2.acquire_insulated_cable.desc": "Combine copper cable with rubber for insulated wiring. Keep cables insulated to avoid nasty shocks.",
   "advancements.ic2.acquire_matter": "Pink Liquid",

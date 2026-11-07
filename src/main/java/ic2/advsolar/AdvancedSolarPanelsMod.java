@@ -332,6 +332,10 @@ public class AdvancedSolarPanelsMod {
               Ingredient.of(Blocks.GLOWSTONE), new ItemStack(SUNNARIUM.get()), 1_000_000.0);
           MolecularTransformerBlockEntity.registerRecipe(
               Ingredient.of(Items.GLOWSTONE_DUST), new ItemStack(SUNNARIUM_PART.get()), 120_000.0);
+          MolecularTransformerBlockEntity.registerRecipe(
+              Ingredient.of(Items.NETHER_STAR),
+              new ItemStack(ic2.core.ref.Ic2Items.UU_MATTER, 16),
+              100_000_000.0);
         });
   }
 

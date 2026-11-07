@@ -8,8 +8,10 @@ import ic2.core.block.machine.CannerEnrichRecipeManager;
 import ic2.core.block.machine.EmptyFluidContainerRecipeManager;
 import ic2.core.block.machine.FillFluidContainerRecipeManager;
 import ic2.core.recipe.BasicMachineRecipeManager;
+import ic2.core.recipe.CompressorCompatibility;
 import ic2.core.recipe.MaceratorCompatibility;
 import ic2.core.recipe.MatterAmplifierRecipeManager;
+import ic2.core.recipe.OreWasherCompatibility;
 import ic2.core.recipe.ScrapboxRecipeManager;
 import ic2.core.recipe.SmeltingRecipeManager;
 import ic2.core.recipe.v2.RecipeHolder;
@@ -99,6 +101,14 @@ public class Rezepte {
 
           if (recipeType == Ic2RecipeTypes.MACERATOR) {
             MaceratorCompatibility.addAutomaticRecipes(recipeManager, manager);
+          }
+
+          if (recipeType == Ic2RecipeTypes.COMPRESSOR) {
+            CompressorCompatibility.addAutomaticRecipes(recipeManager, manager);
+          }
+
+          if (recipeType == Ic2RecipeTypes.ORE_WASHER) {
+            OreWasherCompatibility.addAutomaticRecipes(recipeManager, manager);
           }
 
           return manager;

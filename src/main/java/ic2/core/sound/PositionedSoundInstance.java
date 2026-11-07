@@ -9,6 +9,24 @@ import net.minecraft.sounds.SoundSource;
 public class PositionedSoundInstance extends SimpleSoundInstance
     implements ListenableSoundInstance {
   private Runnable onFinish = null;
+  protected boolean isMachine = false;
+
+  public void setMachine(boolean isMachine) {
+    this.isMachine = isMachine;
+  }
+
+  public boolean isMachine() {
+    return this.isMachine;
+  }
+
+  @Override
+  public float getVolume() {
+    float v = super.getVolume();
+    if (this.isMachine) {
+      v *= ic2.core.init.IC2ClientConfig.getMachineVolume();
+    }
+    return v;
+  }
 
   public PositionedSoundInstance(
       SoundEvent sound, SoundSource category, float volume, float pitch, BlockPos pos) {

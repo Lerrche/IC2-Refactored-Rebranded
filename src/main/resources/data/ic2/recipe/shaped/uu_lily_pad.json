@@ -1,0 +1,17 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "U U",
+    "UUU",
+    " U "
+  ],
+  "key": {
+    "U": {
+      "item": "ic2:uu_matter"
+    }
+  },
+  "result": {
+    "item": "minecraft:lily_pad",
+    "count": 32
+  }
+}

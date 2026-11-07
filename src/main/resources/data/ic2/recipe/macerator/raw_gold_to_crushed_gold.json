@@ -1,7 +1,7 @@
 {
   "type": "ic2:macerator",
   "ingredient": {
-    "item": "minecraft:raw_gold"
+    "tag": "c:raw_materials/gold"
   },
   "result": {
     "item": "ic2:crushed_gold",

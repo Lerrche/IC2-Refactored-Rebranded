@@ -28,10 +28,15 @@ import java.util.Random;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.*;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -51,6 +56,7 @@ import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
@@ -161,6 +167,13 @@ public abstract class AbstractCableBlock extends PipeBlock
     BlockState ret = to.defaultBlockState();
     if (to.insulation >= to.type.minColoredInsulation) {
       ret = ret.setValue(colorProperty, ((AbstractCableBlock) from.getBlock()).getColor(from));
+    }
+
+    if (!to.isFoam()
+        && !this.isFoam()
+        && from.hasProperty(WATERLOGGED)
+        && to.defaultBlockState().hasProperty(WATERLOGGED)) {
+      ret = ret.setValue(WATERLOGGED, from.getValue(WATERLOGGED));
     }
 
     if (to.isFoam()) {
@@ -505,6 +518,44 @@ public abstract class AbstractCableBlock extends PipeBlock
 
   DyeColor getColor(BlockState state) {
     return getColor(state, this.type, this.insulation);
+  }
+
+  @Override
+  protected ItemInteractionResult useItemOn(
+      ItemStack stack,
+      BlockState state,
+      Level world,
+      BlockPos pos,
+      Player player,
+      InteractionHand hand,
+      BlockHitResult hit) {
+    if (isRubber(stack) && this.insulation < this.type.maxInsulation && !this.isHardFoam(state)) {
+      if (!world.isClientSide) {
+        if (this.tryAddInsulation(state, world, pos)) {
+          if (!player.getAbilities().instabuild) {
+            stack.shrink(1);
+          }
+          world.playSound(null, pos, SoundEvents.WOOL_PLACE, SoundSource.BLOCKS, 0.8F, 1.2F);
+        }
+      }
+      return ItemInteractionResult.sidedSuccess(world.isClientSide);
+    }
+    return super.useItemOn(stack, state, world, pos, player, hand, hit);
+  }
+
+  public static boolean isRubber(ItemStack stack) {
+    if (stack.isEmpty()) {
+      return false;
+    }
+    if (stack.getItem() == ic2.core.ref.Ic2Items.RUBBER) {
+      return true;
+    }
+    if (stack.is(ItemTags.create(ResourceLocation.parse("c:rubber")))
+        || stack.is(ItemTags.create(ResourceLocation.parse("c:rubbers")))) {
+      return true;
+    }
+    String path = BuiltInRegistries.ITEM.getKey(stack.getItem()).getPath();
+    return path.equals("rubber") || path.endsWith("_rubber");
   }
 
   public boolean tryAddInsulation(BlockState state, Level world, BlockPos pos) {

@@ -1,0 +1,43 @@
+﻿{
+    "ingredients":  [
+                        {
+                            "tag":  "c:plates/copper"
+                        },
+                        {
+                            "tag":  "c:plates/copper"
+                        },
+                        {
+                            "tag":  "c:plates/copper"
+                        },
+                        {
+                            "tag":  "c:plates/copper"
+                        },
+                        {
+                            "tag":  "c:plates/copper"
+                        },
+                        {
+                            "tag":  "c:plates/copper"
+                        },
+                        {
+                            "tag":  "c:plates/copper"
+                        },
+                        {
+                            "tag":  "c:plates/copper"
+                        },
+                        {
+                            "tag":  "c:plates/copper"
+                        }
+                    ],
+    "neoforge:conditions":  [
+                                {
+                                    "type":  "neoforge:mod_loaded",
+                                    "modid":  "create"
+                                }
+                            ],
+    "type":  "create:compacting",
+    "results":  [
+                    {
+                        "id":  "ic2:dense_copper_plate"
+                    }
+                ]
+}

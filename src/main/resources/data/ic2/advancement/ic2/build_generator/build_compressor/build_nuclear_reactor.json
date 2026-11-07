@@ -1,5 +1,5 @@
 {
-  "parent": "ic2:ic2/build_generator/build_compressor/compress_uranium",
+  "parent": "ic2:ic2/build_generator/build_compressor/root",
   "display": {
     "icon": {
       "id": "ic2:nuclear_reactor"

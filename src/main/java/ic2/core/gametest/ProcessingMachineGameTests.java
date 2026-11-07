@@ -224,6 +224,29 @@ public class ProcessingMachineGameTests {
         });
   }
 
+  // ore washer: verify washing raw iron directly into purified iron + small iron dust + stone dust
+  @GameTest(template = EMPTY, timeoutTicks = 700)
+  public static void oreWasherWashesRawIron(GameTestHelper helper) {
+    helper.setBlock(MACHINE_POS, Ic2Blocks.ORE_WASHING_PLANT);
+    TileEntityOreWashing te = getMachine(helper, TileEntityOreWashing.class);
+    te.dischargeSlot.put(
+        0, ElectricItemManager.getCharged(Ic2Items.RE_BATTERY, Double.POSITIVE_INFINITY));
+    te.fluidSlot.put(0, new ItemStack(Ic2Items.WATER_CELL, 2));
+    helper.assertTrue(
+        te.inputSlot.accepts(new ItemStack(Items.RAW_IRON)),
+        "ore washer input slot should accept raw iron");
+    te.inputSlot.put(0, new ItemStack(Items.RAW_IRON));
+
+    helper.succeedWhen(
+        () -> {
+          helper.assertTrue(
+              hasOutput(te.outputSlot, Ic2Items.PURIFIED_IRON),
+              "ore washer should produce purified iron from raw iron, outputs "
+                  + describe(te.outputSlot));
+          helper.assertTrue(te.inputSlot.get(0).isEmpty(), "ore washer input should be consumed");
+        });
+  }
+
   // blast furnace: no EU, needs heat >= 50000 and (compressed) air fluid; crushed iron -> steel
   // ingot + slag.
   // heat and progress are set directly for a deterministic, fast-completing test (recipe duration

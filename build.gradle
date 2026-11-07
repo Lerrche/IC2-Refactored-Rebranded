@@ -129,10 +129,10 @@ dependencies {
     localRuntime "com.tterrag.registrate:Registrate:${registrate_version}"
 
     // Optional Create: Aeronautics integration (Modrinth release for Minecraft 1.21.1 / NeoForge).
-    localRuntime "maven.modrinth:oWaK0Q19:${aeronautics_version}"
+    // localRuntime "maven.modrinth:oWaK0Q19:${aeronautics_version}"
 
     // Sable physics engine required by Create: Aeronautics (NeoForge 1.21.1).
-    localRuntime "maven.modrinth:T9PomCSv:${sable_version}"
+    // localRuntime "maven.modrinth:T9PomCSv:${sable_version}"
 
     // Curios API is compile-only; the actual mod is loaded only in local dev runs.
     compileOnly "top.theillusivec4.curios:curios-neoforge:${curios_version}:api"

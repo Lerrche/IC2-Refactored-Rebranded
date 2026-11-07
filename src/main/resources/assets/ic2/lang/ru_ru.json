@@ -1,4 +1,7 @@
-{
+﻿{
+  "ic2.soundCategory.machinery": "РњРµС…Р°РЅРёР·РјС‹",
+  "ic2.message.machine.muted": "Р—РІСѓРє РјРµС…Р°РЅРёР·РјР° РІС‹РєР»СЋС‡РµРЅ",
+  "ic2.message.machine.unmuted": "Р—РІСѓРє РјРµС…Р°РЅРёР·РјР° РІРєР»СЋС‡РµРЅ",
   "advancements.ic2.acquire_insulated_cable": "Не дай себя ударить током!",
   "advancements.ic2.acquire_insulated_cable.desc": "Соедините медный кабель с резиной, чтобы получить изолированный провод. Не забывайте об изоляции.",
   "advancements.ic2.acquire_matter": "Розовая жидкость",

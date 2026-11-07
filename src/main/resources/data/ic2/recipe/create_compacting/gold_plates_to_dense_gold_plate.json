@@ -1,0 +1,43 @@
+﻿{
+    "ingredients":  [
+                        {
+                            "tag":  "c:plates/gold"
+                        },
+                        {
+                            "tag":  "c:plates/gold"
+                        },
+                        {
+                            "tag":  "c:plates/gold"
+                        },
+                        {
+                            "tag":  "c:plates/gold"
+                        },
+                        {
+                            "tag":  "c:plates/gold"
+                        },
+                        {
+                            "tag":  "c:plates/gold"
+                        },
+                        {
+                            "tag":  "c:plates/gold"
+                        },
+                        {
+                            "tag":  "c:plates/gold"
+                        },
+                        {
+                            "tag":  "c:plates/gold"
+                        }
+                    ],
+    "neoforge:conditions":  [
+                                {
+                                    "type":  "neoforge:mod_loaded",
+                                    "modid":  "create"
+                                }
+                            ],
+    "type":  "create:compacting",
+    "results":  [
+                    {
+                        "id":  "ic2:dense_gold_plate"
+                    }
+                ]
+}

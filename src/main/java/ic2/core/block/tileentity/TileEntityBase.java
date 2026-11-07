@@ -2,9 +2,15 @@ package ic2.core.block.tileentity;
 
 import ic2.core.IC2;
 import ic2.core.sound.Sound;
+import java.util.ArrayList;
+import java.util.List;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.neoforged.api.distmarker.Dist;
@@ -18,6 +24,7 @@ public class TileEntityBase extends TileEntityInventory {
   protected Sound interruptSound;
   private boolean clientLastActive;
   private boolean playInterruptOnDeactivate;
+  public boolean muted = false;
 
   public TileEntityBase(
       BlockEntityType<? extends TileEntityInventory> type, BlockPos pos, BlockState state) {
@@ -43,6 +50,15 @@ public class TileEntityBase extends TileEntityInventory {
   @OnlyIn(Dist.CLIENT)
   private void syncLoopingSounds() {
     this.initSound();
+    if (this.muted) {
+      if (this.loopingSound != null && this.loopingSound.isPlaying()) {
+        this.loopingSound.stop();
+      }
+      if (this.subLoopingSound != null && this.subLoopingSound.isPlaying()) {
+        this.subLoopingSound.stop();
+      }
+      return;
+    }
     boolean shouldPlay = this.shouldSoundActive();
     boolean shouldPlaySub = this.shouldSubSoundActive();
 
@@ -55,9 +71,9 @@ public class TileEntityBase extends TileEntityInventory {
     }
 
     if (this.subLoopingSound != null) {
-      if (shouldPlaySub && !this.subLoopingSound.isPlaying()) {
+      if (!this.muted && shouldPlaySub && !this.subLoopingSound.isPlaying()) {
         this.subLoopingSound.play();
-      } else if (!shouldPlaySub && this.subLoopingSound.isPlaying()) {
+      } else if ((this.muted || !shouldPlaySub) && this.subLoopingSound.isPlaying()) {
         this.subLoopingSound.stop();
       }
     }
@@ -88,6 +104,13 @@ public class TileEntityBase extends TileEntityInventory {
 
     if (field.equals("active")) {
       this.onActiveFieldUpdated();
+    } else if (field.equals("muted")) {
+      if (this.muted) {
+        this.stopStartSound();
+        this.stopLoopingSound();
+      } else if (this.shouldSoundActive()) {
+        this.startPlaySound(false);
+      }
     } else if (field.equals("playInterruptOnDeactivate")
         && this.playInterruptOnDeactivate
         && !this.shouldSoundActive()) {
@@ -125,6 +148,10 @@ public class TileEntityBase extends TileEntityInventory {
   }
 
   protected boolean shouldSoundActive() {
+    if (this.muted) {
+      return false;
+    }
+
     if (!this.teBlock.canActive()) {
       return false;
     }
@@ -185,10 +212,62 @@ public class TileEntityBase extends TileEntityInventory {
     }
   }
 
+  public boolean toggleMuted(Player player) {
+    this.muted = !this.muted;
+    this.setChanged();
+    if (this.level != null) {
+      if (!this.level.isClientSide) {
+        IC2.network.get(true).updateTileEntityField(this, "muted");
+        if (player != null) {
+          if (this.muted) {
+            player.displayClientMessage(Component.translatable("ic2.message.machine.muted"), true);
+          } else {
+            player.displayClientMessage(
+                Component.translatable("ic2.message.machine.unmuted"), true);
+          }
+        }
+      } else {
+        if (this.muted) {
+          this.stopStartSound();
+          this.stopLoopingSound();
+        } else if (this.shouldSoundActive()) {
+          this.startPlaySound(false);
+        }
+      }
+    }
+    return this.muted;
+  }
+
+  public boolean isMuted() {
+    return this.muted;
+  }
+
+  @Override
+  public List<String> getNetworkedFields() {
+    List<String> ret = new ArrayList<>(super.getNetworkedFields());
+    ret.add("muted");
+    return ret;
+  }
+
+  @Override
+  public void saveAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
+    super.saveAdditional(nbt, registries);
+    if (this.muted) {
+      nbt.putBoolean("muted", true);
+    }
+  }
+
+  @Override
+  protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
+    super.loadAdditional(nbt, registries);
+    this.muted = nbt.getBoolean("muted");
+  }
+
   public void startPlaySound(boolean playSubSound) {
+    if (this.muted) return;
     if (this.startSound != null) {
       if (this.loopingSound != null) {
-        this.startSound.addOnFinishListener(() -> this.playLoopingSound(playSubSound));
+        this.startSound.onFinish(() -> this.playLoopingSound(playSubSound));
       }
 
       this.startSound.playOnce();
@@ -198,6 +277,7 @@ public class TileEntityBase extends TileEntityInventory {
   }
 
   public void playLoopingSound(boolean playSubSound) {
+    if (this.muted) return;
     if (this.loopingSound != null) {
       this.loopingSound.play();
       if (playSubSound && this.subLoopingSound != null) {
@@ -223,12 +303,14 @@ public class TileEntityBase extends TileEntityInventory {
   }
 
   public void playStopSound() {
+    if (this.muted) return;
     if (this.stopSound != null) {
       this.stopSound.playOnce();
     }
   }
 
   public void playInterruptSound() {
+    if (this.muted) return;
     if (this.interruptSound != null) {
       this.interruptSound.playOnce();
     }

@@ -1,5 +1,12 @@
 package ic2.core.init;
 
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.util.Properties;
+import net.minecraft.client.Minecraft;
+import net.minecraft.sounds.SoundSource;
+import net.neoforged.fml.loading.FMLPaths;
 import net.neoforged.neoforge.common.ModConfigSpec;
 
 public class IC2ClientConfig {
@@ -8,6 +15,10 @@ public class IC2ClientConfig {
   public static final Audio audio;
   public static final Misc misc;
 
+  private static double currentMachineVolume = -1.0;
+  private static final File PREFS_FILE =
+      FMLPaths.CONFIGDIR.get().resolve("ic2-audio.properties").toFile();
+
   static {
     ModConfigSpec.Builder b = new ModConfigSpec.Builder();
 
@@ -15,6 +26,75 @@ public class IC2ClientConfig {
     misc = new Misc(b);
 
     SPEC = b.build();
+  }
+
+  public static double getMachineVolumeDouble() {
+    if (currentMachineVolume >= 0.0) {
+      return currentMachineVolume;
+    }
+    if (PREFS_FILE.exists()) {
+      try (FileReader reader = new FileReader(PREFS_FILE)) {
+        Properties props = new Properties();
+        props.load(reader);
+        String val = props.getProperty("machinery_volume");
+        if (val != null) {
+          currentMachineVolume = Math.max(0.0, Math.min(1.0, Double.parseDouble(val)));
+          return currentMachineVolume;
+        }
+      } catch (Exception ignored) {
+      }
+    }
+    try {
+      if (audio != null && audio.volume != null) {
+        Double val = audio.volume.get();
+        currentMachineVolume = (val != null) ? Math.max(0.0, Math.min(1.0, val)) : 1.0;
+        return currentMachineVolume;
+      }
+    } catch (Exception ignored) {
+    }
+    currentMachineVolume = 1.0;
+    return 1.0;
+  }
+
+  public static float getMachineVolume() {
+    try {
+      if (audio != null && audio.enabled != null && !audio.enabled.get()) {
+        return 0.0f;
+      }
+    } catch (Exception ignored) {
+    }
+    double vol = getMachineVolumeDouble();
+    if (vol <= 0.0) {
+      return 0.00001f;
+    }
+    return (float) vol;
+  }
+
+  public static void setMachineVolume(double val) {
+    currentMachineVolume = Math.max(0.0, Math.min(1.0, val));
+    try {
+      Properties props = new Properties();
+      props.setProperty("machinery_volume", Double.toString(currentMachineVolume));
+      try (FileWriter writer = new FileWriter(PREFS_FILE)) {
+        props.store(writer, "IC2 Audio Settings");
+      }
+    } catch (Exception ignored) {
+    }
+    try {
+      if (audio != null && audio.volume != null) {
+        audio.volume.set(currentMachineVolume);
+        audio.volume.save();
+      }
+    } catch (Exception ignored) {
+    }
+    try {
+      Minecraft mc = Minecraft.getInstance();
+      if (mc != null && mc.getSoundManager() != null && mc.options != null) {
+        float blocksVol = mc.options.getSoundSourceVolume(SoundSource.BLOCKS);
+        mc.getSoundManager().updateSourceVolume(SoundSource.BLOCKS, blocksVol);
+      }
+    } catch (Exception ignored) {
+    }
   }
 
   public static class Audio {

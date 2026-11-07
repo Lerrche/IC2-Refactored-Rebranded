@@ -110,7 +110,11 @@ public class SoundManagerClient extends SoundManager {
       float volume,
       float pitch) {
     super.createSound(obj, soundEvent, soundCategory, pos, volume, pitch);
-    return registerSound(obj, new SoundClient(soundEvent, soundCategory, pos, volume, pitch));
+    SoundClient sc = new SoundClient(soundEvent, soundCategory, pos, volume, pitch);
+    if (obj instanceof net.minecraft.world.level.block.entity.BlockEntity) {
+      sc.setMachine(true);
+    }
+    return registerSound(obj, sc);
   }
 
   private Sound registerSound(Object obj, SoundClient soundClient) {
@@ -186,6 +190,16 @@ public class SoundManagerClient extends SoundManager {
 
   public void tick() {
     super.tick();
+    this.objectToSoundMap
+        .entrySet()
+        .removeIf(
+            entry -> {
+              if (entry.getKey().get() == null) {
+                entry.getValue().forEach(SoundClient::stop);
+                return true;
+              }
+              return false;
+            });
     this.objectToSoundMap.forEach(
         (object, soundClientList) -> soundClientList.forEach(SoundClient::tick));
   }

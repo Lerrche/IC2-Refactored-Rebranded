@@ -188,13 +188,24 @@ public class TileEntityMatter extends TileEntityElectricMachine
   }
 
   public boolean attemptGeneration() {
-    if (this.fluidTank.getFluidAmount() + 1 > this.fluidTank.getCapacity()) {
-      return false;
+    boolean produced = false;
+    ItemStack uuStack = new ItemStack(Ic2Items.UU_MATTER);
+
+    if (this.containerSlot.isEmpty() && this.outputSlot.canAdd(uuStack)) {
+      this.outputSlot.add(uuStack);
+      produced = true;
     }
 
-    this.fluidTank.fillMbUnchecked(Ic2FluidStack.create(Ic2Fluids.UU_MATTER.still(), 1), false);
-    this.energy.useEnergy(this.energy.getCapacity());
-    return true;
+    if (this.fluidTank.getFluidAmount() + 1 <= this.fluidTank.getCapacity()) {
+      this.fluidTank.fillMbUnchecked(Ic2FluidStack.create(Ic2Fluids.UU_MATTER.still(), 1), false);
+      produced = true;
+    }
+
+    if (produced) {
+      this.energy.useEnergy(this.energy.getCapacity());
+      return true;
+    }
+    return false;
   }
 
   public String getProgressAsString() {
@@ -280,12 +291,12 @@ public class TileEntityMatter extends TileEntityElectricMachine
 
   @Override
   protected boolean shouldSoundActive() {
-    return this.state != 0;
+    return !this.muted && this.state != 0;
   }
 
   @Override
   protected boolean shouldSubSoundActive() {
-    return this.state == 2;
+    return !this.muted && this.state == 2;
   }
 
   @Override

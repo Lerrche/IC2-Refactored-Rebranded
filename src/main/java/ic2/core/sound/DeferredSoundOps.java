@@ -1,14 +1,14 @@
 package ic2.core.sound;
 
-import java.util.ArrayDeque;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentLinkedQueue;
 
 /**
  * Defers mutations to the vanilla {@link net.minecraft.client.sounds.SoundEngine} until after its
  * tick completes, avoiding {@link java.util.ConcurrentModificationException} on internal HashMaps.
  */
 public final class DeferredSoundOps {
-  private static final Queue<Runnable> pending = new ArrayDeque<>();
+  private static final Queue<Runnable> pending = new ConcurrentLinkedQueue<>();
 
   private DeferredSoundOps() {}
 
@@ -19,7 +19,10 @@ public final class DeferredSoundOps {
   public static void flush() {
     Runnable action;
     while ((action = pending.poll()) != null) {
-      action.run();
+      try {
+        action.run();
+      } catch (Throwable ignored) {
+      }
     }
   }
 }

@@ -1,4 +1,7 @@
-{
+﻿{
+  "ic2.soundCategory.machinery": "жњєе™Ё",
+  "ic2.message.machine.muted": "жњєе™Ёе·Ійќ™йџі",
+  "ic2.message.machine.unmuted": "жњєе™Ёе·ІеЏ–ж¶€йќ™йџі",
   "advancements.ic2.acquire_insulated_cable": "防止触电",
   "advancements.ic2.acquire_insulated_cable.desc": "用橡胶给铜线缆绝缘。使用电缆时务必注意绝缘，避免触电。",
   "advancements.ic2.acquire_matter": "粉色液体",

@@ -705,6 +705,8 @@ public final class Ic2Items {
   public static final Item ASHES = register("ashes", new Item(new Properties()));
   public static final Item IRIDIUM_ORE =
       register("iridium_ore", new Item(new Properties().rarity(Rarity.RARE)));
+  public static final Item UU_MATTER =
+      register("uu_matter", new Item(new Properties().rarity(Rarity.RARE)));
   public static final Item IRIDIUM_SHARD =
       register("iridium_shard", new Item(new Properties().rarity(Rarity.UNCOMMON)));
   public static final Item RESIN = register("resin", new Item(new Properties()));
@@ -1663,6 +1665,7 @@ public final class Ic2Items {
     addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> IODINE);
     addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> IRIDIUM);
     addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> IRIDIUM_ORE);
+    addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> UU_MATTER);
     addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> IRIDIUM_SHARD);
     addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> IRON_CASING);
     addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> IRON_CUTTING_BLADE);
