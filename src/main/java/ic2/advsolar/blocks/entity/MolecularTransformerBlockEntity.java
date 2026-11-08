@@ -94,6 +94,12 @@ public class MolecularTransformerBlockEntity extends AddonEnergyBlockEntity
     RECIPES.add(new TransmutationRecipe(input, output, euCost));
   }
 
+  public static void addRecipe(TransmutationRecipe recipe) {
+    if (recipe != null) {
+      RECIPES.add(recipe);
+    }
+  }
+
   public static List<TransmutationRecipe> getRecipes() {
     return Collections.unmodifiableList(RECIPES);
   }
@@ -263,7 +269,8 @@ public class MolecularTransformerBlockEntity extends AddonEnergyBlockEntity
     if (!input.isEmpty()) {
       TransmutationRecipe recipe = findRecipe(input);
       if (recipe != null) {
-        this.requiredEu = recipe.euCost();
+        this.requiredEu =
+            recipe.euCost() * ic2.industrialjs.IndustrialJS.getMolecularTransformerMultiplier();
         ItemStack recipeOut = recipe.output();
         ItemStack currentOut = this.items.get(1);
 

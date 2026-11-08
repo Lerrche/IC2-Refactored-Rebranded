@@ -2,11 +2,13 @@ package ic2.advsolar.blocks;
 
 import ic2.api.block.AddonEnergyBlock;
 import ic2.api.tile.IWrenchAble;
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.function.BiFunction;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.Container;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.ItemInteractionResult;
@@ -51,6 +53,19 @@ public class SolarPanelBlock extends AddonEnergyBlock implements IWrenchAble {
   }
 
   @Override
+  public void onRemove(
+      BlockState state, Level level, BlockPos pos, BlockState newState, boolean moved) {
+    if (!state.is(newState.getBlock()) && !moved) {
+      BlockEntity be = level.getBlockEntity(pos);
+      if (be instanceof Container container) {
+        Containers.dropContents(level, pos, container);
+        container.clearContent();
+      }
+    }
+    super.onRemove(state, level, pos, newState, moved);
+  }
+
+  @Override
   public Direction getFacing(Level level, BlockPos pos) {
     return Direction.UP;
   }
@@ -68,6 +83,17 @@ public class SolarPanelBlock extends AddonEnergyBlock implements IWrenchAble {
   @Override
   public List<ItemStack> getWrenchDrops(
       Level level, BlockPos pos, BlockState state, BlockEntity te, Player player, int fortune) {
-    return Collections.singletonList(new ItemStack(this.asItem()));
+    List<ItemStack> drops = new ArrayList<>();
+    drops.add(new ItemStack(this.asItem()));
+    if (te instanceof Container container) {
+      for (int i = 0; i < container.getContainerSize(); i++) {
+        ItemStack item = container.getItem(i);
+        if (!item.isEmpty()) {
+          drops.add(item.copy());
+          container.setItem(i, ItemStack.EMPTY);
+        }
+      }
+    }
+    return drops;
   }
 }

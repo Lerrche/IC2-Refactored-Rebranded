@@ -7,6 +7,7 @@ I started this project to build on the existing port with compatibility work, qu
 ## Documentation & Add-on Creation
 
 - **[Complete Add-on Creation Guide](docs/addon-development-guide.md)**: Master guide for creating custom machines, generators, energy storage, electric tools, and recipes.
+- **[IndustrialJS & KubeJS Modpack Guide](docs/IndustrialJS_Guide.md)**: Zero-code JSON customization & KubeJS scripting guide for custom recipes, machine energy outputs, and balancing.
 - **[Online Web Documentation](https://lerrche.github.io/IC2-Refactored-Rebranded/)**: Full online docs and guides.
 - **[Add-on API Reference](docs/api-reference.md)**: Concise index of all add-on API classes and helpers.
 - **[Compilable Example Add-on](src/test/java/ic2/api/example/ExampleAddonMod.java)**: Live, fully working reference mod demonstrating blocks, tools, upgrades, and FE capabilities.

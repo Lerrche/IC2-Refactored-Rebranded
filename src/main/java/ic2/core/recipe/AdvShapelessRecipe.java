@@ -108,13 +108,14 @@ public class AdvShapelessRecipe implements CraftingRecipe {
 
   @Override
   public NonNullList<ItemStack> getRemainingItems(CraftingInput inv) {
+    int size = Math.max(9, inv.size());
     if (this.consuming) {
-      return NonNullList.withSize(inv.size(), StackUtil.emptyStack);
+      return NonNullList.withSize(size, StackUtil.emptyStack);
     }
 
-    NonNullList<ItemStack> defaultedList = NonNullList.withSize(inv.size(), ItemStack.EMPTY);
+    NonNullList<ItemStack> defaultedList = NonNullList.withSize(size, ItemStack.EMPTY);
 
-    for (int i = 0; i < defaultedList.size(); i++) {
+    for (int i = 0; i < inv.size(); i++) {
       ItemStack stack = inv.getItem(i);
       ItemStack remainder = IC2.envProxy.getRecipeRemainder(stack);
       if (stack.getItem() instanceof ItemToolCrafting) {

@@ -16,7 +16,6 @@ import ic2.core.ref.Ic2Items;
 import ic2.core.ref.Ic2SoundEvents;
 import ic2.core.util.ConfigUtil;
 import ic2.core.util.StackUtil;
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -43,25 +42,39 @@ public class TileEntityRecycler
 
   public static void initLate() {
     try {
-      for (IRecipeInput input :
-          ConfigUtil.asRecipeInputList(IC2Config.balance.recyclerBlacklist.get())) {
-        Recipes.recyclerBlacklist.add(input);
+      String bl = IC2Config.balance.recyclerBlacklist.get();
+      if (bl != null && !bl.isBlank()) {
+        for (IRecipeInput input : ConfigUtil.asRecipeInputList(bl, true)) {
+          if (input != null) {
+            Recipes.recyclerBlacklist.add(input);
+          }
+        }
       }
 
-      for (IRecipeInput input :
-          ConfigUtil.asRecipeInputList(IC2Config.balance.recyclerWhitelist.get())) {
-        Recipes.recyclerWhitelist.add(input);
+      String wl = IC2Config.balance.recyclerWhitelist.get();
+      if (wl != null && !wl.isBlank()) {
+        for (IRecipeInput input : ConfigUtil.asRecipeInputList(wl, true)) {
+          if (input != null) {
+            Recipes.recyclerWhitelist.add(input);
+          }
+        }
       }
-    } catch (ParseException pe) {
-      throw new RuntimeException(pe);
+    } catch (Throwable t) {
+      IC2.log.warn(
+          ic2.core.util.LogCategory.General,
+          "Failed to load recycler lists from config: %s",
+          t.getMessage());
     }
   }
 
   public static int recycleChance() {
-    return 8;
+    return ic2.industrialjs.IndustrialJS.getRecyclerScrapChance();
   }
 
   public static boolean getIsItemBlacklisted(ItemStack aStack) {
+    if (ic2.industrialjs.IndustrialJS.isRecyclerBlacklisted(aStack)) {
+      return true;
+    }
     return Recipes.recyclerWhitelist.isEmpty()
         ? Recipes.recyclerBlacklist.contains(aStack)
         : !Recipes.recyclerWhitelist.contains(aStack);
@@ -82,7 +95,8 @@ public class TileEntityRecycler
       MachineRecipeResult<IRecipeInput, Collection<ItemStack>, ItemStack> result,
       Collection<ItemStack> processResult) {
     this.inputSlot.consume(result);
-    if (IC2.random.nextInt(recycleChance()) == 0) {
+    int chance = recycleChance();
+    if (chance <= 1 || (chance > 0 && IC2.random.nextInt(chance) == 0)) {
       this.outputSlot.add(processResult);
     }
   }

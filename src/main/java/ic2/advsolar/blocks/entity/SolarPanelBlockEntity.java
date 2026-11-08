@@ -84,7 +84,11 @@ public class SolarPanelBlockEntity extends AddonEnergyBlockEntity
         canSeeSky && this.level.isDay() && !this.level.isRaining() && !this.level.isThundering();
 
     if (canSeeSky && this.getCapacityEu() > this.getStoredEu()) {
-      double generated = this.sunIsVisible ? this.dayProduction : this.nightProduction;
+      double mult =
+          this.sunIsVisible
+              ? ic2.industrialjs.IndustrialJS.getSolarDayMultiplier()
+              : ic2.industrialjs.IndustrialJS.getSolarNightMultiplier();
+      double generated = (this.sunIsVisible ? this.dayProduction : this.nightProduction) * mult;
       if (generated > 0) {
         addEu(Math.min(generated, this.getCapacityEu() - this.getStoredEu()));
         setChanged();

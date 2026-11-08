@@ -6,7 +6,7 @@ license="${mod_license}"
 modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
-logoFile="IndustrialCraft2_Refactored.png"
+logoFile="logo.png"
 credits="${mod_authors}"
 authors="${mod_authors}"
 description='''
@@ -49,6 +49,7 @@ side="BOTH"
 modId="gravisuite"
 version="${mod_version}"
 displayName="Gravitation Suite"
+logoFile="logo.png"
 authors="SeNtiMeL, Chocohead, HalfCooler"
 description='''
 Gravitation Suite port for IC2 Rebranded on Minecraft 1.21.1 / NeoForge.
@@ -65,6 +66,7 @@ side="BOTH"
 modId="advanced_solar_panels"
 version="${mod_version}"
 displayName="Advanced Solar Panels"
+logoFile="logo.png"
 authors="Icedfire, SeNtiMeL, Chocohead, HalfCooler"
 description='''
 Advanced Solar Panels port for IC2 Rebranded on Minecraft 1.21.1 / NeoForge.

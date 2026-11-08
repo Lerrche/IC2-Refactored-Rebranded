@@ -173,6 +173,17 @@ public class LaserBulletEntity extends ThrowableProjectile {
     }
 
     this.copyDataFromEvent(event);
+    if (!ic2.industrialjs.IndustrialJS.isLaserExplosiveDestruction()) {
+      world.explode(
+          this,
+          this.getX(),
+          this.getY(),
+          this.getZ(),
+          event.explosionPower,
+          false,
+          Level.ExplosionInteraction.NONE);
+      return;
+    }
     Ic2Explosion explosion =
         new Ic2Explosion(
             world,
@@ -349,6 +360,11 @@ public class LaserBulletEntity extends ThrowableProjectile {
 
   private void appendSmeltItemStack(
       Block targetBlock, ItemStack inputItemStack, List<ItemStack> replacementList) {
+    ItemStack customSmelt = ic2.industrialjs.IndustrialJS.getLaserSmelting(inputItemStack);
+    if (!customSmelt.isEmpty()) {
+      replacementList.add(customSmelt.copy());
+      return;
+    }
     if (inputItemStack.getItem() instanceof BlockItem
         && ((BlockItem) inputItemStack.getItem()).getBlock() != targetBlock) {
       inputItemStack = new ItemStack(targetBlock.asItem());

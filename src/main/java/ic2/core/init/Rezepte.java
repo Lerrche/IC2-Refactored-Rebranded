@@ -17,6 +17,8 @@ import ic2.core.recipe.SmeltingRecipeManager;
 import ic2.core.recipe.v2.RecipeHolder;
 import ic2.core.recipe.v2.RecipeManagerGetter;
 import ic2.core.ref.Ic2RecipeTypes;
+import ic2.industrialjs.IndustrialJSConfig;
+import ic2.industrialjs.IndustrialJSRecipeRegistry;
 import java.util.Collection;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
@@ -26,6 +28,8 @@ public class Rezepte {
     Recipes.furnace = new SmeltingRecipeManager();
     ScrapboxRecipeManager.setup();
     ScrapboxRecipeManager.load();
+    IndustrialJSRecipeRegistry.applyMolecularTransformer();
+    IndustrialJSRecipeRegistry.applyScrapbox();
     Recipes.emptyFluidContainer = new EmptyFluidContainerRecipeManager();
     Recipes.fillFluidContainer = new FillFluidContainerRecipeManager();
     Recipes.macerator = basicRecipe(Ic2RecipeTypes.MACERATOR);
@@ -50,6 +54,7 @@ public class Rezepte {
                     null,
                     false);
               }
+              ic2.industrialjs.IndustrialJSRecipeRegistry.applyAmplifiers(manager);
 
               return manager;
             });
@@ -86,6 +91,7 @@ public class Rezepte {
   }
 
   public static void registerRecipes() {
+    IndustrialJSConfig.load();
     loadRecipes();
   }
 
@@ -110,6 +116,8 @@ public class Rezepte {
           if (recipeType == Ic2RecipeTypes.ORE_WASHER) {
             OreWasherCompatibility.addAutomaticRecipes(recipeManager, manager);
           }
+
+          IndustrialJSRecipeRegistry.applyTo(recipeType, manager);
 
           return manager;
         });

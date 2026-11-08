@@ -53,7 +53,9 @@ public abstract class TileEntityElectricBlock extends TileEntityInventory
       int output,
       int maxStorage) {
     super(type, pos, state);
-    this.output = output;
+    int customStorage = ic2.industrialjs.IndustrialJS.getStorageCapacity(type, maxStorage);
+    int customOutput = ic2.industrialjs.IndustrialJS.getStorageOutput(type, output);
+    this.output = customOutput;
     this.chargeSlot = new InvSlotCharge(this, tier);
     this.dischargeSlot =
         new InvSlotDischarge(this, InvSlot.Access.IO, tier, InvSlot.InvSide.BOTTOM);
@@ -61,7 +63,7 @@ public abstract class TileEntityElectricBlock extends TileEntityInventory
         this.addComponent(
             new Energy(
                     this,
-                    maxStorage,
+                    customStorage,
                     EnumSet.complementOf(EnumSet.of(Direction.DOWN)),
                     EnumSet.of(Direction.DOWN),
                     tier,

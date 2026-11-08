@@ -6,18 +6,18 @@ import ic2.api.energy.tile.IEnergyAcceptor;
 import ic2.api.energy.tile.IEnergyConductor;
 import ic2.api.energy.tile.IEnergyEmitter;
 import ic2.api.energy.tile.IEnergySink;
-import ic2.api.energy.tile.IEnergySource;
 import ic2.api.energy.tile.IEnergyTile;
 import ic2.api.info.ILocatable;
 import ic2.core.block.ChunkLoadAwareBlock;
 import ic2.core.block.comp.Energy;
 import ic2.core.block.misc.FoamBlock;
 import ic2.core.block.reactor.tileentity.TileEntityNuclearReactorElectric;
+import ic2.core.block.reactor.tileentity.TileEntityReactorChamberElectric;
 import ic2.core.block.tileentity.Ic2TileEntity;
-import ic2.core.energy.EnergyBridgeMath;
 import ic2.core.item.tool.ItemToolCutter;
 import ic2.core.ref.Ic2Fluids;
 import ic2.forge.Ic2ForgeEnergyBridge;
+import ic2.forge.MekanismEnergyCompat;
 import it.unimi.dsi.fastutil.ints.Int2ReferenceMap;
 import it.unimi.dsi.fastutil.ints.Int2ReferenceOpenHashMap;
 import java.util.EnumMap;
@@ -237,12 +237,14 @@ public abstract class AbstractCableBlock extends PipeBlock
   }
 
   public BlockState withConnectionStates(BlockState state, Level world, BlockPos pos) {
-    boolean isConnectedDown = this.isConnectedWith(state, null, world, pos.below());
-    boolean isConnectedUp = this.isConnectedWith(state, null, world, pos.above());
-    boolean isConnectedNorth = this.isConnectedWith(state, null, world, pos.north());
-    boolean isConnectedEast = this.isConnectedWith(state, null, world, pos.east());
-    boolean isConnectedSouth = this.isConnectedWith(state, null, world, pos.south());
-    boolean isConnectedWest = this.isConnectedWith(state, null, world, pos.west());
+    boolean isConnectedDown = this.isConnectedWith(state, null, world, pos.below(), Direction.DOWN);
+    boolean isConnectedUp = this.isConnectedWith(state, null, world, pos.above(), Direction.UP);
+    boolean isConnectedNorth =
+        this.isConnectedWith(state, null, world, pos.north(), Direction.NORTH);
+    boolean isConnectedEast = this.isConnectedWith(state, null, world, pos.east(), Direction.EAST);
+    boolean isConnectedSouth =
+        this.isConnectedWith(state, null, world, pos.south(), Direction.SOUTH);
+    boolean isConnectedWest = this.isConnectedWith(state, null, world, pos.west(), Direction.WEST);
     return state
         .setValue(DOWN, isConnectedDown)
         .setValue(UP, isConnectedUp)
@@ -254,6 +256,15 @@ public abstract class AbstractCableBlock extends PipeBlock
 
   public boolean isConnectedWith(
       BlockState state, BlockState neighborState, Level world, BlockPos neighborPos) {
+    return isConnectedWith(state, neighborState, world, neighborPos, null);
+  }
+
+  public boolean isConnectedWith(
+      BlockState state,
+      BlockState neighborState,
+      Level world,
+      BlockPos neighborPos,
+      Direction direction) {
     if (neighborState == null) {
       neighborState = world.getBlockState(neighborPos);
     }
@@ -263,7 +274,7 @@ public abstract class AbstractCableBlock extends PipeBlock
     }
 
     if (!(neighborState.getBlock() instanceof AbstractCableBlock neighborBlock)) {
-      return isEuConnectable(world, neighborPos);
+      return isEuConnectable(world, neighborPos, direction);
     } else if (neighborBlock.hasColor() && this.hasColor()) {
       DyeColor color = this.getColor(state);
       DyeColor neighborColor =
@@ -276,28 +287,69 @@ public abstract class AbstractCableBlock extends PipeBlock
     }
   }
 
-  private static boolean isEuConnectable(Level world, BlockPos pos) {
-    if (world.getBlockState(pos).isAir()) {
+  public static boolean isEuConnectable(Level world, BlockPos pos) {
+    return isEuConnectable(world, pos, null);
+  }
+
+  public static boolean isEuConnectable(Level world, BlockPos pos, Direction sideToNeighbor) {
+    if (world == null || pos == null) {
+      return false;
+    }
+    BlockState state = world.getBlockState(pos);
+    if (state.isAir()) {
       return false;
     }
 
-    if (!world.isClientSide) {
-      IEnergyTile tile = EnergyNet.instance.getTile(world, pos);
+    if (!world.isClientSide && EnergyNet.instance != null) {
+      IEnergyTile tile = EnergyNet.instance.getSubTile(world, pos);
       if (tile != null) {
         return !(tile instanceof IEnergyConductor);
+      }
+      IEnergyTile mainTile = EnergyNet.instance.getTile(world, pos);
+      if (mainTile != null) {
+        return !(mainTile instanceof IEnergyConductor);
       }
     }
 
     BlockEntity be = world.getBlockEntity(pos);
-    if (be instanceof Ic2TileEntity ic2 && ic2.hasComponent(Energy.class)) {
+    if (be != null) {
+      if (be instanceof Ic2TileEntity ic2 && ic2.hasComponent(Energy.class)) {
+        return true;
+      }
+      if (be instanceof TileEntityNuclearReactorElectric reactor) {
+        return !reactor.isFluidCooled();
+      }
+      if (be instanceof TileEntityReactorChamberElectric) {
+        return true;
+      }
+      if (be instanceof IEnergySink || be instanceof IEnergyEmitter || be instanceof IEnergyTile) {
+        return !(be instanceof IEnergyConductor);
+      }
+    }
+
+    Direction sideFromNeighbor = sideToNeighbor != null ? sideToNeighbor.getOpposite() : null;
+    IEnergyStorage storage =
+        world.getCapability(
+            net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK,
+            pos,
+            sideFromNeighbor);
+    if (storage == null) {
+      storage =
+          world.getCapability(
+              net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK, pos, null);
+    }
+    if (storage != null && (storage.canReceive() || storage.canExtract())) {
       return true;
     }
 
-    if (be instanceof TileEntityNuclearReactorElectric reactor) {
-      return !reactor.isFluidCooled();
+    if (MekanismEnergyCompat.isAvailable()) {
+      Object handler = MekanismEnergyCompat.getHandler(world, pos, sideFromNeighbor);
+      if (MekanismEnergyCompat.canReceiveFrom(handler, sideFromNeighbor)) {
+        return true;
+      }
     }
 
-    return be instanceof IEnergySink || be instanceof IEnergyEmitter;
+    return false;
   }
 
   public BlockState getStateForPlacement(BlockPlaceContext ctx) {
@@ -370,7 +422,8 @@ public abstract class AbstractCableBlock extends PipeBlock
     }
 
     if (!this.isFoam()) {
-      boolean isConnected = this.isConnectedWith(state, neighborState, (Level) world, neighborPos);
+      boolean isConnected =
+          this.isConnectedWith(state, neighborState, (Level) world, neighborPos, direction);
       return state.setValue(PipeBlock.PROPERTY_BY_DIRECTION.get(direction), isConnected);
     } else {
       return super.updateShape(state, direction, neighborState, world, pos, neighborPos);
@@ -572,7 +625,13 @@ public abstract class AbstractCableBlock extends PipeBlock
       return false;
     }
 
-    world.setBlockAndUpdate(pos, this.copyState(state, newBlock));
+    BlockState newState =
+        newBlock.withConnectionStates(this.copyState(state, newBlock), world, pos);
+    world.setBlockAndUpdate(pos, newState);
+    world.updateNeighborsAt(pos, newBlock);
+    for (Direction dir : Direction.values()) {
+      world.updateNeighborsAt(pos.relative(dir), newBlock);
+    }
     return true;
   }
 
@@ -595,24 +654,13 @@ public abstract class AbstractCableBlock extends PipeBlock
       return true;
     }
 
-    BlockState newState = this.copyState(state, newBlock);
-    IEnergyTile tile = null;
-    if (this.insulation == this.type.minColoredInsulation
-        && this.getColor(state) != DEFAULT_COLOR) {
-      assert newBlock.getColor(newState) == DEFAULT_COLOR;
-      if (!world.isClientSide) {
-        tile = EnergyNet.instance.getTile(world, pos);
-        if (tile != null) {
-          EnergyNet.instance.removeTile(tile);
-        }
-      }
-    }
-
+    BlockState newState =
+        newBlock.withConnectionStates(this.copyState(state, newBlock), world, pos);
     world.setBlockAndUpdate(pos, newState);
-    if (tile != null) {
-      EnergyNet.instance.addTileUnchecked(tile);
+    world.updateNeighborsAt(pos, newBlock);
+    for (Direction dir : Direction.values()) {
+      world.updateNeighborsAt(pos.relative(dir), newBlock);
     }
-
     return true;
   }
 
@@ -654,22 +702,6 @@ public abstract class AbstractCableBlock extends PipeBlock
     }
   }
 
-  /**
-   * Gets the shared Forge Energy bridge for this cable position. The bridge is the same conductor
-   * object registered with IC2's EU network, so FE power can cross between IC2 wires and external
-   * energy cables without introducing a second, disconnected storage.
-   */
-  public IEnergyStorage getForgeEnergyStorage(Level level, BlockPos pos) {
-    if (level.isClientSide || EnergyNet.instance == null) {
-      return null;
-    }
-    IEnergyTile tile = EnergyNet.instance.getSubTile(level, pos);
-    if (tile instanceof AbstractCableBlock.Conductor conductor) {
-      return conductor.getForgeEnergyStorage();
-    }
-    return null;
-  }
-
   protected void addToEnet(BlockState state, Level world, BlockPos pos, boolean checkConflicting) {
     if (world.isClientSide) {
       return;
@@ -677,10 +709,9 @@ public abstract class AbstractCableBlock extends PipeBlock
 
     IEnergyTile existing = EnergyNet.instance.getTile(world, pos);
     if (existing != null) {
-      if (checkConflicting) {
+      if (checkConflicting && !(existing instanceof AbstractCableBlock.Conductor)) {
         return;
       }
-
       EnergyNet.instance.removeTile(existing);
     }
 
@@ -700,19 +731,10 @@ public abstract class AbstractCableBlock extends PipeBlock
     Ic2ForgeEnergyBridge.onCableRemoved(world, pos);
   }
 
-  private final class Conductor
-      implements ILocatable,
-          IColoredEnergyTile,
-          IEnergyConductor,
-          IEnergySink,
-          IEnergySource,
-          IEnergyStorage {
-    private static final long EXTERNAL_BRIDGE_TIMEOUT_TICKS = 40L;
+  private final class Conductor implements ILocatable, IColoredEnergyTile, IEnergyConductor {
     private final Level world;
     private final BlockPos pos;
     private BlockState state;
-    private double forgeEnergyBufferEu;
-    private long lastForgeEnergyAccess = Long.MIN_VALUE;
 
     Conductor(BlockState state, Level world, BlockPos pos) {
       this.state = state;
@@ -728,137 +750,6 @@ public abstract class AbstractCableBlock extends PipeBlock
     @Override
     public BlockPos getPosition() {
       return this.pos;
-    }
-
-    private void markForgeEnergyAccess() {
-      this.lastForgeEnergyAccess = this.world.getGameTime();
-    }
-
-    private boolean isForgeEnergyBridgeActive() {
-      return this.lastForgeEnergyAccess != Long.MIN_VALUE
-          && this.world.getGameTime() - this.lastForgeEnergyAccess <= EXTERNAL_BRIDGE_TIMEOUT_TICKS;
-    }
-
-    private int getForgeEnergyTier() {
-      if (AbstractCableBlock.this.type.capacity >= 8192) {
-        return Math.max(
-            1, EnergyNet.instance.getTierFromPower(AbstractCableBlock.this.type.capacity));
-      }
-      return Math.max(1, AbstractCableBlock.this.insulation + 1);
-    }
-
-    private double getForgeEnergyCapacityEu() {
-      return EnergyNet.instance.getPowerFromTier(this.getForgeEnergyTier());
-    }
-
-    private IEnergyStorage getForgeEnergyStorage() {
-      this.markForgeEnergyAccess();
-      return this;
-    }
-
-    @Override
-    public int receiveEnergy(int maxReceive, boolean simulate) {
-      this.markForgeEnergyAccess();
-      if (maxReceive <= 0) {
-        return 0;
-      }
-      int freeFe =
-          EnergyBridgeMath.clampToIntEnergy(
-              EnergyBridgeMath.euToFeFloor(
-                  Math.max(0.0, this.getForgeEnergyCapacityEu() - this.forgeEnergyBufferEu)));
-      int accepted = Math.min(maxReceive, freeFe);
-      if (!simulate && accepted > 0) {
-        this.forgeEnergyBufferEu += EnergyBridgeMath.feToEu(accepted);
-      }
-      return accepted;
-    }
-
-    @Override
-    public int extractEnergy(int maxExtract, boolean simulate) {
-      this.markForgeEnergyAccess();
-      if (maxExtract <= 0) {
-        return 0;
-      }
-      int storedFe =
-          EnergyBridgeMath.clampToIntEnergy(EnergyBridgeMath.euToFeFloor(this.forgeEnergyBufferEu));
-      int extracted = Math.min(maxExtract, storedFe);
-      if (!simulate && extracted > 0) {
-        this.forgeEnergyBufferEu =
-            Math.max(0.0, this.forgeEnergyBufferEu - EnergyBridgeMath.feToEu(extracted));
-      }
-      return extracted;
-    }
-
-    @Override
-    public int getEnergyStored() {
-      this.markForgeEnergyAccess();
-      return EnergyBridgeMath.clampToIntEnergy(
-          EnergyBridgeMath.euToFeFloor(this.forgeEnergyBufferEu));
-    }
-
-    @Override
-    public int getMaxEnergyStored() {
-      this.markForgeEnergyAccess();
-      return EnergyBridgeMath.clampToIntEnergy(
-          EnergyBridgeMath.euToFeFloor(this.getForgeEnergyCapacityEu()));
-    }
-
-    @Override
-    public boolean canExtract() {
-      this.markForgeEnergyAccess();
-      // Keep the cable attached even while the bridge buffer is empty.
-      return true;
-    }
-
-    @Override
-    public boolean canReceive() {
-      this.markForgeEnergyAccess();
-      // Keep the cable attached even while the bridge buffer is full.
-      return true;
-    }
-
-    @Override
-    public double getOfferedEnergy() {
-      if (!this.isForgeEnergyBridgeActive() || this.forgeEnergyBufferEu <= 0.0) {
-        return 0.0;
-      }
-      return Math.min(
-          this.forgeEnergyBufferEu, EnergyNet.instance.getPowerFromTier(this.getSourceTier()));
-    }
-
-    @Override
-    public void drawEnergy(double amount) {
-      this.forgeEnergyBufferEu = Math.max(0.0, this.forgeEnergyBufferEu - Math.max(0.0, amount));
-    }
-
-    @Override
-    public int getSourceTier() {
-      return this.getForgeEnergyTier();
-    }
-
-    @Override
-    public double getDemandedEnergy() {
-      if (!this.isForgeEnergyBridgeActive()) {
-        return 0.0;
-      }
-      return Math.max(0.0, this.getForgeEnergyCapacityEu() - this.forgeEnergyBufferEu);
-    }
-
-    @Override
-    public int getSinkTier() {
-      return this.getForgeEnergyTier();
-    }
-
-    @Override
-    public double injectEnergy(Direction directionFrom, double amount, double voltage) {
-      if (!this.isForgeEnergyBridgeActive() || amount <= 0.0) {
-        return amount;
-      }
-      double accepted =
-          Math.min(
-              amount, Math.max(0.0, this.getForgeEnergyCapacityEu() - this.forgeEnergyBufferEu));
-      this.forgeEnergyBufferEu += accepted;
-      return Math.max(0.0, amount - accepted);
     }
 
     @Override

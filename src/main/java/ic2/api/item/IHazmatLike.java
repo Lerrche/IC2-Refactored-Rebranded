@@ -7,9 +7,15 @@ import net.minecraft.world.item.ItemStack;
 
 public interface IHazmatLike {
   static boolean hasCompleteHazmat(LivingEntity living) {
+    if (ic2.industrialjs.IndustrialJS.isRadiationDisabled()) {
+      return true;
+    }
     for (EquipmentSlot slot : EquipmentSlot.values()) {
       if (slot.getType() == Type.HUMANOID_ARMOR) {
         ItemStack stack = living.getItemBySlot(slot);
+        if (ic2.industrialjs.IndustrialJS.isHazmatPiece(stack, slot)) {
+          continue;
+        }
         if (stack == null || !(stack.getItem() instanceof IHazmatLike hazmat)) {
           return false;
         }

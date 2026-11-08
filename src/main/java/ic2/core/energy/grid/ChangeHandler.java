@@ -411,7 +411,12 @@ class ChangeHandler {
                 extraNodes.add(currentNode);
               }
 
-              neighbor.getGrid().add(currentNode, nodeList);
+              Grid neighborGrid = neighbor.getGrid();
+              if (neighborGrid == null) {
+                neighborGrid = new Grid(enet);
+                neighborGrid.add(neighbor, Collections.emptyList());
+              }
+              neighborGrid.add(currentNode, nodeList);
               assert currentNode.getGrid() != null;
             }
         }

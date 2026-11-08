@@ -79,7 +79,10 @@ public class TileEntityMatter extends TileEntityElectricMachine
         Ic2BlockEntities.MATTER_GENERATOR,
         pos,
         state,
-        Math.round(1000000.0F * IC2Config.balance.uuEnergyFactor.get().floatValue()),
+        Math.round(
+            1000000.0F
+                * IC2Config.balance.uuEnergyFactor.get().floatValue()
+                * (float) ic2.industrialjs.IndustrialJS.getUuEnergyMultiplier()),
         getDefaultTier());
     this.upgradeSlot = new InvSlotUpgrade(this, "upgrade", 4);
     this.redstone = this.addComponent(new Redstone(this));
@@ -152,7 +155,8 @@ public class TileEntityMatter extends TileEntityElectricMachine
       if (this.scrap > 0) {
         double bonus = Math.min(this.scrap, this.energy.getEnergy() - this.lastEnergy);
         if (bonus > 0.0) {
-          this.energy.forceAddEnergy(5.0 * bonus);
+          this.energy.forceAddEnergy(
+              5.0 * bonus * ic2.industrialjs.IndustrialJS.getMatterAmplifierMultiplier());
           this.scrap -= (int) bonus;
         }
 

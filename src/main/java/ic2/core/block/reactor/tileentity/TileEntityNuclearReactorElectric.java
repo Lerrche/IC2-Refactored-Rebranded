@@ -251,7 +251,8 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory
   public double getOfferedEnergy() {
     return this.getReactorEnergyOutput()
         * 5.0F
-        * IC2Config.balance.energy.generator.nuclear.get().floatValue();
+        * IC2Config.balance.energy.generator.nuclear.get().floatValue()
+        * (float) ic2.industrialjs.IndustrialJS.getNuclearReactorMultiplier();
   }
 
   @Override
@@ -728,7 +729,8 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory
       this.reactorSlot.put(i, null);
     }
 
-    boomPower *= this.hem * boomMod;
+    boomPower *=
+        this.hem * boomMod * (float) ic2.industrialjs.IndustrialJS.getReactorExplosionMultiplier();
     IC2.log.log(
         LogCategory.PlayerActivity,
         org.apache.logging.log4j.Level.INFO,
@@ -747,10 +749,12 @@ public class TileEntityNuclearReactorElectric extends TileEntityInventory
     }
 
     world.removeBlock(this.worldPosition, false);
-    Ic2Explosion explosion =
-        new Ic2Explosion(
-            world, null, this.worldPosition, boomPower, 0.01F, Ic2Explosion.Type.ReactorMeltdown);
-    explosion.doExplosion();
+    if (boomPower > 0.0F) {
+      Ic2Explosion explosion =
+          new Ic2Explosion(
+              world, null, this.worldPosition, boomPower, 0.01F, Ic2Explosion.Type.ReactorMeltdown);
+      explosion.doExplosion();
+    }
   }
 
   @Override

@@ -14,6 +14,10 @@ public final class EnergyBridgeMath {
 
   private EnergyBridgeMath() {}
 
+  public static double getFePerEu() {
+    return ic2.industrialjs.IndustrialJS.getEuToFeRatio();
+  }
+
   public static boolean isValidRatio(double fePerEu) {
     return Double.isFinite(fePerEu) && fePerEu > 0.0;
   }
@@ -35,7 +39,7 @@ public final class EnergyBridgeMath {
   }
 
   public static long euToFeCeil(double eu) {
-    return euToFeCeil(eu, DEFAULT_FE_PER_EU);
+    return euToFeCeil(eu, getFePerEu());
   }
 
   public static long euToFeFloor(double eu, double fePerEu) {
@@ -55,7 +59,7 @@ public final class EnergyBridgeMath {
   }
 
   public static long euToFeFloor(double eu) {
-    return euToFeFloor(eu, DEFAULT_FE_PER_EU);
+    return euToFeFloor(eu, getFePerEu());
   }
 
   public static double feToEu(long fe, double fePerEu) {
@@ -67,7 +71,7 @@ public final class EnergyBridgeMath {
   }
 
   public static double feToEu(long fe) {
-    return feToEu(fe, DEFAULT_FE_PER_EU);
+    return feToEu(fe, getFePerEu());
   }
 
   public static long residualFe(long offeredFe, long transferredFe) {
@@ -96,7 +100,7 @@ public final class EnergyBridgeMath {
   }
 
   public static double residualEuAfterFeTransfer(double euOffer, long feAccepted) {
-    return residualEuAfterFeTransfer(euOffer, feAccepted, DEFAULT_FE_PER_EU);
+    return residualEuAfterFeTransfer(euOffer, feAccepted, getFePerEu());
   }
 
   public static int clampToIntEnergy(long amount) {

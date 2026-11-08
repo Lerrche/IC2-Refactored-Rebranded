@@ -66,8 +66,20 @@ public abstract class TileEntityStandardMachine<RI, RO, I> extends TileEntityEle
       int outputSlots,
       int aDefaultTier) {
     super(type, pos, state, energyPerTick * length, aDefaultTier);
-    this.defaultEnergyConsume = this.energyConsume = energyPerTick;
-    this.defaultOperationLength = this.operationLength = length;
+    this.defaultEnergyConsume =
+        this.energyConsume =
+            (int)
+                Math.max(
+                    1,
+                    Math.round(
+                        energyPerTick
+                            * ic2.industrialjs.IndustrialJS.getMachineConsumptionMultiplier()));
+    this.defaultOperationLength =
+        this.operationLength =
+            (int)
+                Math.max(
+                    1,
+                    Math.round(length / ic2.industrialjs.IndustrialJS.getMachineSpeedMultiplier()));
     this.defaultTier = aDefaultTier;
     this.defaultEnergyStorage = energyPerTick * length;
     this.outputSlot = new InvSlotOutput(this, "output", outputSlots);
@@ -173,8 +185,20 @@ public abstract class TileEntityStandardMachine<RI, RO, I> extends TileEntityEle
     this.upgradeSlot.onChanged();
     double previousProgress = (double) this.progress / this.operationLength;
     this.operationsPerTick = this.upgradeSlot.getOperationsPerTick(this.defaultOperationLength);
-    this.operationLength = this.upgradeSlot.getOperationLength(this.defaultOperationLength);
-    this.energyConsume = this.upgradeSlot.getEnergyDemand(this.defaultEnergyConsume);
+    this.operationLength =
+        (int)
+            Math.max(
+                1,
+                Math.round(
+                    this.upgradeSlot.getOperationLength(this.defaultOperationLength)
+                        / ic2.industrialjs.IndustrialJS.getMachineSpeedMultiplier()));
+    this.energyConsume =
+        (int)
+            Math.max(
+                1,
+                Math.round(
+                    this.upgradeSlot.getEnergyDemand(this.defaultEnergyConsume)
+                        * ic2.industrialjs.IndustrialJS.getMachineConsumptionMultiplier()));
     int tier = this.upgradeSlot.getTier(this.defaultTier);
     this.energy.setSinkTier(tier);
     this.dischargeSlot.setTier(tier);

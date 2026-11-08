@@ -19,6 +19,7 @@ import ic2.core.util.ParticleUtil;
 import ic2.core.util.StackUtil;
 import java.util.ArrayList;
 import java.util.List;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -389,24 +390,18 @@ public class TileEntityCokeKiln extends TileEntityBase implements IHasGui, IGuiV
 
   @Override
   public void appendItemTooltip(ItemStack stack, List<Component> tooltip, TooltipFlag advanced) {
-    Ic2Tooltip.add(tooltip, Component.literal(""));
-    Ic2Tooltip.add(tooltip, Component.literal("MultiBlock Structure:"));
-    Ic2Tooltip.add(tooltip, Component.literal(""));
     Ic2Tooltip.add(
         tooltip,
-        Component.literal(
-            " Bottom Layer - 3x3 of Refractory Blocks with a Coke Kiln Grate in the centre"));
-    Ic2Tooltip.add(tooltip, Component.literal(""));
+        Component.translatable("ic2.coke_kiln.structure.title").withStyle(ChatFormatting.GOLD));
     Ic2Tooltip.add(
         tooltip,
-        Component.literal(
-            " Middle Layer - 3x3 of Refractory Blocks with a hollow centre and this block in the middle of one of the sides"));
-    Ic2Tooltip.add(tooltip, Component.literal(""));
+        Component.translatable("ic2.coke_kiln.structure.bottom").withStyle(ChatFormatting.GRAY));
     Ic2Tooltip.add(
         tooltip,
-        Component.literal(
-            " Top Layer - 3x3 of Refractory Blocks with a Coke Kiln Hatch in the centre"));
-    Ic2Tooltip.add(tooltip, Component.literal(""));
+        Component.translatable("ic2.coke_kiln.structure.middle").withStyle(ChatFormatting.GRAY));
+    Ic2Tooltip.add(
+        tooltip,
+        Component.translatable("ic2.coke_kiln.structure.top").withStyle(ChatFormatting.GRAY));
   }
 
   /**

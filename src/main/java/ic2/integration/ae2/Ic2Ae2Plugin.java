@@ -9,11 +9,13 @@ import ic2.core.IC2;
 import ic2.core.energy.EnergyBridgeMath;
 import ic2.core.util.LogCategory;
 import java.lang.reflect.Method;
-import java.util.ArrayDeque;
-import java.util.HashMap;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Queue;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import javax.annotation.Nullable;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -44,11 +46,11 @@ public final class Ic2Ae2Plugin {
   public static final ResourceLocation ENERGY_ACCEPTOR_ID =
       ResourceLocation.fromNamespaceAndPath("ae2", "energy_acceptor");
 
-  private static final Map<Level, Map<BlockPos, Ae2EnergySink>> sinks = new HashMap<>();
+  private static final Map<Level, Map<BlockPos, Ae2EnergySink>> sinks = new ConcurrentHashMap<>();
 
-  private static final Map<Level, Queue<ChunkPos>> pendingChunks = new HashMap<>();
+  private static final Map<Level, Queue<ChunkPos>> pendingChunks = new ConcurrentHashMap<>();
 
-  private static final Map<Level, Queue<BlockPos>> pendingPositions = new HashMap<>();
+  private static final Map<Level, Queue<BlockPos>> pendingPositions = new ConcurrentHashMap<>();
 
   private static final int POSITIONS_PER_TICK = 32;
 
@@ -120,21 +122,22 @@ public final class Ic2Ae2Plugin {
   }
 
   private static void registerSink(Level world, BlockPos pos) {
-    if (world.isClientSide || !Info.isIc2Available()) return;
-    Map<BlockPos, Ae2EnergySink> worldSinks = sinks.computeIfAbsent(world, k -> new HashMap<>());
-    if (worldSinks.containsKey(pos)) return;
-    Ae2EnergySink sink = new Ae2EnergySink(world, pos);
-    worldSinks.put(pos, sink);
-    EnergyNet.instance.addLocatableTile(sink);
-    IC2.log.debug(
-        LogCategory.EnergyNet,
-        "Registered AE2 grid energy sink at %s in %s",
-        pos,
-        world.dimension().location());
+    if (world == null || world.isClientSide || !Info.isIc2Available()) return;
+    Map<BlockPos, Ae2EnergySink> worldSinks =
+        sinks.computeIfAbsent(world, k -> new ConcurrentHashMap<>());
+    Ae2EnergySink sink = new Ae2EnergySink(world, pos.immutable());
+    if (worldSinks.putIfAbsent(pos.immutable(), sink) == null) {
+      EnergyNet.instance.addLocatableTile(sink);
+      IC2.log.debug(
+          LogCategory.EnergyNet,
+          "Registered AE2 grid energy sink at %s in %s",
+          pos,
+          world.dimension().location());
+    }
   }
 
   private static void unregisterSink(Level world, BlockPos pos) {
-    if (world.isClientSide || !Info.isIc2Available()) return;
+    if (world == null || world.isClientSide || !Info.isIc2Available()) return;
     Map<BlockPos, Ae2EnergySink> worldSinks = sinks.get(world);
     if (worldSinks == null) return;
     Ae2EnergySink sink = worldSinks.remove(pos);
@@ -146,14 +149,19 @@ public final class Ic2Ae2Plugin {
           pos,
           world.dimension().location());
     }
+    if (worldSinks.isEmpty()) {
+      sinks.remove(world, worldSinks);
+    }
   }
 
   private static void unregisterAllInWorld(Level world) {
+    if (world == null) return;
     Map<BlockPos, Ae2EnergySink> worldSinks = sinks.remove(world);
     pendingChunks.remove(world);
     pendingPositions.remove(world);
-    if (worldSinks == null) return;
-    for (Ae2EnergySink sink : worldSinks.values()) {
+    if (worldSinks == null || EnergyNet.instance == null) return;
+    List<Ae2EnergySink> toRemove = new ArrayList<>(worldSinks.values());
+    for (Ae2EnergySink sink : toRemove) {
       EnergyNet.instance.removeTile(sink);
     }
     IC2.log.debug(
@@ -163,17 +171,20 @@ public final class Ic2Ae2Plugin {
   }
 
   private static void processPendingChunks(ServerLevel world) {
+    if (world == null) return;
     Queue<ChunkPos> queue = pendingChunks.get(world);
     if (queue == null || queue.isEmpty()) return;
     int processed = 0;
     while (processed < POSITIONS_PER_TICK && !queue.isEmpty()) {
       ChunkPos cp = queue.poll();
+      if (cp == null) break;
       int chunkX = cp.x;
       int chunkZ = cp.z;
       BlockPos checkPos = new BlockPos(chunkX << 4, 0, chunkZ << 4);
       if (!world.isLoaded(checkPos)) continue;
       LevelChunk chunk = world.getChunk(chunkX, chunkZ);
-      for (BlockPos pos : chunk.getBlockEntities().keySet()) {
+      List<BlockPos> entityPositions = new ArrayList<>(chunk.getBlockEntities().keySet());
+      for (BlockPos pos : entityPositions) {
         if (isEnergyAcceptor(world, pos)) {
           registerSink(world, pos);
         }
@@ -183,7 +194,9 @@ public final class Ic2Ae2Plugin {
   }
 
   private static void queueNearbyPositions(Level world, BlockPos center) {
-    Queue<BlockPos> queue = pendingPositions.computeIfAbsent(world, level -> new ArrayDeque<>());
+    if (world == null || world.isClientSide) return;
+    Queue<BlockPos> queue =
+        pendingPositions.computeIfAbsent(world, level -> new ConcurrentLinkedQueue<>());
     queue.add(center.immutable());
     for (Direction direction : Direction.values()) {
       queue.add(center.relative(direction).immutable());
@@ -191,18 +204,20 @@ public final class Ic2Ae2Plugin {
   }
 
   private static void processPendingPositions(ServerLevel world) {
+    if (world == null) return;
     Queue<BlockPos> queue = pendingPositions.get(world);
     if (queue == null || queue.isEmpty()) return;
     int processed = 0;
     while (processed < PLACED_POSITIONS_PER_TICK && !queue.isEmpty()) {
       BlockPos pos = queue.poll();
+      if (pos == null) break;
       if (world.hasChunkAt(pos) && isEnergyAcceptor(world, pos)) {
         registerSink(world, pos);
       }
       processed++;
     }
     if (queue.isEmpty()) {
-      pendingPositions.remove(world);
+      pendingPositions.remove(world, queue);
     }
   }
 
@@ -218,8 +233,7 @@ public final class Ic2Ae2Plugin {
 
     @SubscribeEvent
     public void onBlockBreak(BlockEvent.BreakEvent event) {
-      Level world = (Level) event.getLevel();
-      if (world.isClientSide) return;
+      if (!(event.getLevel() instanceof Level world) || world.isClientSide) return;
       BlockPos pos = event.getPos();
       if (isEnergyAcceptor(world, pos)) {
         unregisterSink(world, pos);
@@ -230,27 +244,34 @@ public final class Ic2Ae2Plugin {
     public void onChunkLoad(ChunkEvent.Load event) {
       if (!(event.getChunk() instanceof LevelChunk chunk)) return;
       Level world = chunk.getLevel();
-      if (world.isClientSide) return;
-      pendingChunks.computeIfAbsent(world, k -> new ArrayDeque<>()).add(chunk.getPos());
+      if (world == null || world.isClientSide) return;
+      pendingChunks.computeIfAbsent(world, k -> new ConcurrentLinkedQueue<>()).add(chunk.getPos());
     }
 
     @SubscribeEvent
     public void onChunkUnload(ChunkEvent.Unload event) {
       if (!(event.getChunk() instanceof LevelChunk chunk)) return;
       Level world = chunk.getLevel();
-      if (world.isClientSide) return;
+      if (world == null || world.isClientSide) return;
       Map<BlockPos, Ae2EnergySink> worldSinks = sinks.get(world);
-      if (worldSinks != null) {
+      if (worldSinks != null && EnergyNet.instance != null) {
         int chunkX = chunk.getPos().x;
         int chunkZ = chunk.getPos().z;
+        List<Ae2EnergySink> toRemove = new ArrayList<>();
         Iterator<Map.Entry<BlockPos, Ae2EnergySink>> it = worldSinks.entrySet().iterator();
         while (it.hasNext()) {
           Map.Entry<BlockPos, Ae2EnergySink> entry = it.next();
           BlockPos pos = entry.getKey();
           if ((pos.getX() >> 4) == chunkX && (pos.getZ() >> 4) == chunkZ) {
-            EnergyNet.instance.removeTile(entry.getValue());
+            toRemove.add(entry.getValue());
             it.remove();
           }
+        }
+        for (Ae2EnergySink sink : toRemove) {
+          EnergyNet.instance.removeTile(sink);
+        }
+        if (worldSinks.isEmpty()) {
+          sinks.remove(world, worldSinks);
         }
       }
     }

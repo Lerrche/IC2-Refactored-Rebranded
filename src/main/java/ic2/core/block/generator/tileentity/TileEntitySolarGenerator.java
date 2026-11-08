@@ -56,7 +56,10 @@ public class TileEntitySolarGenerator extends TileEntityBaseGenerator {
     }
 
     if (this.skyLight > 0.0F) {
-      this.energy.addEnergy(IC2Config.balance.energy.generator.solar.get() * this.skyLight);
+      this.energy.addEnergy(
+          IC2Config.balance.energy.generator.solar.get()
+              * this.skyLight
+              * ic2.industrialjs.IndustrialJS.getSolarDayMultiplier());
       return true;
     } else {
       return false;

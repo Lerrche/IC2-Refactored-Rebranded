@@ -42,4 +42,15 @@ public class TileEntityCokeKilnHatch extends TileEntityInventory implements IHas
       ic2.core.network.GrowingBuffer data) {
     return DynamicContainer.create(syncId, inventory, this);
   }
+
+  @Override
+  public void appendItemTooltip(
+      ItemStack stack,
+      java.util.List<net.minecraft.network.chat.Component> tooltip,
+      net.minecraft.world.item.TooltipFlag advanced) {
+    ic2.core.util.Ic2Tooltip.add(
+        tooltip,
+        net.minecraft.network.chat.Component.translatable("ic2.coke_kiln_hatch.tooltip")
+            .withStyle(net.minecraft.ChatFormatting.GRAY));
+  }
 }

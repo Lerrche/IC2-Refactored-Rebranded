@@ -23,7 +23,10 @@ public class ConfigUtil {
     List<ItemStack> ret = new ArrayList<>(parts.size());
 
     for (String part : parts) {
-      ret.add(asStack(part));
+      ItemStack stack = asStack(part);
+      if (stack != null && !stack.isEmpty()) {
+        ret.add(stack);
+      }
     }
 
     return ret;
@@ -39,26 +42,48 @@ public class ConfigUtil {
     List<IRecipeInput> ret = new ArrayList<>(parts.size());
 
     for (String part : parts) {
-      IRecipeInput input = asRecipeInput(part);
-      if (input == null && !allowNull) {
-        throw new ParseException("There is no item matching " + part + ".", -1);
+      part = part.trim();
+      if (part.isEmpty()) continue;
+      try {
+        IRecipeInput input = asRecipeInput(part);
+        if (input != null) {
+          ret.add(input);
+        } else if (!allowNull) {
+          ic2.core.IC2.log.warn(
+              ic2.core.util.LogCategory.General,
+              "Skipping invalid or missing item in config: '%s'",
+              part);
+        }
+      } catch (Exception e) {
+        ic2.core.IC2.log.warn(
+            ic2.core.util.LogCategory.General,
+            "Failed to parse recipe input '%s' from config: %s",
+            part,
+            e.getMessage());
       }
-
-      ret.add(input);
     }
 
     return ret;
   }
 
   private static ItemStack asStack(String str, boolean checkAmount) throws ParseException {
+    if (str == null || str.isBlank()) {
+      return null;
+    }
     String[] parts = str.split("(?=(\\*))");
-    String itemName = parts[0];
+    String itemName = parts[0].trim();
+    if (itemName.isEmpty()) {
+      return null;
+    }
     Item item = Util.getItem(itemName);
-    if (item == null) {
+    if (item == null || item == net.minecraft.world.item.Items.AIR) {
       return null;
     }
 
     ItemStack stack = new ItemStack(item);
+    if (stack.isEmpty()) {
+      return null;
+    }
     int amount = 1;
 
     for (int i = 1; i < parts.length; i++) {
@@ -117,7 +142,7 @@ public class ConfigUtil {
     String itemName = parts[0];
     if (!itemName.startsWith("Tag:") && !itemName.startsWith("Fluid:")) {
       ItemStack stack = asStack(str, checkAmount);
-      return stack == null ? null : Recipes.inputFactory.forStack(stack);
+      return (stack == null || stack.isEmpty()) ? null : Recipes.inputFactory.forStack(stack);
     }
 
     Integer amount = null;

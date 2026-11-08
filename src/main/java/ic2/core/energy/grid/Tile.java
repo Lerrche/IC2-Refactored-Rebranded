@@ -24,16 +24,16 @@ public final class Tile {
   Tile(EnergyNetLocal enet, IEnergyTile mainTile, List<IEnergyTile> subTiles) {
     this.mainTile = mainTile;
     this.subTiles = subTiles;
-    if (mainTile instanceof IEnergySource) {
-      this.nodes.add(new Node(enet.allocateNodeId(), this, NodeType.Source));
-    }
-
-    if (mainTile instanceof IEnergySink) {
-      this.nodes.add(new Node(enet.allocateNodeId(), this, NodeType.Sink));
-    }
-
     if (mainTile instanceof IEnergyConductor) {
       this.nodes.add(new Node(enet.allocateNodeId(), this, NodeType.Conductor));
+    } else {
+      if (mainTile instanceof IEnergySource) {
+        this.nodes.add(new Node(enet.allocateNodeId(), this, NodeType.Source));
+      }
+
+      if (mainTile instanceof IEnergySink) {
+        this.nodes.add(new Node(enet.allocateNodeId(), this, NodeType.Sink));
+      }
     }
   }
 

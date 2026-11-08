@@ -145,6 +145,10 @@ public class TileEntityBase extends TileEntityInventory {
   protected void onLoaded() {
     this.initSound();
     super.onLoaded();
+    if (this.muted && this.level != null && this.level.isClientSide) {
+      this.stopStartSound();
+      this.stopLoopingSound();
+    }
   }
 
   protected boolean shouldSoundActive() {
@@ -249,7 +253,6 @@ public class TileEntityBase extends TileEntityInventory {
     return ret;
   }
 
-  @Override
   public void saveAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
     super.saveAdditional(nbt, registries);
     if (this.muted) {
@@ -261,6 +264,10 @@ public class TileEntityBase extends TileEntityInventory {
   protected void loadAdditional(CompoundTag nbt, HolderLookup.Provider registries) {
     super.loadAdditional(nbt, registries);
     this.muted = nbt.getBoolean("muted");
+    if (this.muted && this.level != null && this.level.isClientSide) {
+      this.stopStartSound();
+      this.stopLoopingSound();
+    }
   }
 
   public void startPlaySound(boolean playSubSound) {

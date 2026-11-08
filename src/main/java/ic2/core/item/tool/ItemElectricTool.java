@@ -130,9 +130,41 @@ public abstract class ItemElectricTool extends DiggerItem
     return super.use(world, player, hand);
   }
 
+  public double getOperationEnergyCost(ItemStack stack) {
+    if (stack == null || stack.isEmpty()) return this.operationEnergyCost;
+    net.minecraft.resources.ResourceLocation rl =
+        net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem());
+    if (rl != null) {
+      if (ic2.industrialjs.IndustrialJS.hasDrillEnergyPerBlock(rl.toString())) {
+        return ic2.industrialjs.IndustrialJS.getDrillEnergyPerBlock(
+            rl.toString(), (int) this.operationEnergyCost);
+      }
+      if (ic2.industrialjs.IndustrialJS.hasDrillEnergyPerBlock(rl.getPath())) {
+        return ic2.industrialjs.IndustrialJS.getDrillEnergyPerBlock(
+            rl.getPath(), (int) this.operationEnergyCost);
+      }
+    }
+    return this.operationEnergyCost;
+  }
+
   public float getDestroySpeed(ItemStack stack, BlockState state) {
-    return this.isEffective(state) && ElectricItem.manager.canUse(stack, this.operationEnergyCost)
-        ? this.getTier().getSpeed()
+    double cost = this.getOperationEnergyCost(stack);
+    float baseSpeed = this.getTier().getSpeed();
+    if (stack != null && !stack.isEmpty()) {
+      net.minecraft.resources.ResourceLocation rl =
+          net.minecraft.core.registries.BuiltInRegistries.ITEM.getKey(stack.getItem());
+      if (rl != null) {
+        if (ic2.industrialjs.IndustrialJS.hasDrillMiningSpeed(rl.toString())) {
+          baseSpeed =
+              (float) ic2.industrialjs.IndustrialJS.getDrillMiningSpeed(rl.toString(), baseSpeed);
+        } else if (ic2.industrialjs.IndustrialJS.hasDrillMiningSpeed(rl.getPath())) {
+          baseSpeed =
+              (float) ic2.industrialjs.IndustrialJS.getDrillMiningSpeed(rl.getPath(), baseSpeed);
+        }
+      }
+    }
+    return this.isEffective(state) && ElectricItem.manager.canUse(stack, cost)
+        ? baseSpeed * (float) ic2.industrialjs.IndustrialJS.getMiningSpeedMultiplier()
         : 1.0F;
   }
 
@@ -184,7 +216,7 @@ public abstract class ItemElectricTool extends DiggerItem
   public boolean mineBlock(
       ItemStack stack, Level world, BlockState state, BlockPos pos, LivingEntity user) {
     if (state.getDestroySpeed(world, pos) != 0.0F) {
-      this.consumeEnergy(stack, this.operationEnergyCost, user);
+      this.consumeEnergy(stack, this.getOperationEnergyCost(stack), user);
     }
 
     return true;
@@ -320,6 +352,6 @@ public abstract class ItemElectricTool extends DiggerItem
   }
 
   public boolean canUse(ItemStack stack) {
-    return ElectricItem.manager.canUse(stack, this.operationEnergyCost);
+    return ElectricItem.manager.canUse(stack, this.getOperationEnergyCost(stack));
   }
 }

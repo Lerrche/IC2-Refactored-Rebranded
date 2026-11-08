@@ -66,12 +66,19 @@ public abstract class ItemArmorElectric extends ItemArmorIC2 implements IElectri
       ItemStack stack = entity.getItemBySlot(slot);
       if (stack.getItem() instanceof ItemArmorElectric electricArmor) {
         double absorptionRatio =
-            electricArmor.getBaseAbsorptionRatio() * electricArmor.getDamageAbsorptionRatio();
+            electricArmor.getBaseAbsorptionRatio()
+                * electricArmor.getDamageAbsorptionRatio()
+                * ic2.industrialjs.IndustrialJS.getArmorAbsorptionMultiplier();
         if (absorptionRatio <= 0.0) {
           continue;
         }
 
-        int energyPerDamage = electricArmor.getEnergyPerDamage();
+        int energyPerDamage =
+            (int)
+                Math.max(
+                    1,
+                    electricArmor.getEnergyPerDamage()
+                        * ic2.industrialjs.IndustrialJS.getArmorEnergyCostMultiplier());
         if (energyPerDamage <= 0) {
           continue;
         }

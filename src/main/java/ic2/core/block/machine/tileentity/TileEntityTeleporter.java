@@ -16,7 +16,11 @@ import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.DustParticleOptions;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundSource;
@@ -43,6 +47,7 @@ import org.joml.Vector3f;
 public class TileEntityTeleporter extends TileEntityBase
     implements INetworkTileEntityEventListener {
   private BlockPos target;
+  private ResourceKey<Level> targetDimension;
   private int targetCheckTicker = IC2.random.nextInt(1024);
   private int cooldown = 0;
 
@@ -62,6 +67,12 @@ public class TileEntityTeleporter extends TileEntityBase
       this.target =
           new BlockPos(nbt.getInt("targetX"), nbt.getInt("targetY"), nbt.getInt("targetZ"));
     }
+    if (nbt.contains("targetDim")) {
+      ResourceLocation dimLoc = ResourceLocation.tryParse(nbt.getString("targetDim"));
+      if (dimLoc != null) {
+        this.targetDimension = ResourceKey.create(Registries.DIMENSION, dimLoc);
+      }
+    }
   }
 
   @Override
@@ -71,6 +82,9 @@ public class TileEntityTeleporter extends TileEntityBase
       nbt.putInt("targetX", this.target.getX());
       nbt.putInt("targetY", this.target.getY());
       nbt.putInt("targetZ", this.target.getZ());
+      if (this.targetDimension != null) {
+        nbt.putString("targetDim", this.targetDimension.location().toString());
+      }
     }
   }
 
@@ -125,7 +139,12 @@ public class TileEntityTeleporter extends TileEntityBase
         }
 
         assert closestEntity != null;
-        this.teleport(closestEntity, Math.sqrt(this.worldPosition.distSqr(this.target)));
+        boolean isCrossDim =
+            this.targetDimension != null
+                && this.level != null
+                && !this.targetDimension.equals(this.level.dimension());
+        double dist = isCrossDim ? 0.0 : Math.sqrt(this.worldPosition.distSqr(this.target));
+        this.teleport(closestEntity, dist);
       } else if (++this.targetCheckTicker % 1024 == 0) {
         this.verifyTarget();
       }
@@ -134,12 +153,37 @@ public class TileEntityTeleporter extends TileEntityBase
     }
   }
 
+  public Level getTargetLevel() {
+    if (this.level == null) return null;
+    if (this.targetDimension == null || this.targetDimension.equals(this.level.dimension())) {
+      return this.level;
+    }
+    if (this.level.getServer() != null) {
+      return this.level.getServer().getLevel(this.targetDimension);
+    }
+    return null;
+  }
+
   private boolean verifyTarget() {
-    if (this.getLevel().getBlockEntity(this.target) instanceof TileEntityTeleporter) {
-      return true;
+    if (this.target == null) {
+      return false;
+    }
+    Level targetLvl = this.getTargetLevel();
+    if (targetLvl != null) {
+      if (this.targetDimension != null
+          && this.level != null
+          && !this.targetDimension.equals(this.level.dimension())) {
+        if (!ic2.industrialjs.IndustrialJS.isTeleporterCrossDimension()) {
+          return false;
+        }
+      }
+      if (targetLvl.getBlockEntity(this.target) instanceof TileEntityTeleporter) {
+        return true;
+      }
     }
 
     this.target = null;
+    this.targetDimension = null;
     this.updateComparatorLevel();
     this.shutdown(false);
     return false;
@@ -165,26 +209,70 @@ public class TileEntityTeleporter extends TileEntityBase
   public void teleport(Entity user, double distance) {
     int weight = this.getWeightOf(user);
     if (weight != 0) {
-      int energyCost = (int) (weight * Math.pow(distance + 10.0, 0.7) * 5.0);
+      boolean isCrossDim =
+          this.targetDimension != null
+              && this.level != null
+              && !this.targetDimension.equals(this.level.dimension());
+      int energyCost;
+      if (isCrossDim) {
+        energyCost =
+            (int)
+                (weight
+                    * ic2.industrialjs.IndustrialJS.getTeleporterCrossDimensionFlatCost()
+                    * ic2.industrialjs.IndustrialJS.getTeleporterCostMultiplier());
+      } else {
+        energyCost =
+            (int)
+                (weight
+                    * Math.pow(distance + 10.0, 0.7)
+                    * 5.0
+                    * ic2.industrialjs.IndustrialJS.getTeleporterCostMultiplier());
+      }
       if (energyCost <= this.getAvailableEnergy()) {
         this.consumeEnergy(energyCost);
-        if (user instanceof ServerPlayer) {
-          user.teleportTo(
-              this.target.getX() + 0.5, this.target.getY() + 1.5, this.target.getZ() + 0.5);
-        } else {
-          user.absMoveTo(
-              this.target.getX() + 0.5,
-              this.target.getY() + 1.5,
-              this.target.getZ() + 0.5,
-              user.getYRot(),
-              user.getXRot());
+        Level targetLvl = this.getTargetLevel();
+        if (targetLvl == null) {
+          return;
         }
 
-        BlockEntity te = this.getLevel().getBlockEntity(this.target);
-        assert te instanceof TileEntityTeleporter;
-        ((TileEntityTeleporter) te).onTeleportTo();
+        double tx = this.target.getX() + 0.5;
+        double ty = this.target.getY() + 1.5;
+        double tz = this.target.getZ() + 0.5;
+
+        if (isCrossDim && targetLvl instanceof ServerLevel targetServerLevel) {
+          if (user instanceof ServerPlayer player) {
+            player.teleportTo(
+                targetServerLevel,
+                tx,
+                ty,
+                tz,
+                java.util.Collections.emptySet(),
+                user.getYRot(),
+                user.getXRot());
+          } else {
+            user.changeDimension(
+                new net.minecraft.world.level.portal.DimensionTransition(
+                    targetServerLevel,
+                    new net.minecraft.world.phys.Vec3(tx, ty, tz),
+                    user.getDeltaMovement(),
+                    user.getYRot(),
+                    user.getXRot(),
+                    net.minecraft.world.level.portal.DimensionTransition.DO_NOTHING));
+          }
+        } else {
+          if (user instanceof ServerPlayer) {
+            user.teleportTo(tx, ty, tz);
+          } else {
+            user.absMoveTo(tx, ty, tz, user.getYRot(), user.getXRot());
+          }
+        }
+
+        BlockEntity te = targetLvl.getBlockEntity(this.target);
+        if (te instanceof TileEntityTeleporter targetTp) {
+          targetTp.onTeleportTo();
+        }
         IC2.network.get(true).initiateTileEntityEvent(this, 0, true);
-        if (user instanceof Player && distance >= 1000.0) {
+        if (user instanceof Player && (isCrossDim || distance >= 1000.0)) {
           IC2.grantAdvancement(
               (Player) user,
               "ic2/build_generator/build_batbox/build_mfeu/build_mfsu/build_teleporter/teleport_far_away");
@@ -336,8 +424,17 @@ public class TileEntityTeleporter extends TileEntityBase
     return this.target;
   }
 
+  public ResourceKey<Level> getTargetDimension() {
+    return this.targetDimension;
+  }
+
   public void setTarget(BlockPos pos) {
+    this.setTarget(pos, this.level != null ? this.level.dimension() : Level.OVERWORLD);
+  }
+
+  public void setTarget(BlockPos pos, ResourceKey<Level> dimension) {
     this.target = pos;
+    this.targetDimension = dimension;
     this.updateComparatorLevel();
     IC2.network.get(true).updateTileEntityField(this, "target");
   }
@@ -371,7 +468,11 @@ public class TileEntityTeleporter extends TileEntityBase
           1.0F,
           true);
       this.spawnBlueParticles(20, this.worldPosition);
-      this.spawnBlueParticles(20, this.target);
+      if (this.target != null
+          && (this.targetDimension == null
+              || (this.level != null && this.targetDimension.equals(this.level.dimension())))) {
+        this.spawnBlueParticles(20, this.target);
+      }
     } else {
       IC2.sideProxy.displayError(
           "An unknown event type was received over multiplayer.\nThis could happen due to corrupted data or a bug.\n\n(Technical information: event ID "

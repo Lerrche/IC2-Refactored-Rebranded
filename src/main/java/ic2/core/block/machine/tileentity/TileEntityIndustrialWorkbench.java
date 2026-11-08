@@ -30,6 +30,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -273,13 +274,20 @@ public class TileEntityIndustrialWorkbench extends TileEntityInventory implement
           return true;
         }
 
+        RecipeManager recipeManager = world.getRecipeManager();
+        if (recipeManager == null && world.getServer() != null) {
+          recipeManager = world.getServer().getRecipeManager();
+        }
+        if (recipeManager == null) {
+          recipeManager = ic2.core.IC2.sideProxy.getRecipeManager();
+        }
         this.recipe =
-            world
-                .getServer()
-                .getRecipeManager()
-                .getRecipeFor(RecipeType.CRAFTING, input, world)
-                .map(RecipeHolder::value)
-                .orElse(null);
+            recipeManager != null
+                ? recipeManager
+                    .getRecipeFor(RecipeType.CRAFTING, input, world)
+                    .map(RecipeHolder::value)
+                    .orElse(null)
+                : null;
         return this.recipe != null && this.recipe.matches(input, world);
       } catch (RuntimeException exception) {
         // A broken third-party recipe must not poison the menu result slot or the server tick.

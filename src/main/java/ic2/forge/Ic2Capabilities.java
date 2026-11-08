@@ -4,7 +4,6 @@ import ic2.api.item.INanoSaberState;
 import ic2.core.IC2;
 import ic2.core.block.comp.Fluids;
 import ic2.core.block.tileentity.Ic2TileEntity;
-import ic2.core.block.wiring.AbstractCableBlock;
 import ic2.core.fluid.FluidBeBridge;
 import ic2.core.fluid.Ic2FluidBlock;
 import ic2.core.fluid.Ic2FluidItem;
@@ -16,7 +15,6 @@ import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -43,25 +41,6 @@ public final class Ic2Capabilities {
           Capabilities.EnergyStorage.BLOCK,
           type,
           (be, side) -> Ic2EnergyStorage.forBlockEntity(be, side));
-    }
-
-    // Make IC2 wire blocks visible to all mods using NeoForge/Forge Energy capabilities.
-    // The cable conductor itself backs the capability, so the energy network and FE adapter
-    // operate on one shared buffer rather than two independent stores.
-    List<Block> cableBlocks = new ArrayList<>();
-    for (Block block : BuiltInRegistries.BLOCK) {
-      if (block instanceof AbstractCableBlock) {
-        cableBlocks.add(block);
-      }
-    }
-    if (!cableBlocks.isEmpty()) {
-      event.registerBlock(
-          Capabilities.EnergyStorage.BLOCK,
-          (level, pos, state, blockEntity, side) ->
-              state.getBlock() instanceof AbstractCableBlock cable
-                  ? cable.getForgeEnergyStorage(level, pos)
-                  : null,
-          cableBlocks.toArray(new Block[0]));
     }
 
     List<Item> fluidItems = new ArrayList<>();

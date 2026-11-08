@@ -23,6 +23,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.CraftingInput;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.RecipeHolder;
+import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.item.crafting.RecipeType;
 import net.minecraft.world.level.Level;
 
@@ -142,14 +143,23 @@ public class ContainerIndustrialWorkbench extends ContainerFullInv<TileEntityInd
 
   private CraftingRecipe getRecipe(CraftingContainer inventory) {
     Level world = this.base.getLevel();
-    if (world == null || world.getServer() == null) {
+    if (world == null) {
       return null;
     }
 
     try {
-      return world
-          .getServer()
-          .getRecipeManager()
+      RecipeManager recipeManager = world.getRecipeManager();
+      if (recipeManager == null && world.getServer() != null) {
+        recipeManager = world.getServer().getRecipeManager();
+      }
+      if (recipeManager == null) {
+        recipeManager = ic2.core.IC2.sideProxy.getRecipeManager();
+      }
+      if (recipeManager == null) {
+        return null;
+      }
+
+      return recipeManager
           .getRecipeFor(RecipeType.CRAFTING, toCraftingInput(inventory), world)
           .map(RecipeHolder::value)
           .orElse(null);

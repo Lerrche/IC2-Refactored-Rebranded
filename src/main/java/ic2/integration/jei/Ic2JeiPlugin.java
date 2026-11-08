@@ -1,5 +1,6 @@
 package ic2.integration.jei;
 
+import ic2.api.item.IElectricItem;
 import ic2.api.recipe.IRecipeInput;
 import ic2.api.util.FluidContainerOutputMode;
 import ic2.core.IC2;
@@ -46,6 +47,8 @@ import mezz.jei.api.constants.RecipeTypes;
 import mezz.jei.api.gui.ingredient.IRecipeSlotView;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.ingredients.subtypes.ISubtypeInterpreter;
+import mezz.jei.api.ingredients.subtypes.UidContext;
 import mezz.jei.api.neoforge.NeoForgeTypes;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.transfer.IRecipeTransferError;
@@ -56,6 +59,7 @@ import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
 import mezz.jei.api.registration.IRecipeTransferRegistration;
+import mezz.jei.api.registration.ISubtypeRegistration;
 import mezz.jei.api.registration.IVanillaCategoryExtensionRegistration;
 import mezz.jei.api.runtime.IJeiRuntime;
 import mezz.jei.api.runtime.IRecipesGui;
@@ -205,6 +209,28 @@ public class Ic2JeiPlugin implements IModPlugin {
         new JetpackAttachmentCategoryExtension(
             registration.getJeiHelpers().getIngredientManager()));
     craftingCategory.addExtension(AdvRecipe.class, new AdvRecipeCategoryExtension());
+  }
+
+  @Override
+  public void registerItemSubtypes(ISubtypeRegistration registration) {
+    ISubtypeInterpreter<ItemStack> electricInterpreter =
+        new ISubtypeInterpreter<>() {
+          @Override
+          public @Nullable Object getSubtypeData(ItemStack ingredient, UidContext context) {
+            return null;
+          }
+
+          @Override
+          public String getLegacyStringSubtypeInfo(ItemStack ingredient, UidContext context) {
+            return "";
+          }
+        };
+
+    for (Item item : BuiltInRegistries.ITEM) {
+      if (item instanceof IElectricItem) {
+        registration.registerSubtypeInterpreter(item, electricInterpreter);
+      }
+    }
   }
 
   public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
@@ -855,7 +881,7 @@ public class Ic2JeiPlugin implements IModPlugin {
       for (int invIdx = 0; invIdx < 36; invIdx++) {
         ItemStack invStack = container.getSlot(invIdx).getItem();
         for (ItemStack needed : possibleStacks) {
-          if (ItemStack.isSameItemSameComponents(invStack, needed)) {
+          if (isMatchingForTransfer(invStack, needed)) {
             if (doTransfer) {
               ItemStack toMove = invStack.copyWithCount(1);
               container.getSlot(invIdx).remove(1);
@@ -866,6 +892,13 @@ public class Ic2JeiPlugin implements IModPlugin {
         }
       }
       return true;
+    }
+
+    private static boolean isMatchingForTransfer(ItemStack playerStack, ItemStack recipeNeeded) {
+      if (playerStack.isEmpty() || recipeNeeded.isEmpty()) return false;
+      if (!playerStack.is(recipeNeeded.getItem())) return false;
+      if (playerStack.getItem() instanceof IElectricItem) return true;
+      return ItemStack.isSameItemSameComponents(playerStack, recipeNeeded);
     }
   }
 

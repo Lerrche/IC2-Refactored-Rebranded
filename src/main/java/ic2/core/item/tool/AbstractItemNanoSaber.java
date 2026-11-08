@@ -134,7 +134,19 @@ public abstract class AbstractItemNanoSaber extends ItemElectricTool implements 
     }
 
     if (IC2.sideProxy.isSimulating()) {
-      this.consumeEnergy(stack, 400.0, source);
+      double energyPerHit = ic2.industrialjs.IndustrialJS.getNanoSaberEnergyPerHit();
+      this.consumeEnergy(stack, energyPerHit, source);
+
+      double bypass = ic2.industrialjs.IndustrialJS.getNanoSaberArmorBypass();
+      if (bypass > 0.0) {
+        float bypassDamage =
+            (float) (ic2.industrialjs.IndustrialJS.getNanoSaberActiveDamage() * bypass);
+        target.hurt(target.damageSources().genericKill(), bypassDamage);
+      }
+      double extraDamage = ic2.industrialjs.IndustrialJS.getNanoSaberActiveDamage() - 10.0;
+      if (extraDamage > 0.0) {
+        target.hurt(target.damageSources().mobAttack(source), (float) extraDamage);
+      }
       if (!(source instanceof ServerPlayer)
           || !(target instanceof Player)
           || ((ServerPlayer) source).canHarmPlayer((Player) target)) {

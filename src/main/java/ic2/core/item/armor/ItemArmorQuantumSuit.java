@@ -23,6 +23,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Holder;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.effect.MobEffect;
@@ -327,6 +328,18 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric
 
     } else if (equipSlot == EquipmentSlot.CHEST) {
       player.clearFire();
+      if (ic2.industrialjs.IndustrialJS.isQuantumSuitVoidProtection()
+          && player.getY() < player.level().getMinBuildHeight() - 5
+          && ElectricItem.manager.canUse(stack, 50000.0)) {
+        ElectricItem.manager.use(stack, 50000.0, player);
+        player.setDeltaMovement(0, 0.5, 0);
+        player.fallDistance = 0.0F;
+        if (!player.level().isClientSide && player instanceof ServerPlayer sp) {
+          sp.teleportTo(sp.getX(), sp.level().getMinBuildHeight() + 10.0, sp.getZ());
+          sp.displayClientMessage(
+              Component.literal("§b[Quantum Suit] Void Rescue Activated!"), true);
+        }
+      }
     } else if (equipSlot == EquipmentSlot.LEGS) {
       boolean speedEnabled =
           !nbtData.contains("speed_enabled") || nbtData.getBoolean("speed_enabled");
@@ -368,9 +381,9 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric
           }
 
           nbtData.putByte("speed_ticker", speedTicker);
-          float speed = 0.22F;
+          float speed = 0.22F * (float) ic2.industrialjs.IndustrialJS.getQuantumSprintMultiplier();
           if (player.isInWater()) {
-            speed = 0.1F;
+            speed = 0.1F * (float) ic2.industrialjs.IndustrialJS.getQuantumSprintMultiplier();
             if (IC2.keyboard.isJumpKeyDown(player)) {
               Vec3 motion = player.getDeltaMovement();
               player.setDeltaMovement(motion.x, motion.y + 0.1F, motion.z);

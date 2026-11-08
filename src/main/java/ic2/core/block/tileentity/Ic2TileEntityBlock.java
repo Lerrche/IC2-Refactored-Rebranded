@@ -482,6 +482,9 @@ public final class Ic2TileEntityBlock extends Block
     if (stack.isEmpty()) {
       return false;
     }
+    if (ic2.industrialjs.IndustrialJS.isMuteTool(stack)) {
+      return true;
+    }
     if (stack.getItem() == ic2.core.ref.Ic2Items.FORGE_HAMMER
         || stack.is(ic2.core.ref.Ic2ItemTags.FORGE_HAMMERS)) {
       return true;

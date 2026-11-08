@@ -283,16 +283,29 @@ public final class Util {
   }
 
   public static Item getItem(String name) {
-    if (name == null) {
-      throw new NullPointerException("null name");
-    } else {
-      // Error occurred once, name has a namespace.
-      return getItem(ResourceLocation.parse(name));
+    if (name == null || name.isBlank()) {
+      return null;
+    }
+    try {
+      ResourceLocation loc = ResourceLocation.tryParse(name.trim());
+      if (loc == null || loc.getPath().isEmpty()) {
+        return null;
+      }
+      return getItem(loc);
+    } catch (Throwable t) {
+      return null;
     }
   }
 
   public static Item getItem(ResourceLocation loc) {
-    return BuiltInRegistries.ITEM.get(loc);
+    if (loc == null) {
+      return null;
+    }
+    Item item = BuiltInRegistries.ITEM.getOptional(loc).orElse(null);
+    if (item == net.minecraft.world.item.Items.AIR) {
+      return null;
+    }
+    return item;
   }
 
   public static Vector3 getLook(Entity entity) {

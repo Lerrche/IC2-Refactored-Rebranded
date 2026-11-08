@@ -15,6 +15,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 
@@ -60,5 +61,16 @@ public class TileEntityCokeKilnGrate extends TileEntityInventory
       net.minecraft.world.entity.player.Inventory inventory,
       ic2.core.network.GrowingBuffer data) {
     return DynamicContainer.create(syncId, inventory, this);
+  }
+
+  @Override
+  public void appendItemTooltip(
+      ItemStack stack,
+      java.util.List<net.minecraft.network.chat.Component> tooltip,
+      net.minecraft.world.item.TooltipFlag advanced) {
+    ic2.core.util.Ic2Tooltip.add(
+        tooltip,
+        net.minecraft.network.chat.Component.translatable("ic2.coke_kiln_grate.tooltip")
+            .withStyle(net.minecraft.ChatFormatting.GRAY));
   }
 }

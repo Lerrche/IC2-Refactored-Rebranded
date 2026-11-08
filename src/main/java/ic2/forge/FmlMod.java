@@ -54,6 +54,9 @@ public final class FmlMod {
     if (FMLEnvironment.dist.isClient()) {
       modEventBus.register(new ClientModEventHandlerForge());
       this.modContainer.registerConfig(ModConfig.Type.CLIENT, IC2ClientConfig.SPEC);
+      this.modContainer.registerExtensionPoint(
+          net.neoforged.neoforge.client.gui.IConfigScreenFactory.class,
+          ic2.core.gui.IC2ConfigScreen::create);
     }
     Ic2Fluids.init();
     this.modContainer.registerConfig(ModConfig.Type.COMMON, IC2Config.SPEC);
@@ -82,11 +85,25 @@ public final class FmlMod {
     }
     if (this.toRunAfterRegistryInit != null) {
       for (Runnable runnable : this.toRunAfterRegistryInit) {
-        runnable.run();
+        try {
+          runnable.run();
+        } catch (Throwable t) {
+          ic2.core.IC2.log.warn(
+              ic2.core.util.LogCategory.General,
+              "Failed to run deferred registry task: %s",
+              t.getMessage());
+        }
       }
       this.toRunAfterRegistryInit = null;
     }
-    EventHandler.onInitLate();
+    try {
+      EventHandler.onInitLate();
+    } catch (Throwable t) {
+      ic2.core.IC2.log.warn(
+          ic2.core.util.LogCategory.General,
+          "Failed during EventHandler.onInitLate(): %s",
+          t.getMessage());
+    }
   }
 
   @SubscribeEvent

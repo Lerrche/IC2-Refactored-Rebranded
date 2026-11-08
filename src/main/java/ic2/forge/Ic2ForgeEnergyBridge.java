@@ -8,13 +8,14 @@ import ic2.api.info.ILocatable;
 import ic2.core.block.tileentity.Ic2TileEntity;
 import ic2.core.block.wiring.AbstractCableBlock;
 import ic2.core.energy.EnergyBridgeMath;
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.registries.BuiltInRegistries;
@@ -34,10 +35,10 @@ import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
 /** Bridges IC2's EU network directly to external FE and Mekanism energy receivers. */
 public final class Ic2ForgeEnergyBridge {
-  private static final Map<Level, Map<BlockPos, ForgeEnergySink>> sinks = new HashMap<>();
+  private static final Map<Level, Map<BlockPos, ForgeEnergySink>> sinks = new ConcurrentHashMap<>();
 
   /** Positions whose block entities/capabilities may not be ready until the next server tick. */
-  private static final Map<Level, Set<BlockPos>> pendingPositions = new HashMap<>();
+  private static final Map<Level, Set<BlockPos>> pendingPositions = new ConcurrentHashMap<>();
 
   private static final int EXTERNAL_SINK_TIER = 4;
   private static final int MAX_PENDING_POSITIONS_PER_TICK = 64;
@@ -111,6 +112,9 @@ public final class Ic2ForgeEnergyBridge {
    * Queues only loaded neighbors when a source disappears; unloaded targets cannot have live sinks.
    */
   private static void queueAdjacentLoadedPositions(Level world, BlockPos pos) {
+    if (world == null || world.isClientSide) {
+      return;
+    }
     Set<BlockPos> queued = pendingPositions.get(world);
     for (Direction direction : Direction.values()) {
       BlockPos neighborPos = pos.relative(direction).immutable();
@@ -122,7 +126,7 @@ public final class Ic2ForgeEnergyBridge {
       }
     }
     if (queued != null && queued.isEmpty()) {
-      pendingPositions.remove(world);
+      pendingPositions.remove(world, queued);
     }
   }
 
@@ -146,7 +150,12 @@ public final class Ic2ForgeEnergyBridge {
   }
 
   private static void queuePosition(Level world, BlockPos pos) {
-    pendingPositions.computeIfAbsent(world, level -> new HashSet<>()).add(pos.immutable());
+    if (world == null || world.isClientSide) {
+      return;
+    }
+    pendingPositions
+        .computeIfAbsent(world, level -> ConcurrentHashMap.newKeySet())
+        .add(pos.immutable());
   }
 
   /** Called directly by an IC2 cable when it is placed or loaded. */
@@ -173,12 +182,18 @@ public final class Ic2ForgeEnergyBridge {
   }
 
   private static boolean isSinkRegistered(Level world, BlockPos pos) {
+    if (world == null) {
+      return false;
+    }
     Map<BlockPos, ForgeEnergySink> worldSinks = sinks.get(world);
     return worldSinks != null && worldSinks.containsKey(pos);
   }
 
   private static void registerSink(Level world, BlockPos pos) {
-    if (world.isClientSide || EnergyNet.instance == null || !world.hasChunkAt(pos)) {
+    if (world == null
+        || world.isClientSide
+        || EnergyNet.instance == null
+        || !world.hasChunkAt(pos)) {
       return;
     }
 
@@ -189,7 +204,7 @@ public final class Ic2ForgeEnergyBridge {
     }
 
     Map<BlockPos, ForgeEnergySink> worldSinks =
-        sinks.computeIfAbsent(world, level -> new HashMap<>());
+        sinks.computeIfAbsent(world, level -> new ConcurrentHashMap<>());
     ForgeEnergySink existing = worldSinks.get(pos);
     if (existing != null) {
       existing.setConnectedSides(connectedSides);
@@ -203,12 +218,16 @@ public final class Ic2ForgeEnergyBridge {
     // physically touching IC2 sources. The live sink then refreshes those cached faces once per
     // tick so side-configuration changes are picked up without rescanning unrelated faces.
     ForgeEnergySink sink = new ForgeEnergySink(world, pos.immutable(), connectedSides);
-    worldSinks.put(pos.immutable(), sink);
+    ForgeEnergySink prev = worldSinks.putIfAbsent(pos.immutable(), sink);
+    if (prev != null) {
+      prev.setConnectedSides(connectedSides);
+      return;
+    }
     EnergyNet.instance.addLocatableTile(sink);
   }
 
   private static void unregisterSink(Level world, BlockPos pos) {
-    if (world.isClientSide || EnergyNet.instance == null) {
+    if (world == null || world.isClientSide || EnergyNet.instance == null) {
       return;
     }
     Map<BlockPos, ForgeEnergySink> worldSinks = sinks.get(world);
@@ -220,11 +239,14 @@ public final class Ic2ForgeEnergyBridge {
       EnergyNet.instance.removeTile(sink);
     }
     if (worldSinks.isEmpty()) {
-      sinks.remove(world);
+      sinks.remove(world, worldSinks);
     }
   }
 
   private static void processPendingPositions(ServerLevel world) {
+    if (world == null) {
+      return;
+    }
     Set<BlockPos> queued = pendingPositions.get(world);
     if (queued == null || queued.isEmpty()) {
       return;
@@ -232,9 +254,11 @@ public final class Ic2ForgeEnergyBridge {
 
     // A chunk can contain many IC2 emitters (or cables). Process only a small number of
     // adjacent positions per tick so loading a large base cannot stall the world join.
+    // Gather up to MAX_PENDING_POSITIONS_PER_TICK candidates first to completely decouple
+    // iteration from registration callbacks.
+    List<BlockPos> toProcess = new ArrayList<>();
     Iterator<BlockPos> iterator = queued.iterator();
-    int processed = 0;
-    while (iterator.hasNext() && processed < MAX_PENDING_POSITIONS_PER_TICK) {
+    while (iterator.hasNext() && toProcess.size() < MAX_PENDING_POSITIONS_PER_TICK) {
       BlockPos pos = iterator.next();
       // Keep positions in unloaded chunks queued. The source chunk may load before the
       // receiving machine's chunk; its pending registration must survive until that chunk loads.
@@ -243,41 +267,62 @@ public final class Ic2ForgeEnergyBridge {
       }
 
       iterator.remove();
+      toProcess.add(pos);
+    }
+
+    for (BlockPos pos : toProcess) {
       registerSink(world, pos);
-      processed++;
     }
 
     if (queued.isEmpty()) {
-      pendingPositions.remove(world);
+      pendingPositions.remove(world, queued);
     }
   }
 
   private static void unregisterChunk(Level world, ChunkPos chunkPos) {
-    Map<BlockPos, ForgeEnergySink> worldSinks = sinks.get(world);
-    if (worldSinks == null || EnergyNet.instance == null) {
+    if (world == null) {
       return;
     }
-    Iterator<Map.Entry<BlockPos, ForgeEnergySink>> it = worldSinks.entrySet().iterator();
-    while (it.hasNext()) {
-      Map.Entry<BlockPos, ForgeEnergySink> entry = it.next();
-      BlockPos pos = entry.getKey();
-      if ((pos.getX() >> 4) == chunkPos.x && (pos.getZ() >> 4) == chunkPos.z) {
-        EnergyNet.instance.removeTile(entry.getValue());
-        it.remove();
+    Map<BlockPos, ForgeEnergySink> worldSinks = sinks.get(world);
+    if (worldSinks != null && EnergyNet.instance != null) {
+      List<ForgeEnergySink> toRemove = new ArrayList<>();
+      Iterator<Map.Entry<BlockPos, ForgeEnergySink>> it = worldSinks.entrySet().iterator();
+      while (it.hasNext()) {
+        Map.Entry<BlockPos, ForgeEnergySink> entry = it.next();
+        BlockPos pos = entry.getKey();
+        if ((pos.getX() >> 4) == chunkPos.x && (pos.getZ() >> 4) == chunkPos.z) {
+          toRemove.add(entry.getValue());
+          it.remove();
+        }
+      }
+      for (ForgeEnergySink sink : toRemove) {
+        EnergyNet.instance.removeTile(sink);
+      }
+      if (worldSinks.isEmpty()) {
+        sinks.remove(world, worldSinks);
       }
     }
-    if (worldSinks.isEmpty()) {
-      sinks.remove(world);
+
+    Set<BlockPos> queued = pendingPositions.get(world);
+    if (queued != null) {
+      queued.removeIf(pos -> (pos.getX() >> 4) == chunkPos.x && (pos.getZ() >> 4) == chunkPos.z);
+      if (queued.isEmpty()) {
+        pendingPositions.remove(world, queued);
+      }
     }
   }
 
   private static void unregisterWorld(Level world) {
+    if (world == null) {
+      return;
+    }
     Map<BlockPos, ForgeEnergySink> worldSinks = sinks.remove(world);
     pendingPositions.remove(world);
     if (worldSinks == null || EnergyNet.instance == null) {
       return;
     }
-    for (ForgeEnergySink sink : worldSinks.values()) {
+    List<ForgeEnergySink> toRemove = new ArrayList<>(worldSinks.values());
+    for (ForgeEnergySink sink : toRemove) {
       EnergyNet.instance.removeTile(sink);
     }
   }

@@ -6,8 +6,11 @@ import ic2.core.util.Ic2Tooltip;
 import ic2.core.util.StackUtil;
 import java.util.List;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.registries.Registries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -62,33 +65,59 @@ public class ItemFrequencyTransmitter extends Item {
       BlockPos target =
           new BlockPos(
               nbtData.getInt("targetX"), nbtData.getInt("targetY"), nbtData.getInt("targetZ"));
+      String targetDimStr = nbtData.getString("targetDim");
+      ResourceKey<Level> targetDim =
+          !targetDimStr.isEmpty()
+              ? ResourceKey.create(Registries.DIMENSION, ResourceLocation.parse(targetDimStr))
+              : world.dimension();
+
       if (!targetSet) {
         targetSet = true;
         target = tp.getBlockPos();
+        targetDim = world.dimension();
+        nbtData.putString("targetDim", targetDim.location().toString());
         IC2.sideProxy.messagePlayer(
             player,
             "ic2.frequency_transmitter.link_target",
             target.getX(),
             target.getY(),
             target.getZ());
-      } else if (tp.getBlockPos().equals(target)) {
+      } else if (tp.getBlockPos().equals(target) && world.dimension().equals(targetDim)) {
         IC2.sideProxy.messagePlayer(player, "ic2.frequency_transmitter.cannot_link_to_self");
-      } else if (tp.hasTarget() && tp.getTarget().equals(target)) {
+      } else if (tp.hasTarget()
+          && tp.getTarget().equals(target)
+          && targetDim.equals(tp.getTargetDimension())) {
         IC2.sideProxy.messagePlayer(player, "ic2.frequency_transmitter.link_already_established");
       } else {
-        BlockEntity targetTe = world.getBlockEntity(target);
-        if (targetTe instanceof TileEntityTeleporter) {
-          tp.setTarget(target);
-          ((TileEntityTeleporter) targetTe).setTarget(pos);
-          IC2.sideProxy.messagePlayer(
-              player,
-              "ic2.frequency_transmitter.link_target",
-              target.getX(),
-              target.getY(),
-              target.getZ());
-        } else {
+        boolean crossDim = !world.dimension().equals(targetDim);
+        if (crossDim && !ic2.industrialjs.IndustrialJS.isTeleporterCrossDimension()) {
+          player.displayClientMessage(
+              Component.literal(
+                  "§cCross-dimensional teleportation is disabled in modpack configuration!"),
+              true);
           justSetTarget = false;
-          targetSet = false;
+        } else {
+          Level targetLevel =
+              crossDim && world.getServer() != null ? world.getServer().getLevel(targetDim) : world;
+          BlockEntity targetTe = targetLevel != null ? targetLevel.getBlockEntity(target) : null;
+          if (targetTe instanceof TileEntityTeleporter otherTp) {
+            tp.setTarget(target, targetDim);
+            otherTp.setTarget(pos, world.dimension());
+            IC2.sideProxy.messagePlayer(
+                player,
+                "ic2.frequency_transmitter.link_target",
+                target.getX(),
+                target.getY(),
+                target.getZ());
+            if (crossDim) {
+              player.displayClientMessage(
+                  Component.literal("§aLinked inter-dimensionally to " + targetDim.location()),
+                  false);
+            }
+          } else {
+            justSetTarget = false;
+            targetSet = false;
+          }
         }
       }
 
@@ -97,6 +126,9 @@ public class ItemFrequencyTransmitter extends Item {
       nbtData.putInt("targetX", target.getX());
       nbtData.putInt("targetY", target.getY());
       nbtData.putInt("targetZ", target.getZ());
+      if (targetDim != null) {
+        nbtData.putString("targetDim", targetDim.location().toString());
+      }
       return InteractionResult.SUCCESS;
     }
   }
@@ -108,13 +140,28 @@ public class ItemFrequencyTransmitter extends Item {
       @NotNull TooltipFlag advanced) {
     CompoundTag nbtData = StackUtil.getOrCreateNbtData(stack);
     if (nbtData.getBoolean("targetSet")) {
-      Ic2Tooltip.add(
-          tooltip,
-          Component.translatable(
-              "ic2.frequency_transmitter.tooltip.target",
-              nbtData.getInt("targetX"),
-              nbtData.getInt("targetY"),
-              nbtData.getInt("targetZ")));
+      String dim = nbtData.contains("targetDim") ? nbtData.getString("targetDim") : "";
+      if (!dim.isEmpty()) {
+        tooltip.add(
+            Component.literal(
+                "§7Target: "
+                    + nbtData.getInt("targetX")
+                    + ", "
+                    + nbtData.getInt("targetY")
+                    + ", "
+                    + nbtData.getInt("targetZ")
+                    + " §8("
+                    + dim
+                    + ")"));
+      } else {
+        Ic2Tooltip.add(
+            tooltip,
+            Component.translatable(
+                "ic2.frequency_transmitter.tooltip.target",
+                nbtData.getInt("targetX"),
+                nbtData.getInt("targetY"),
+                nbtData.getInt("targetZ")));
+      }
     } else {
       Ic2Tooltip.add(tooltip, Component.translatable("ic2.frequency_transmitter.tooltip.blank"));
     }

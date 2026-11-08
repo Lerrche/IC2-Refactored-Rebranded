@@ -268,9 +268,15 @@ public class AdvRecipe implements Ic2CraftingRecipe {
 
   @Override
   public NonNullList<ItemStack> getRemainingItems(CraftingInput input) {
-    return this.consuming
-        ? NonNullList.withSize(input.size(), StackUtil.emptyStack)
-        : Ic2CraftingRecipe.super.getRemainingItems(input);
+    int size = Math.max(9, input.size());
+    NonNullList<ItemStack> list = NonNullList.withSize(size, StackUtil.emptyStack);
+    if (!this.consuming) {
+      NonNullList<ItemStack> remainders = Ic2CraftingRecipe.super.getRemainingItems(input);
+      for (int i = 0; i < remainders.size(); i++) {
+        list.set(i, remainders.get(i));
+      }
+    }
+    return list;
   }
 
   @Override

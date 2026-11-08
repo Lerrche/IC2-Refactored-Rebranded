@@ -22,9 +22,14 @@ import java.util.Objects;
 import java.util.Set;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.Connection;
 import net.minecraft.network.chat.Component;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -262,6 +267,34 @@ public abstract class Ic2TileEntity extends BlockEntity
     }
   }
 
+  @Override
+  public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
+    CompoundTag tag = super.getUpdateTag(registries);
+    this.saveAdditional(tag, registries);
+    return tag;
+  }
+
+  @Override
+  public Packet<ClientGamePacketListener> getUpdatePacket() {
+    return ClientboundBlockEntityDataPacket.create(this);
+  }
+
+  @Override
+  public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
+    super.handleUpdateTag(tag, registries);
+    this.loadAdditional(tag, registries);
+  }
+
+  @Override
+  public void onDataPacket(
+      Connection net, ClientboundBlockEntityDataPacket pkt, HolderLookup.Provider lookupProvider) {
+    CompoundTag tag = pkt.getTag();
+    if (tag != null) {
+      this.loadAdditional(tag, lookupProvider);
+    }
+  }
+
+  @Override
   public void saveAdditional(CompoundTag nbt, net.minecraft.core.HolderLookup.Provider registries) {
     nbt.putBoolean("active", this.active);
     if (this.components != null) {
@@ -460,7 +493,7 @@ public abstract class Ic2TileEntity extends BlockEntity
   }
 
   public ItemStack adjustDrop(ItemStack drop, boolean wrench) {
-    if (wrench) {
+    if (wrench || ic2.industrialjs.IndustrialJS.isLosslessWrench()) {
       return drop;
     }
 
