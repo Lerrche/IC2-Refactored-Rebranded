@@ -14,7 +14,7 @@ public enum PumpCoverTier implements StringRepresentable {
 
   private final String name;
   public final int ratePerTick; // mB/t
-  public final int ratePerSec;  // mB/s
+  public final int ratePerSec; // mB/s
   public final int color;
 
   PumpCoverTier(String name, int ratePerTick, int ratePerSec, int color) {

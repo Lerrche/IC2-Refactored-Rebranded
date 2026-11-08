@@ -29,17 +29,11 @@ public class ItemTransportPipe extends BlockItem {
     int capacity = (int) (this.pipeType.transferRate * this.pipeSize.multiplier);
     int ratePerTick = this.pipeType.getTransferRatePerTick();
 
+    Ic2Tooltip.add(tooltip, Component.translatable("tooltip.ic2.pipe.transfer_rate", ratePerTick));
+    Ic2Tooltip.add(tooltip, Component.translatable("tooltip.ic2.pipe.capacity", capacity));
     Ic2Tooltip.add(
-        tooltip,
-        Component.translatable("tooltip.ic2.pipe.transfer_rate", ratePerTick));
+        tooltip, Component.translatable("tooltip.ic2.pipe.max_stack", this.pipeSize.maxStackSize));
     Ic2Tooltip.add(
-        tooltip,
-        Component.translatable("tooltip.ic2.pipe.capacity", capacity));
-    Ic2Tooltip.add(
-        tooltip,
-        Component.translatable("tooltip.ic2.pipe.max_stack", this.pipeSize.maxStackSize));
-    Ic2Tooltip.add(
-        tooltip,
-        Component.translatable("tooltip.ic2.pipe.wrench").withStyle(ChatFormatting.GOLD));
+        tooltip, Component.translatable("tooltip.ic2.pipe.wrench").withStyle(ChatFormatting.GOLD));
   }
 }

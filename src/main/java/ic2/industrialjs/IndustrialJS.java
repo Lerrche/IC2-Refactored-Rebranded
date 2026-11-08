@@ -3,9 +3,6 @@ package ic2.industrialjs;
 import ic2.core.Ic2Potion;
 import ic2.core.item.armor.ItemArmorHazmat;
 import ic2.core.ref.Ic2RecipeTypes;
-import ic2.core.util.StackUtil;
-import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -25,8 +22,8 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
  *
  * <p>Allows modpack creators to customize machinery energy output, consumption, speed, wrench
  * lossless behavior, recycler chances, EU/FE ratios, reactor stats, cross-dimensional teleporters,
- * mining drills, nano sabers, quantum armor, energy storage blocks, kinetic rotors, upgrades,
- * crops breeding, audio mute tools, structure loot, canner recipes, and full custom recipes.
+ * mining drills, nano sabers, quantum armor, energy storage blocks, kinetic rotors, upgrades, crops
+ * breeding, audio mute tools, structure loot, canner recipes, and full custom recipes.
  */
 public class IndustrialJS {
 
@@ -100,8 +97,11 @@ public class IndustrialJS {
 
   // Data structures for fine-grained per-item tuning
   public record FuelRodStats(double powerMultiplier, double heatMultiplier, int lifespan) {}
+
   public record RadioactiveItem(int durationSeconds, int amplifier) {}
+
   public record RotorStats(double efficiencyMultiplier, int minWind, int maxWind) {}
+
   public record StructureLootEntry(Object item, float chance, int minCount, int maxCount) {}
 
   private static final Map<String, Double> machineMultipliers = new ConcurrentHashMap<>();
@@ -120,7 +120,8 @@ public class IndustrialJS {
   private static final Map<String, RotorStats> rotorStats = new ConcurrentHashMap<>();
   private static final Map<String, Double> armorCapacities = new ConcurrentHashMap<>();
   private static final Map<String, Double> armorTransferLimits = new ConcurrentHashMap<>();
-  private static final Map<String, List<StructureLootEntry>> structureLoot = new ConcurrentHashMap<>();
+  private static final Map<String, List<StructureLootEntry>> structureLoot =
+      new ConcurrentHashMap<>();
 
   public static void reset() {
     generatorMultiplier = 1.0;
@@ -440,7 +441,9 @@ public class IndustrialJS {
 
   public static void addRadioactiveItem(String itemOrTag, int durationSeconds, int amplifier) {
     if (itemOrTag != null && !itemOrTag.isBlank()) {
-      radioactiveItems.put(itemOrTag.trim().toLowerCase(), new RadioactiveItem(Math.max(1, durationSeconds), Math.max(0, amplifier)));
+      radioactiveItems.put(
+          itemOrTag.trim().toLowerCase(),
+          new RadioactiveItem(Math.max(1, durationSeconds), Math.max(0, amplifier)));
     }
   }
 
@@ -504,35 +507,54 @@ public class IndustrialJS {
 
   // --- Fuel Rods ---
 
-  public static IndustrialJS fuelRod(String itemOrId, double powerMultiplier, double heatMultiplier, int lifespan) {
+  public static IndustrialJS fuelRod(
+      String itemOrId, double powerMultiplier, double heatMultiplier, int lifespan) {
     setFuelRodStats(itemOrId, powerMultiplier, heatMultiplier, lifespan);
     return instance;
   }
 
-  public static void setFuelRodStats(String itemOrId, double powerMultiplier, double heatMultiplier, int lifespan) {
+  public static void setFuelRodStats(
+      String itemOrId, double powerMultiplier, double heatMultiplier, int lifespan) {
     if (itemOrId != null) {
-      fuelRodStats.put(itemOrId.trim().toLowerCase(), new FuelRodStats(Math.max(0.0, powerMultiplier), Math.max(0.0, heatMultiplier), Math.max(1, lifespan)));
+      fuelRodStats.put(
+          itemOrId.trim().toLowerCase(),
+          new FuelRodStats(
+              Math.max(0.0, powerMultiplier),
+              Math.max(0.0, heatMultiplier),
+              Math.max(1, lifespan)));
     }
   }
 
   public static void setFuelRodPowerMultiplier(String itemOrId, double mult) {
     if (itemOrId != null) {
-      FuelRodStats cur = fuelRodStats.getOrDefault(itemOrId.trim().toLowerCase(), new FuelRodStats(1.0, 1.0, 20000));
-      fuelRodStats.put(itemOrId.trim().toLowerCase(), new FuelRodStats(Math.max(0.0, mult), cur.heatMultiplier(), cur.lifespan()));
+      FuelRodStats cur =
+          fuelRodStats.getOrDefault(
+              itemOrId.trim().toLowerCase(), new FuelRodStats(1.0, 1.0, 20000));
+      fuelRodStats.put(
+          itemOrId.trim().toLowerCase(),
+          new FuelRodStats(Math.max(0.0, mult), cur.heatMultiplier(), cur.lifespan()));
     }
   }
 
   public static void setFuelRodHeatMultiplier(String itemOrId, double mult) {
     if (itemOrId != null) {
-      FuelRodStats cur = fuelRodStats.getOrDefault(itemOrId.trim().toLowerCase(), new FuelRodStats(1.0, 1.0, 20000));
-      fuelRodStats.put(itemOrId.trim().toLowerCase(), new FuelRodStats(cur.powerMultiplier(), Math.max(0.0, mult), cur.lifespan()));
+      FuelRodStats cur =
+          fuelRodStats.getOrDefault(
+              itemOrId.trim().toLowerCase(), new FuelRodStats(1.0, 1.0, 20000));
+      fuelRodStats.put(
+          itemOrId.trim().toLowerCase(),
+          new FuelRodStats(cur.powerMultiplier(), Math.max(0.0, mult), cur.lifespan()));
     }
   }
 
   public static void setFuelRodLifespan(String itemOrId, int lifespan) {
     if (itemOrId != null) {
-      FuelRodStats cur = fuelRodStats.getOrDefault(itemOrId.trim().toLowerCase(), new FuelRodStats(1.0, 1.0, 20000));
-      fuelRodStats.put(itemOrId.trim().toLowerCase(), new FuelRodStats(cur.powerMultiplier(), cur.heatMultiplier(), Math.max(1, lifespan)));
+      FuelRodStats cur =
+          fuelRodStats.getOrDefault(
+              itemOrId.trim().toLowerCase(), new FuelRodStats(1.0, 1.0, 20000));
+      fuelRodStats.put(
+          itemOrId.trim().toLowerCase(),
+          new FuelRodStats(cur.powerMultiplier(), cur.heatMultiplier(), Math.max(1, lifespan)));
     }
   }
 
@@ -697,9 +719,15 @@ public class IndustrialJS {
     rotorEfficiencyMultiplier = Math.max(0.0, mult);
   }
 
-  public static void setRotorStats(String rotorId, double efficiencyMultiplier, int minWind, int maxWind) {
+  public static void setRotorStats(
+      String rotorId, double efficiencyMultiplier, int minWind, int maxWind) {
     if (rotorId != null) {
-      rotorStats.put(rotorId.trim().toLowerCase(), new RotorStats(Math.max(0.0, efficiencyMultiplier), Math.max(0, minWind), Math.max(minWind, maxWind)));
+      rotorStats.put(
+          rotorId.trim().toLowerCase(),
+          new RotorStats(
+              Math.max(0.0, efficiencyMultiplier),
+              Math.max(0, minWind),
+              Math.max(minWind, maxWind)));
     }
   }
 
@@ -779,7 +807,9 @@ public class IndustrialJS {
   }
 
   public static int getEnergyStorageUpgradeBonus(ItemStack stack, int base) {
-    return energyStorageUpgradeBonus > 0 ? (int) Math.round(base * ((double) energyStorageUpgradeBonus / 10000.0)) : base;
+    return energyStorageUpgradeBonus > 0
+        ? (int) Math.round(base * ((double) energyStorageUpgradeBonus / 10000.0))
+        : base;
   }
 
   public static int getTransformerUpgradeTier(ItemStack stack, int base) {
@@ -1058,10 +1088,17 @@ public class IndustrialJS {
 
   // --- Structure Loot Injection ---
 
-  public static void addStructureLoot(String tablePattern, Object itemOrStack, float chance, int minCount, int maxCount) {
+  public static void addStructureLoot(
+      String tablePattern, Object itemOrStack, float chance, int minCount, int maxCount) {
     if (tablePattern != null && itemOrStack != null) {
-      structureLoot.computeIfAbsent(tablePattern.trim().toLowerCase(), k -> new CopyOnWriteArrayList<>())
-          .add(new StructureLootEntry(itemOrStack, Math.max(0.0f, Math.min(1.0f, chance)), Math.max(1, minCount), Math.max(minCount, maxCount)));
+      structureLoot
+          .computeIfAbsent(tablePattern.trim().toLowerCase(), k -> new CopyOnWriteArrayList<>())
+          .add(
+              new StructureLootEntry(
+                  itemOrStack,
+                  Math.max(0.0f, Math.min(1.0f, chance)),
+                  Math.max(1, minCount),
+                  Math.max(minCount, maxCount)));
     }
   }
 
@@ -1069,7 +1106,8 @@ public class IndustrialJS {
     addStructureLoot(tablePattern, itemOrStack, chance, 1, 1);
   }
 
-  public static void applyStructureLoot(ResourceLocation tableId, List<ItemStack> loot, RandomSource random) {
+  public static void applyStructureLoot(
+      ResourceLocation tableId, List<ItemStack> loot, RandomSource random) {
     if (tableId == null || loot == null || structureLoot.isEmpty()) return;
     String idStr = tableId.toString().toLowerCase();
     String path = tableId.getPath().toLowerCase();
@@ -1081,7 +1119,10 @@ public class IndustrialJS {
           if (random.nextFloat() <= e.chance()) {
             ItemStack base = ItemParser.parseOutput(e.item());
             if (!base.isEmpty()) {
-              int count = e.minCount() >= e.maxCount() ? e.minCount() : e.minCount() + random.nextInt(e.maxCount() - e.minCount() + 1);
+              int count =
+                  e.minCount() >= e.maxCount()
+                      ? e.minCount()
+                      : e.minCount() + random.nextInt(e.maxCount() - e.minCount() + 1);
               ItemStack toAdd = base.copy();
               toAdd.setCount(count);
               loot.add(toAdd);

@@ -69,8 +69,7 @@ public class IndustrialJSRecipeRegistry {
     QUEUED_CANNER_ENRICH.add(new QueuedCannerEnrich(outputFluid, inputFluid, additive));
   }
 
-  public static synchronized void queueCannerBottle(
-      Object output, Object container, Object fill) {
+  public static synchronized void queueCannerBottle(Object output, Object container, Object fill) {
     QUEUED_CANNER_BOTTLE.add(new QueuedCannerBottle(output, container, fill));
   }
 

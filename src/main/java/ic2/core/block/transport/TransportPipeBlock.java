@@ -3,7 +3,6 @@ package ic2.core.block.transport;
 import com.mojang.serialization.MapCodec;
 import ic2.api.tile.IWrenchAble;
 import ic2.core.item.tool.ItemToolWrench;
-import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.ref.Ic2ItemTags;
 import ic2.core.ref.Ic2SoundEvents;
 import ic2.core.util.CauldronUtil;
@@ -21,7 +20,6 @@ import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
-import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
@@ -80,8 +78,7 @@ public class TransportPipeBlock extends PipeBlock
   }
 
   @Override
-  protected void createBlockStateDefinition(
-      StateDefinition.Builder<Block, BlockState> builder) {
+  protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> builder) {
     builder.add(UP, DOWN, NORTH, EAST, SOUTH, WEST, WATERLOGGED);
   }
 

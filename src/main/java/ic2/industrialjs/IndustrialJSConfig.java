@@ -7,7 +7,6 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 import ic2.core.IC2;
-import ic2.core.ref.Ic2RecipeTypes;
 import ic2.core.util.LogCategory;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -15,7 +14,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
-import net.minecraft.nbt.CompoundTag;
 import net.neoforged.fml.loading.FMLPaths;
 
 public class IndustrialJSConfig {
@@ -329,8 +327,7 @@ public class IndustrialJSConfig {
               obj.get("jetpack_energy_cost_multiplier").getAsDouble());
         }
         if (obj.has("jetpack_boost_multiplier")) {
-          IndustrialJS.setJetpackBoostMultiplier(
-              obj.get("jetpack_boost_multiplier").getAsDouble());
+          IndustrialJS.setJetpackBoostMultiplier(obj.get("jetpack_boost_multiplier").getAsDouble());
         }
         if (obj.has("rotor_efficiency_multiplier")) {
           IndustrialJS.setRotorEfficiencyMultiplier(
@@ -554,7 +551,8 @@ public class IndustrialJSConfig {
         def.add(ex7);
 
         JsonObject ex8 = new JsonObject();
-        ex8.addProperty("_comment", "Example Canner Enrich: 1000mB Water + Bio Chaff -> 1000mB Biomass");
+        ex8.addProperty(
+            "_comment", "Example Canner Enrich: 1000mB Water + Bio Chaff -> 1000mB Biomass");
         ex8.addProperty("type", "canner_enrich");
         ex8.addProperty("input_fluid", "1000mB minecraft:water");
         ex8.addProperty("additive", "ic2:bio_chaff");
@@ -562,7 +560,8 @@ public class IndustrialJSConfig {
         def.add(ex8);
 
         JsonObject ex9 = new JsonObject();
-        ex9.addProperty("_comment", "Example Canner Bottle: Empty Cell + Fuel Rod -> Uranium Fuel Rod");
+        ex9.addProperty(
+            "_comment", "Example Canner Bottle: Empty Cell + Fuel Rod -> Uranium Fuel Rod");
         ex9.addProperty("type", "canner_bottle");
         ex9.addProperty("container", "ic2:empty_cell");
         ex9.addProperty("fill", "ic2:fuel_rod");
@@ -600,7 +599,8 @@ public class IndustrialJSConfig {
 
           if (type.equals("laser_smelting") || type.equals("laser_smelt")) {
             if (r.has("input") && r.has("output")) {
-              IndustrialJS.laserSmelting(r.get("input").getAsString().trim(), r.get("output").getAsString().trim());
+              IndustrialJS.laserSmelting(
+                  r.get("input").getAsString().trim(), r.get("output").getAsString().trim());
             }
             continue;
           }

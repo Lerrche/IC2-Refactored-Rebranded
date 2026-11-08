@@ -26,8 +26,9 @@ public class PositionedSoundInstance extends SimpleSoundInstance
       if (ic2.industrialjs.IndustrialJS.isAudioDisabled()) {
         return 0.0F;
       }
-      v *= ic2.core.init.IC2ClientConfig.getMachineVolume()
-          * (float) ic2.industrialjs.IndustrialJS.getMachineVolumeMultiplier();
+      v *=
+          ic2.core.init.IC2ClientConfig.getMachineVolume()
+              * (float) ic2.industrialjs.IndustrialJS.getMachineVolumeMultiplier();
     }
     return v;
   }

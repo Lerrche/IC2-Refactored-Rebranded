@@ -90,7 +90,8 @@ public class TileEntityTerra extends TileEntityElectricMachine {
     ItemStack stack = this.tfbpSlot.get();
     if (!StackUtil.isEmpty(stack)) {
       ITerraformingBP tfbp = (ITerraformingBP) stack.getItem();
-      double consume = tfbp.getConsume(stack) * ic2.industrialjs.IndustrialJS.getTerraformerEnergyMultiplier();
+      double consume =
+          tfbp.getConsume(stack) * ic2.industrialjs.IndustrialJS.getTerraformerEnergyMultiplier();
       if (this.energy.getEnergy() >= consume) {
         newActive = true;
         Level world = this.getLevel();
@@ -98,7 +99,11 @@ public class TileEntityTerra extends TileEntityElectricMachine {
           return;
         }
 
-        int baseRange = (int) Math.round(tfbp.getRange(stack) * ic2.industrialjs.IndustrialJS.getTerraformerRangeMultiplier());
+        int baseRange =
+            (int)
+                Math.round(
+                    tfbp.getRange(stack)
+                        * ic2.industrialjs.IndustrialJS.getTerraformerRangeMultiplier());
         BlockPos nextPos;
         if (this.lastPos != null) {
           int range = baseRange / 10;

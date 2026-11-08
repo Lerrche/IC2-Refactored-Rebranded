@@ -64,12 +64,7 @@ public class ItemPumpCover extends Item {
               hand.shrink(1);
             }
             level.playSound(
-                null,
-                targetPipePos,
-                SoundEvents.ANVIL_USE,
-                SoundSource.BLOCKS,
-                0.5F,
-                1.5F);
+                null, targetPipePos, SoundEvents.ANVIL_USE, SoundSource.BLOCKS, 0.5F, 1.5F);
             return InteractionResult.SUCCESS;
           }
         } else {
@@ -87,10 +82,8 @@ public class ItemPumpCover extends Item {
       @NotNull List<Component> tooltip,
       @NotNull TooltipFlag flag) {
     Ic2Tooltip.add(
-        tooltip,
-        Component.translatable("tooltip.ic2.cover.pump.rate", this.tier.ratePerTick));
+        tooltip, Component.translatable("tooltip.ic2.cover.pump.rate", this.tier.ratePerTick));
     Ic2Tooltip.add(
-        tooltip,
-        Component.translatable("tooltip.ic2.cover.pump.rate_sec", this.tier.ratePerSec));
+        tooltip, Component.translatable("tooltip.ic2.cover.pump.rate_sec", this.tier.ratePerSec));
   }
 }

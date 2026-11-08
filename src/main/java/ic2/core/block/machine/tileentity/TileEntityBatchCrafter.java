@@ -132,8 +132,14 @@ public class TileEntityBatchCrafter extends TileEntityElectricMachine
           };
     }
 
-    int baseOpLength = Math.max(1, (int) Math.round(40 / ic2.industrialjs.IndustrialJS.getBatchCrafterSpeedMultiplier()));
-    int baseEnergyConsume = Math.max(1, (int) Math.round(2 * ic2.industrialjs.IndustrialJS.getBatchCrafterEnergyMultiplier()));
+    int baseOpLength =
+        Math.max(
+            1,
+            (int) Math.round(40 / ic2.industrialjs.IndustrialJS.getBatchCrafterSpeedMultiplier()));
+    int baseEnergyConsume =
+        Math.max(
+            1,
+            (int) Math.round(2 * ic2.industrialjs.IndustrialJS.getBatchCrafterEnergyMultiplier()));
     this.energyConsume = baseEnergyConsume;
     this.operationLength = baseOpLength;
     this.operationsPerTick = 1;
@@ -376,8 +382,14 @@ public class TileEntityBatchCrafter extends TileEntityElectricMachine
   protected void setOverclockRates() {
     this.upgradeSlot.onChanged();
     double previousProgress = (double) this.progress / this.operationLength;
-    int baseOpLength = Math.max(1, (int) Math.round(40 / ic2.industrialjs.IndustrialJS.getBatchCrafterSpeedMultiplier()));
-    int baseEnergyConsume = Math.max(1, (int) Math.round(2 * ic2.industrialjs.IndustrialJS.getBatchCrafterEnergyMultiplier()));
+    int baseOpLength =
+        Math.max(
+            1,
+            (int) Math.round(40 / ic2.industrialjs.IndustrialJS.getBatchCrafterSpeedMultiplier()));
+    int baseEnergyConsume =
+        Math.max(
+            1,
+            (int) Math.round(2 * ic2.industrialjs.IndustrialJS.getBatchCrafterEnergyMultiplier()));
     int baseStorage = ic2.industrialjs.IndustrialJS.getBatchCrafterCapacity(20000);
     this.operationsPerTick = this.upgradeSlot.getOperationsPerTick(baseOpLength);
     this.operationLength = this.upgradeSlot.getOperationLength(baseOpLength);
@@ -385,7 +397,8 @@ public class TileEntityBatchCrafter extends TileEntityElectricMachine
     int tier = this.upgradeSlot.getTier(1);
     this.energy.setSinkTier(tier);
     this.dischargeSlot.setTier(tier);
-    this.energy.setCapacity(this.upgradeSlot.getEnergyStorage(baseStorage, baseOpLength, baseEnergyConsume));
+    this.energy.setCapacity(
+        this.upgradeSlot.getEnergyStorage(baseStorage, baseOpLength, baseEnergyConsume));
     this.progress = (short) Math.floor(previousProgress * this.operationLength + 0.1);
   }
 

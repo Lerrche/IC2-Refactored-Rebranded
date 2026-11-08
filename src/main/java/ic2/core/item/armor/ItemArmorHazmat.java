@@ -22,7 +22,9 @@ public class ItemArmorHazmat extends ItemArmorUtility implements IHazmatLike {
     for (EquipmentSlot slot : EquipmentSlot.values()) {
       if (slot.getType() == EquipmentSlot.Type.HUMANOID_ARMOR) {
         ItemStack stack = living.getItemBySlot(slot);
-        if (stack != null && !stack.isEmpty() && ic2.industrialjs.IndustrialJS.isFullHazmatSuit(stack)) {
+        if (stack != null
+            && !stack.isEmpty()
+            && ic2.industrialjs.IndustrialJS.isFullHazmatSuit(stack)) {
           return true;
         }
       }

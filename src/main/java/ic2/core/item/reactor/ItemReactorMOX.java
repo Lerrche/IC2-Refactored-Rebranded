@@ -47,7 +47,11 @@ public class ItemReactorMOX extends ItemReactorUranium {
       boolean heatrun) {
     if (!heatrun) {
       float breedereffectiveness = (float) reactor.getHeat() / reactor.getMaxHeat();
-      float ReaktorOutput = (4.0F * breedereffectiveness + 1.0F) * (float) ic2.industrialjs.IndustrialJS.getFuelRodPowerMultiplier(pulsingStack != null ? pulsingStack : stack);
+      float ReaktorOutput =
+          (4.0F * breedereffectiveness + 1.0F)
+              * (float)
+                  ic2.industrialjs.IndustrialJS.getFuelRodPowerMultiplier(
+                      pulsingStack != null ? pulsingStack : stack);
       reactor.addOutput(ReaktorOutput);
     }
 

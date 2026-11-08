@@ -48,8 +48,7 @@ public class TransportPipeBlockEntity extends BlockEntity
   private final FluidTank fluidTank;
   private final ItemStackHandler itemHandler;
 
-  public TransportPipeBlockEntity(
-      PipeType type, PipeSize size, BlockPos pos, BlockState state) {
+  public TransportPipeBlockEntity(PipeType type, PipeSize size, BlockPos pos, BlockState state) {
     super(Ic2BlockEntities.TRANSPORT_PIPE, pos, state);
     this.pipeType = type;
     this.pipeSize = size;
@@ -155,8 +154,7 @@ public class TransportPipeBlockEntity extends BlockEntity
     if (this.level != null && !this.level.isClientSide) {
       BlockState state = this.getBlockState();
       boolean connected = isFaceConnected(side);
-      BlockState updated =
-          state.setValue(PipeBlock.PROPERTY_BY_DIRECTION.get(side), connected);
+      BlockState updated = state.setValue(PipeBlock.PROPERTY_BY_DIRECTION.get(side), connected);
       this.level.setBlock(this.worldPosition, updated, 3);
       this.level.sendBlockUpdated(this.worldPosition, state, updated, 3);
 
@@ -198,8 +196,7 @@ public class TransportPipeBlockEntity extends BlockEntity
 
     if (this.level != null) {
       BlockState state = this.getBlockState();
-      BlockState updated =
-          state.setValue(PipeBlock.PROPERTY_BY_DIRECTION.get(side), true);
+      BlockState updated = state.setValue(PipeBlock.PROPERTY_BY_DIRECTION.get(side), true);
       this.level.setBlock(this.worldPosition, updated, 3);
       this.level.sendBlockUpdated(this.worldPosition, state, updated, 3);
     }
@@ -537,7 +534,8 @@ public class TransportPipeBlockEntity extends BlockEntity
               level.getCapability(Capabilities.FluidHandler.BLOCK, sinkTarget.pos, sinkTarget.face);
           if (sink == null) continue;
 
-          FluidStack drainedSim = this.fluidTank.drain(availableFluid, IFluidHandler.FluidAction.SIMULATE);
+          FluidStack drainedSim =
+              this.fluidTank.drain(availableFluid, IFluidHandler.FluidAction.SIMULATE);
           if (drainedSim.isEmpty()) break;
 
           int accepted = sink.fill(drainedSim, IFluidHandler.FluidAction.EXECUTE);
@@ -548,7 +546,8 @@ public class TransportPipeBlockEntity extends BlockEntity
         }
       }
 
-      // 2b. If fluid remains and sinks couldn't accept all of it, push to adjacent connected pipes with space
+      // 2b. If fluid remains and sinks couldn't accept all of it, push to adjacent connected pipes
+      // with space
       if (availableFluid > 0 && this.fluidTank.getFluidAmount() > 0) {
         for (Direction dir : Direction.values()) {
           if (!isFaceConnected(dir) || hasCover(dir)) {
@@ -558,7 +557,8 @@ public class TransportPipeBlockEntity extends BlockEntity
           BlockEntity targetBe = level.getBlockEntity(targetPos);
           if (targetBe instanceof TransportPipeBlockEntity otherPipe
               && otherPipe.isFaceConnected(dir.getOpposite())) {
-            int otherSpace = otherPipe.fluidTank.getCapacity() - otherPipe.fluidTank.getFluidAmount();
+            int otherSpace =
+                otherPipe.fluidTank.getCapacity() - otherPipe.fluidTank.getFluidAmount();
             if (otherSpace > 0) {
               int toMove = Math.min(availableFluid, otherSpace);
               FluidStack drained = this.fluidTank.drain(toMove, IFluidHandler.FluidAction.SIMULATE);

@@ -65,7 +65,12 @@ public class ItemReactorUranium extends AbstractDamageableReactorComponent {
                   + checkPulsable(reactor, x, y - 1, stack, x, y, heatRun)
                   + checkPulsable(reactor, x, y + 1, stack, x, y, heatRun);
           int heat = triangularNumber(pulses) * 4;
-          heat = (int) Math.round(heat * ic2.industrialjs.IndustrialJS.getFuelRodHeatMultiplier(stack) * ic2.industrialjs.IndustrialJS.getReactorHeatMultiplier());
+          heat =
+              (int)
+                  Math.round(
+                      heat
+                          * ic2.industrialjs.IndustrialJS.getFuelRodHeatMultiplier(stack)
+                          * ic2.industrialjs.IndustrialJS.getReactorHeatMultiplier());
           heat = this.getFinalHeat(stack, reactor, x, y, heat);
           Queue<ItemStackCoordination> heatAcceptors = new ArrayDeque<>();
           this.checkHeatAcceptor(reactor, x - 1, y, heatAcceptors);
@@ -131,7 +136,11 @@ public class ItemReactorUranium extends AbstractDamageableReactorComponent {
       int pulseY,
       boolean heatRun) {
     if (!heatRun) {
-      float power = 1.0F * (float) ic2.industrialjs.IndustrialJS.getFuelRodPowerMultiplier(pulsingStack != null ? pulsingStack : stack);
+      float power =
+          1.0F
+              * (float)
+                  ic2.industrialjs.IndustrialJS.getFuelRodPowerMultiplier(
+                      pulsingStack != null ? pulsingStack : stack);
       reactor.addOutput(power);
     }
 

@@ -91,7 +91,8 @@ public class Ic2LootModifier extends LootModifier {
               .create(LootContextParamSets.CHEST);
       generatedLoot.addAll(table.getRandomItems(params));
     }
-    ic2.industrialjs.IndustrialJS.applyStructureLoot(context.getQueriedLootTableId(), generatedLoot, context.getRandom());
+    ic2.industrialjs.IndustrialJS.applyStructureLoot(
+        context.getQueriedLootTableId(), generatedLoot, context.getRandom());
     return generatedLoot;
   }
 

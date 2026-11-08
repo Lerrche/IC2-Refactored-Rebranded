@@ -72,7 +72,9 @@ public abstract class AbstractDamageableReactorComponent extends Item implements
     Ic2Tooltip.add(
         tooltip,
         Component.translatable(
-            "ic2.reactoritem.durability", this.getMaxUse(stack) - this.getUse(stack), this.getMaxUse(stack)));
+            "ic2.reactoritem.durability",
+            this.getMaxUse(stack) - this.getUse(stack),
+            this.getMaxUse(stack)));
   }
 
   @Override

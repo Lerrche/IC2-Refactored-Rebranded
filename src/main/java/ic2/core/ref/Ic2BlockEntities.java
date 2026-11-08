@@ -1,5 +1,4 @@
 package ic2.core.ref;
-import ic2.core.block.transport.TransportPipeBlockEntity;
 
 import ic2.core.IC2;
 import ic2.core.block.generator.tileentity.TileEntityCreativeGenerator;
@@ -93,6 +92,7 @@ import ic2.core.block.storage.tank.TileEntityIronTank;
 import ic2.core.block.storage.tank.TileEntitySteelTank;
 import ic2.core.block.tileentity.Ic2SignBlockEntity;
 import ic2.core.block.tileentity.TileEntityWall;
+import ic2.core.block.transport.TransportPipeBlockEntity;
 import ic2.core.block.wiring.tileentity.TileEntityChargePadBatBox;
 import ic2.core.block.wiring.tileentity.TileEntityChargePadCESU;
 import ic2.core.block.wiring.tileentity.TileEntityChargePadMFE;
