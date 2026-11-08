@@ -1,4 +1,4 @@
-# IC2 Refactored (Rebranded)
+# [IC2 Refactored (Rebranded)](https://www.curseforge.com/minecraft/mc-mods/industrial-craft-2-refactored-rebranded)
 
 An unofficial continuation of the IndustrialCraft 2 port for Minecraft 1.21.1 on NeoForge.
 
