@@ -79,19 +79,19 @@ public class Ic2LootModifier extends LootModifier {
       ObjectArrayList<ItemStack> generatedLoot, LootContext context) {
     net.minecraft.resources.ResourceKey<LootTable> iLootId =
         AllLootTables.get(context.getQueriedLootTableId());
-    if (iLootId == null) {
-      return generatedLoot;
+    if (iLootId != null) {
+      LootTable table = context.getLevel().getServer().reloadableRegistries().getLootTable(iLootId);
+      LootParams params =
+          new LootParams.Builder(context.getLevel())
+              .withParameter(LootContextParams.ORIGIN, context.getParam(LootContextParams.ORIGIN))
+              .withOptionalParameter(
+                  LootContextParams.THIS_ENTITY,
+                  context.getParamOrNull(LootContextParams.THIS_ENTITY))
+              .withLuck(context.getLuck())
+              .create(LootContextParamSets.CHEST);
+      generatedLoot.addAll(table.getRandomItems(params));
     }
-    LootTable table = context.getLevel().getServer().reloadableRegistries().getLootTable(iLootId);
-    LootParams params =
-        new LootParams.Builder(context.getLevel())
-            .withParameter(LootContextParams.ORIGIN, context.getParam(LootContextParams.ORIGIN))
-            .withOptionalParameter(
-                LootContextParams.THIS_ENTITY,
-                context.getParamOrNull(LootContextParams.THIS_ENTITY))
-            .withLuck(context.getLuck())
-            .create(LootContextParamSets.CHEST);
-    generatedLoot.addAll(table.getRandomItems(params));
+    ic2.industrialjs.IndustrialJS.applyStructureLoot(context.getQueriedLootTableId(), generatedLoot, context.getRandom());
     return generatedLoot;
   }
 

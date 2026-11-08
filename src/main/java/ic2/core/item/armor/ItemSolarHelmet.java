@@ -38,8 +38,11 @@ public class ItemSolarHelmet extends ItemArmorUtility {
 
     ItemStack chestplate = player.getItemBySlot(EquipmentSlot.CHEST);
     if (!chestplate.isEmpty()) {
-      // The gateway manager also supports external electric-item integrations.
-      ElectricItem.manager.charge(chestplate, 1.0, Integer.MAX_VALUE, true, false);
+      double charge = 1.0 * ic2.industrialjs.IndustrialJS.getSolarHelmetMultiplier(stack);
+      if (charge > 0.0) {
+        // The gateway manager also supports external electric-item integrations.
+        ElectricItem.manager.charge(chestplate, charge, Integer.MAX_VALUE, true, false);
+      }
     }
   }
 }

@@ -90,16 +90,18 @@ public class TileEntityTerra extends TileEntityElectricMachine {
     ItemStack stack = this.tfbpSlot.get();
     if (!StackUtil.isEmpty(stack)) {
       ITerraformingBP tfbp = (ITerraformingBP) stack.getItem();
-      if (this.energy.getEnergy() >= tfbp.getConsume(stack)) {
+      double consume = tfbp.getConsume(stack) * ic2.industrialjs.IndustrialJS.getTerraformerEnergyMultiplier();
+      if (this.energy.getEnergy() >= consume) {
         newActive = true;
         Level world = this.getLevel();
         if (world == null) {
           return;
         }
 
+        int baseRange = (int) Math.round(tfbp.getRange(stack) * ic2.industrialjs.IndustrialJS.getTerraformerRangeMultiplier());
         BlockPos nextPos;
         if (this.lastPos != null) {
-          int range = tfbp.getRange(stack) / 10;
+          int range = baseRange / 10;
           nextPos =
               new BlockPos(
                   this.lastPos.getX() - rng.nextInt(range + 1) + rng.nextInt(range + 1),
@@ -110,7 +112,7 @@ public class TileEntityTerra extends TileEntityElectricMachine {
             this.failedAttempts = 4;
           }
 
-          int range = tfbp.getRange(stack) * (this.failedAttempts + 1) / 5;
+          int range = baseRange * (this.failedAttempts + 1) / 5;
           nextPos =
               new BlockPos(
                   this.worldPosition.getX() - rng.nextInt(range + 1) + rng.nextInt(range + 1),
@@ -119,11 +121,11 @@ public class TileEntityTerra extends TileEntityElectricMachine {
         }
 
         if (tfbp.terraform(stack, world, nextPos)) {
-          this.energy.useEnergy(tfbp.getConsume(stack));
+          this.energy.useEnergy(consume);
           this.failedAttempts = 0;
           this.lastPos = nextPos;
         } else {
-          this.energy.useEnergy(tfbp.getConsume(stack) / 10.0);
+          this.energy.useEnergy(consume / 10.0);
           this.failedAttempts++;
           this.lastPos = null;
         }

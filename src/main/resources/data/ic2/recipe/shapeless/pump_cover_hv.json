@@ -1,0 +1,17 @@
+{
+  "type": "ic2:shapeless",
+  "ingredients": [
+    {
+      "item": "ic2:steel_pipe_large"
+    },
+    {
+      "item": "minecraft:piston"
+    },
+    {
+      "item": "ic2:insulated_iron_cable"
+    }
+  ],
+  "result": {
+    "item": "ic2:pump_cover_hv"
+  }
+}

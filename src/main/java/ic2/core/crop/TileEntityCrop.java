@@ -314,6 +314,7 @@ public class TileEntityCrop extends Ic2TileEntity implements ICropTile {
         }
       }
 
+      totalGrowth = (int) Math.round(totalGrowth * ic2.industrialjs.IndustrialJS.getCropGrowthMultiplier());
       this.growthPoints = (short) (this.growthPoints + totalGrowth);
       if (debugGrowth) {
         IC2.log.info(
@@ -1236,10 +1237,11 @@ public class TileEntityCrop extends Ic2TileEntity implements ICropTile {
     this.statGrowth = (byte) (this.statGrowth / count);
     this.statResistance = (byte) (this.statResistance / count);
     this.statGain = (byte) (this.statGain / count);
-    this.statGrowth = (byte) (this.statGrowth + (IC2.random.nextInt(1 + 2 * count) - count));
-    this.statGain = (byte) (this.statGain + (IC2.random.nextInt(1 + 2 * count) - count));
+    double statMult = ic2.industrialjs.IndustrialJS.getCropStatGainMultiplier();
+    this.statGrowth = (byte) (this.statGrowth + Math.round((IC2.random.nextInt(1 + 2 * count) - count) * statMult));
+    this.statGain = (byte) (this.statGain + Math.round((IC2.random.nextInt(1 + 2 * count) - count) * statMult));
     this.statResistance =
-        (byte) (this.statResistance + (IC2.random.nextInt(1 + 2 * count) - count));
+        (byte) (this.statResistance + Math.round((IC2.random.nextInt(1 + 2 * count) - count) * statMult));
     this.statGrowth = (byte) Util.limit(this.statGrowth, 0, 31);
     this.statGain = (byte) Util.limit(this.statGain, 0, 31);
     this.statResistance = (byte) Util.limit(this.statResistance, 0, 31);

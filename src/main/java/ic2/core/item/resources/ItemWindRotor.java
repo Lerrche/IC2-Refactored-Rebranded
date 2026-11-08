@@ -75,17 +75,17 @@ public class ItemWindRotor extends Item implements IKineticRotor {
 
   @Override
   public float getEfficiency(ItemStack stack) {
-    return this.efficiency;
+    return this.efficiency * (float) ic2.industrialjs.IndustrialJS.getRotorEfficiencyMultiplier(stack);
   }
 
   @Override
   public int getMinWindStrength(ItemStack stack) {
-    return this.minWindStrength;
+    return ic2.industrialjs.IndustrialJS.getRotorMinWind(stack, this.minWindStrength);
   }
 
   @Override
   public int getMaxWindStrength(ItemStack stack) {
-    return this.maxWindStrength;
+    return ic2.industrialjs.IndustrialJS.getRotorMaxWind(stack, this.maxWindStrength);
   }
 
   @Override

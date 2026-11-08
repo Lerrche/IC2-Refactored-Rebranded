@@ -70,6 +70,7 @@ public class Rezepte {
                     null,
                     false);
               }
+              ic2.industrialjs.IndustrialJSRecipeRegistry.applyCannerBottle(manager);
 
               return manager;
             });
@@ -85,6 +86,7 @@ public class Rezepte {
                     null,
                     false);
               }
+              ic2.industrialjs.IndustrialJSRecipeRegistry.applyCannerEnrich(manager);
 
               return manager;
             });

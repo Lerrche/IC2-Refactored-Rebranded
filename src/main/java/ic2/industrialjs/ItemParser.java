@@ -2,10 +2,14 @@ package ic2.industrialjs;
 
 import ic2.api.recipe.IRecipeInput;
 import ic2.api.recipe.Recipes;
+import ic2.core.fluid.FluidHandler;
+import ic2.core.fluid.Ic2FluidStack;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.tags.ItemTags;
@@ -14,6 +18,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.material.Fluid;
 
 public class ItemParser {
 
@@ -164,5 +169,31 @@ public class ItemParser {
     }
     ResourceLocation itemLoc = BuiltInRegistries.ITEM.getKey(stack.getItem());
     return itemLoc != null && itemLoc.toString().equalsIgnoreCase(pattern);
+  }
+
+  public static Ic2FluidStack parseFluid(Object obj) {
+    if (obj == null) return null;
+    if (obj instanceof Ic2FluidStack fs) return fs.copy();
+    if (obj instanceof net.neoforged.neoforge.fluids.FluidStack fs) {
+      return FluidHandler.createFluidStackMb(fs.getFluid(), fs.getAmount(), null);
+    }
+    if (obj instanceof Fluid f) {
+      return FluidHandler.createFluidStackMb(f, 1000, null);
+    }
+    if (obj instanceof String str) {
+      str = str.trim();
+      int amount = 1000;
+      Pattern p = Pattern.compile("^(\\d+)(?:\\s*mb)?\\s+(.*)", Pattern.CASE_INSENSITIVE);
+      Matcher m = p.matcher(str);
+      if (m.find()) {
+        amount = Integer.parseInt(m.group(1));
+        str = m.group(2).trim();
+      }
+      ResourceLocation rl = ResourceLocation.tryParse(str);
+      if (rl != null && BuiltInRegistries.FLUID.containsKey(rl)) {
+        return FluidHandler.createFluidStackMb(BuiltInRegistries.FLUID.get(rl), amount, null);
+      }
+    }
+    return null;
   }
 }

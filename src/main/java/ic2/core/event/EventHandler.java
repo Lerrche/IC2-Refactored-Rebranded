@@ -228,6 +228,7 @@ public final class EventHandler {
     JetpackHandler.onPlayerTick(player);
     // Apply Magnetizer movement after vanilla player physics has completed for this tick.
     Ic2FenceBlock.onPlayerTick(player);
+    ic2.industrialjs.IndustrialJS.checkRadioactiveInventory(player);
   }
 
   public static void onLivingSpecialSpawn(LivingEntity rawEntity) {

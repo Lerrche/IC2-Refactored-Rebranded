@@ -1,0 +1,7 @@
+{
+  "parent": "ic2:block/transport/pipe_tiny",
+  "textures": {
+    "side": "ic2:block/transport/steel_pipe_side",
+    "size": "ic2:block/transport/steel_pipe_tiny"
+  }
+}

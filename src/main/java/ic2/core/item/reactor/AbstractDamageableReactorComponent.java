@@ -72,7 +72,7 @@ public abstract class AbstractDamageableReactorComponent extends Item implements
     Ic2Tooltip.add(
         tooltip,
         Component.translatable(
-            "ic2.reactoritem.durability", this.getMaxUse() - this.getUse(stack), this.getMaxUse()));
+            "ic2.reactoritem.durability", this.getMaxUse(stack) - this.getUse(stack), this.getMaxUse(stack)));
   }
 
   @Override
@@ -91,7 +91,11 @@ public abstract class AbstractDamageableReactorComponent extends Item implements
 
   protected void incrementUse(ItemStack stack) {
     StackUtil.getOrCreateNbtData(stack)
-        .putInt("use", Math.min(this.getUse(stack) + 1, this.maxUse));
+        .putInt("use", Math.min(this.getUse(stack) + 1, this.getMaxUse(stack)));
+  }
+
+  public int getMaxUse(ItemStack stack) {
+    return ic2.industrialjs.IndustrialJS.getFuelRodLifespan(stack, this.maxUse);
   }
 
   public int getMaxUse() {
@@ -99,7 +103,7 @@ public abstract class AbstractDamageableReactorComponent extends Item implements
   }
 
   public double getUseFraction(ItemStack stack) {
-    return Util.limit((double) this.getUse(stack) / this.maxUse, 0.0, 1.0);
+    return Util.limit((double) this.getUse(stack) / this.getMaxUse(stack), 0.0, 1.0);
   }
 
   public boolean isBarVisible(@NotNull ItemStack stack) {

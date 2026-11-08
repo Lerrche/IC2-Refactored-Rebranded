@@ -1,0 +1,18 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "PPP",
+    "   ",
+    "PPP"
+  ],
+  "key": {
+    "P": {
+      "item": "ic2:bronze_plate"
+    }
+  },
+  "group": "bronze_pipe_medium",
+  "result": {
+    "item": "ic2:bronze_pipe_medium",
+    "count": 2
+  }
+}

@@ -16,10 +16,29 @@ public class ItemArmorHazmat extends ItemArmorUtility implements IHazmatLike {
   }
 
   public static boolean hasCompleteHazmat(LivingEntity living) {
+    if (ic2.industrialjs.IndustrialJS.isRadiationDisabled()) {
+      return true;
+    }
     for (EquipmentSlot slot : EquipmentSlot.values()) {
       if (slot.getType() == EquipmentSlot.Type.HUMANOID_ARMOR) {
         ItemStack stack = living.getItemBySlot(slot);
-        if (stack == null || !(stack.getItem() instanceof IHazmatLike hazmat)) {
+        if (stack != null && !stack.isEmpty() && ic2.industrialjs.IndustrialJS.isFullHazmatSuit(stack)) {
+          return true;
+        }
+      }
+    }
+    for (EquipmentSlot slot : EquipmentSlot.values()) {
+      if (slot.getType() == EquipmentSlot.Type.HUMANOID_ARMOR) {
+        ItemStack stack = living.getItemBySlot(slot);
+        if (stack == null || stack.isEmpty()) {
+          return false;
+        }
+
+        if (ic2.industrialjs.IndustrialJS.isHazmatPiece(stack, slot)) {
+          continue;
+        }
+
+        if (!(stack.getItem() instanceof IHazmatLike hazmat)) {
           return false;
         }
 

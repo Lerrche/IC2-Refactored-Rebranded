@@ -86,6 +86,14 @@
     "ic2:steel_tank",
     "ic2:iridium_tank",
     "ic2:industrial_workbench",
-    "ic2:batch_crafter"
+    "ic2:batch_crafter",
+    "ic2:bronze_pipe_tiny",
+    "ic2:bronze_pipe_small",
+    "ic2:bronze_pipe_medium",
+    "ic2:bronze_pipe_large",
+    "ic2:steel_pipe_tiny",
+    "ic2:steel_pipe_small",
+    "ic2:steel_pipe_medium",
+    "ic2:steel_pipe_large"
   ]
 }

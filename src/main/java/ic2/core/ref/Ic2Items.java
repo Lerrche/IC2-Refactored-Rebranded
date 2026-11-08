@@ -1,4 +1,8 @@
 package ic2.core.ref;
+import ic2.core.block.transport.ItemPumpCover;
+import ic2.core.block.transport.ItemTransportPipe;
+import ic2.core.block.transport.PumpCoverTier;
+import ic2.core.block.transport.TransportPipeBlock;
 
 import ic2.core.IC2;
 import ic2.core.Ic2ItemGroupType;
@@ -267,6 +271,31 @@ public final class Ic2Items {
       register("detector_cable", new ItemCable(Ic2Blocks.DETECTOR_CABLE, new Properties()));
   public static final Item SPLITTER_CABLE =
       register("splitter_cable", new ItemCable(Ic2Blocks.SPLITTER_CABLE, new Properties()));
+  public static final Item BRONZE_PIPE_TINY =
+      register("bronze_pipe_tiny", new ItemTransportPipe((TransportPipeBlock) Ic2Blocks.BRONZE_PIPE_TINY, new Properties()));
+  public static final Item BRONZE_PIPE_SMALL =
+      register("bronze_pipe_small", new ItemTransportPipe((TransportPipeBlock) Ic2Blocks.BRONZE_PIPE_SMALL, new Properties()));
+  public static final Item BRONZE_PIPE_MEDIUM =
+      register("bronze_pipe_medium", new ItemTransportPipe((TransportPipeBlock) Ic2Blocks.BRONZE_PIPE_MEDIUM, new Properties()));
+  public static final Item BRONZE_PIPE_LARGE =
+      register("bronze_pipe_large", new ItemTransportPipe((TransportPipeBlock) Ic2Blocks.BRONZE_PIPE_LARGE, new Properties()));
+  public static final Item STEEL_PIPE_TINY =
+      register("steel_pipe_tiny", new ItemTransportPipe((TransportPipeBlock) Ic2Blocks.STEEL_PIPE_TINY, new Properties()));
+  public static final Item STEEL_PIPE_SMALL =
+      register("steel_pipe_small", new ItemTransportPipe((TransportPipeBlock) Ic2Blocks.STEEL_PIPE_SMALL, new Properties()));
+  public static final Item STEEL_PIPE_MEDIUM =
+      register("steel_pipe_medium", new ItemTransportPipe((TransportPipeBlock) Ic2Blocks.STEEL_PIPE_MEDIUM, new Properties()));
+  public static final Item STEEL_PIPE_LARGE =
+      register("steel_pipe_large", new ItemTransportPipe((TransportPipeBlock) Ic2Blocks.STEEL_PIPE_LARGE, new Properties()));
+
+  public static final Item PUMP_COVER_LV =
+      register("pump_cover_lv", new ItemPumpCover(PumpCoverTier.LV, new Properties()));
+  public static final Item PUMP_COVER_MV =
+      register("pump_cover_mv", new ItemPumpCover(PumpCoverTier.MV, new Properties()));
+  public static final Item PUMP_COVER_HV =
+      register("pump_cover_hv", new ItemPumpCover(PumpCoverTier.HV, new Properties()));
+  public static final Item PUMP_COVER_EV =
+      register("pump_cover_ev", new ItemPumpCover(PumpCoverTier.EV, new Properties()));
   public static final Item BATBOX_CHARGEPAD =
       register(
           "batbox_chargepad",
@@ -1506,6 +1535,18 @@ public final class Ic2Items {
     addToCreativeTab(Ic2ItemGroupType.GENERATORS_AND_WIRING, () -> BATBOX_CHARGEPAD);
     addToCreativeTab(Ic2ItemGroupType.GENERATORS_AND_WIRING, () -> CESU);
     addToCreativeTab(Ic2ItemGroupType.GENERATORS_AND_WIRING, () -> CESU_CHARGEPAD);
+        addToCreativeTab(Ic2ItemGroupType.GENERATORS_AND_WIRING, () -> BRONZE_PIPE_TINY);
+    addToCreativeTab(Ic2ItemGroupType.GENERATORS_AND_WIRING, () -> BRONZE_PIPE_SMALL);
+    addToCreativeTab(Ic2ItemGroupType.GENERATORS_AND_WIRING, () -> BRONZE_PIPE_MEDIUM);
+    addToCreativeTab(Ic2ItemGroupType.GENERATORS_AND_WIRING, () -> BRONZE_PIPE_LARGE);
+    addToCreativeTab(Ic2ItemGroupType.GENERATORS_AND_WIRING, () -> STEEL_PIPE_TINY);
+    addToCreativeTab(Ic2ItemGroupType.GENERATORS_AND_WIRING, () -> STEEL_PIPE_SMALL);
+    addToCreativeTab(Ic2ItemGroupType.GENERATORS_AND_WIRING, () -> STEEL_PIPE_MEDIUM);
+    addToCreativeTab(Ic2ItemGroupType.GENERATORS_AND_WIRING, () -> STEEL_PIPE_LARGE);
+    addToCreativeTab(Ic2ItemGroupType.GENERATORS_AND_WIRING, () -> PUMP_COVER_LV);
+    addToCreativeTab(Ic2ItemGroupType.GENERATORS_AND_WIRING, () -> PUMP_COVER_MV);
+    addToCreativeTab(Ic2ItemGroupType.GENERATORS_AND_WIRING, () -> PUMP_COVER_HV);
+    addToCreativeTab(Ic2ItemGroupType.GENERATORS_AND_WIRING, () -> PUMP_COVER_EV);
     addToCreativeTab(Ic2ItemGroupType.GENERATORS_AND_WIRING, () -> COPPER_CABLE);
     addToCreativeTab(Ic2ItemGroupType.GENERATORS_AND_WIRING, () -> CREATIVE_GENERATOR);
     addToCreativeTab(Ic2ItemGroupType.GENERATORS_AND_WIRING, () -> DETECTOR_CABLE);

@@ -27,6 +27,9 @@ import ic2.core.block.kineticgenerator.tileentity.TileEntityStirlingKineticGener
 import ic2.core.block.kineticgenerator.tileentity.TileEntityWaterKineticGenerator;
 import ic2.core.block.kineticgenerator.tileentity.TileEntityWindKineticGenerator;
 import ic2.core.block.machine.MiningPipeBlock;
+import ic2.core.block.transport.PipeSize;
+import ic2.core.block.transport.PipeType;
+import ic2.core.block.transport.TransportPipeBlock;
 import ic2.core.block.machine.tileentity.TileEntityAdvMiner;
 import ic2.core.block.machine.tileentity.TileEntityBatchCrafter;
 import ic2.core.block.machine.tileentity.TileEntityBlastFurnace;
@@ -2074,6 +2077,24 @@ public final class Ic2Blocks {
       register(
           "insulated_tin_cable",
           CableBlock.create(insulatedCableSettings, CableType.tin, 1, INSULATED_TIN_FOAM_CABLE));
+  private static final Properties pipeSettings =
+      Properties.of().strength(1.5F, 5.0F).sound(SoundType.METAL);
+  public static final Block BRONZE_PIPE_TINY =
+      register("bronze_pipe_tiny", new TransportPipeBlock(PipeType.BRONZE, PipeSize.TINY, pipeSettings));
+  public static final Block BRONZE_PIPE_SMALL =
+      register("bronze_pipe_small", new TransportPipeBlock(PipeType.BRONZE, PipeSize.SMALL, pipeSettings));
+  public static final Block BRONZE_PIPE_MEDIUM =
+      register("bronze_pipe_medium", new TransportPipeBlock(PipeType.BRONZE, PipeSize.MEDIUM, pipeSettings));
+  public static final Block BRONZE_PIPE_LARGE =
+      register("bronze_pipe_large", new TransportPipeBlock(PipeType.BRONZE, PipeSize.LARGE, pipeSettings));
+  public static final Block STEEL_PIPE_TINY =
+      register("steel_pipe_tiny", new TransportPipeBlock(PipeType.STEEL, PipeSize.TINY, pipeSettings));
+  public static final Block STEEL_PIPE_SMALL =
+      register("steel_pipe_small", new TransportPipeBlock(PipeType.STEEL, PipeSize.SMALL, pipeSettings));
+  public static final Block STEEL_PIPE_MEDIUM =
+      register("steel_pipe_medium", new TransportPipeBlock(PipeType.STEEL, PipeSize.MEDIUM, pipeSettings));
+  public static final Block STEEL_PIPE_LARGE =
+      register("steel_pipe_large", new TransportPipeBlock(PipeType.STEEL, PipeSize.LARGE, pipeSettings));
   private static final Properties cropSettings =
       Properties.of().strength(0.8F, 0.2F).sound(SoundType.CROP).noCollission();
   public static final Block CROP_STICK =

@@ -23,7 +23,11 @@ public class PositionedSoundInstance extends SimpleSoundInstance
   public float getVolume() {
     float v = super.getVolume();
     if (this.isMachine) {
-      v *= ic2.core.init.IC2ClientConfig.getMachineVolume();
+      if (ic2.industrialjs.IndustrialJS.isAudioDisabled()) {
+        return 0.0F;
+      }
+      v *= ic2.core.init.IC2ClientConfig.getMachineVolume()
+          * (float) ic2.industrialjs.IndustrialJS.getMachineVolumeMultiplier();
     }
     return v;
   }

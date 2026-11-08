@@ -132,8 +132,10 @@ public class TileEntityBatchCrafter extends TileEntityElectricMachine
           };
     }
 
-    this.energyConsume = 2;
-    this.operationLength = 40;
+    int baseOpLength = Math.max(1, (int) Math.round(40 / ic2.industrialjs.IndustrialJS.getBatchCrafterSpeedMultiplier()));
+    int baseEnergyConsume = Math.max(1, (int) Math.round(2 * ic2.industrialjs.IndustrialJS.getBatchCrafterEnergyMultiplier()));
+    this.energyConsume = baseEnergyConsume;
+    this.operationLength = baseOpLength;
     this.operationsPerTick = 1;
     this.comparator.setUpdate(() -> this.progress * 15 / this.operationLength);
   }
@@ -374,13 +376,16 @@ public class TileEntityBatchCrafter extends TileEntityElectricMachine
   protected void setOverclockRates() {
     this.upgradeSlot.onChanged();
     double previousProgress = (double) this.progress / this.operationLength;
-    this.operationsPerTick = this.upgradeSlot.getOperationsPerTick(40);
-    this.operationLength = this.upgradeSlot.getOperationLength(40);
-    this.energyConsume = this.upgradeSlot.getEnergyDemand(2);
+    int baseOpLength = Math.max(1, (int) Math.round(40 / ic2.industrialjs.IndustrialJS.getBatchCrafterSpeedMultiplier()));
+    int baseEnergyConsume = Math.max(1, (int) Math.round(2 * ic2.industrialjs.IndustrialJS.getBatchCrafterEnergyMultiplier()));
+    int baseStorage = ic2.industrialjs.IndustrialJS.getBatchCrafterCapacity(20000);
+    this.operationsPerTick = this.upgradeSlot.getOperationsPerTick(baseOpLength);
+    this.operationLength = this.upgradeSlot.getOperationLength(baseOpLength);
+    this.energyConsume = this.upgradeSlot.getEnergyDemand(baseEnergyConsume);
     int tier = this.upgradeSlot.getTier(1);
     this.energy.setSinkTier(tier);
     this.dischargeSlot.setTier(tier);
-    this.energy.setCapacity(this.upgradeSlot.getEnergyStorage(20000, 40, 2));
+    this.energy.setCapacity(this.upgradeSlot.getEnergyStorage(baseStorage, baseOpLength, baseEnergyConsume));
     this.progress = (short) Math.floor(previousProgress * this.operationLength + 0.1);
   }
 

@@ -1,0 +1,18 @@
+{
+  "type": "ic2:shaped",
+  "pattern": [
+    "CCC",
+    "   ",
+    "CCC"
+  ],
+  "key": {
+    "C": {
+      "item": "ic2:steel_casing"
+    }
+  },
+  "group": "steel_pipe_tiny",
+  "result": {
+    "item": "ic2:steel_pipe_tiny",
+    "count": 6
+  }
+}

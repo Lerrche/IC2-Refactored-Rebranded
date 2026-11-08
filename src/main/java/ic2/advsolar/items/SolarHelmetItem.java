@@ -102,7 +102,8 @@ public class SolarHelmetItem extends AddonElectricArmor {
                 && !level.isThundering();
         int generation = 0;
         if (canSeeSky) {
-          generation = level.isDay() ? this.dayEu : this.nightEu;
+          double mult = ic2.industrialjs.IndustrialJS.getSolarHelmetMultiplier(stack);
+          generation = (int) Math.round((level.isDay() ? this.dayEu : this.nightEu) * mult);
         }
 
         if (generation > 0 && ElectricItem.manager != null) {

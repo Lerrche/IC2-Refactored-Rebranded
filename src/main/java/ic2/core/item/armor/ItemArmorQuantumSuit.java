@@ -449,7 +449,7 @@ public class ItemArmorQuantumSuit extends ItemArmorElectric
             }
 
             Vec3 motion = player.getDeltaMovement();
-            player.setDeltaMovement(motion.x, motion.y + jumpCharge * 0.3F, motion.z);
+            player.setDeltaMovement(motion.x, motion.y + jumpCharge * 0.3F * (float) ic2.industrialjs.IndustrialJS.getQuantumJumpMultiplier(), motion.z);
             jumpCharges.put(player, jumpCharge * 0.75F);
           } else if (jumpCharge < 1.0F) {
             jumpCharges.put(player, 0.0F);

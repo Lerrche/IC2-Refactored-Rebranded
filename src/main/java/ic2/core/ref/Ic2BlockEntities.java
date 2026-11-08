@@ -1,4 +1,5 @@
 package ic2.core.ref;
+import ic2.core.block.transport.TransportPipeBlockEntity;
 
 import ic2.core.IC2;
 import ic2.core.block.generator.tileentity.TileEntityCreativeGenerator;
@@ -543,4 +544,16 @@ public final class Ic2BlockEntities {
       register("coke_kiln_hatch", TileEntityCokeKilnHatch::new, Ic2Blocks.COKE_KILN_HATCH);
   public static final BlockEntityType<TileEntityCokeKilnGrate> COKE_KILN_GRATE =
       register("coke_kiln_grate", TileEntityCokeKilnGrate::new, Ic2Blocks.COKE_KILN_GRATE);
+  public static final BlockEntityType<TransportPipeBlockEntity> TRANSPORT_PIPE =
+      register(
+          "transport_pipe",
+          TransportPipeBlockEntity::new,
+          Ic2Blocks.BRONZE_PIPE_TINY,
+          Ic2Blocks.BRONZE_PIPE_SMALL,
+          Ic2Blocks.BRONZE_PIPE_MEDIUM,
+          Ic2Blocks.BRONZE_PIPE_LARGE,
+          Ic2Blocks.STEEL_PIPE_TINY,
+          Ic2Blocks.STEEL_PIPE_SMALL,
+          Ic2Blocks.STEEL_PIPE_MEDIUM,
+          Ic2Blocks.STEEL_PIPE_LARGE);
 }

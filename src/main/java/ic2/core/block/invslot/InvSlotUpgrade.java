@@ -68,30 +68,34 @@ public class InvSlotUpgrade extends InvSlot {
 
         if (all || upgrade instanceof IProcessingUpgrade) {
           IProcessingUpgrade procUpgrade = (IProcessingUpgrade) upgrade;
+          double pTimeMult = ic2.industrialjs.IndustrialJS.getOverclockerSpeedMultiplier(stack, procUpgrade.getProcessTimeMultiplier(stack, block));
+          double pEnergyMult = ic2.industrialjs.IndustrialJS.getOverclockerEnergyMultiplier(stack, procUpgrade.getEnergyDemandMultiplier(stack, block));
           this.extraProcessTime =
               this.extraProcessTime + procUpgrade.getExtraProcessTime(stack, block) * size;
           this.processTimeMultiplier =
               this.processTimeMultiplier
-                  * Math.pow(procUpgrade.getProcessTimeMultiplier(stack, block), size);
+                  * Math.pow(pTimeMult, size);
           this.extraEnergyDemand =
               this.extraEnergyDemand + procUpgrade.getExtraEnergyDemand(stack, block) * size;
           this.energyDemandMultiplier =
               this.energyDemandMultiplier
-                  * Math.pow(procUpgrade.getEnergyDemandMultiplier(stack, block), size);
+                  * Math.pow(pEnergyMult, size);
         }
 
         if (all || upgrade instanceof IEnergyStorageUpgrade) {
           IEnergyStorageUpgrade engUpgrade = (IEnergyStorageUpgrade) upgrade;
+          int extraStorage = ic2.industrialjs.IndustrialJS.getEnergyStorageUpgradeBonus(stack, engUpgrade.getExtraEnergyStorage(stack, block));
           this.extraEnergyStorage =
-              this.extraEnergyStorage + engUpgrade.getExtraEnergyStorage(stack, block) * size;
+              this.extraEnergyStorage + extraStorage * size;
           this.energyStorageMultiplier =
               this.energyStorageMultiplier
                   * Math.pow(engUpgrade.getEnergyStorageMultiplier(stack, block), size);
         }
 
         if (all || upgrade instanceof ITransformerUpgrade) {
+          int extraTier = ic2.industrialjs.IndustrialJS.getTransformerUpgradeTier(stack, ((ITransformerUpgrade) upgrade).getExtraTier(stack, block));
           this.extraTier =
-              this.extraTier + ((ITransformerUpgrade) upgrade).getExtraTier(stack, block) * size;
+              this.extraTier + extraTier * size;
         }
 
         if (all || upgrade instanceof IRedstoneSensitiveUpgrade) {

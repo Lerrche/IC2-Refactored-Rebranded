@@ -18,6 +18,7 @@ import ic2.core.network.GrowingBuffer;
 import ic2.core.network.GuiSynced;
 import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.ref.Ic2SoundEvents;
+import ic2.core.util.CauldronUtil;
 import ic2.core.util.LiquidUtil;
 import ic2.core.util.PumpUtil;
 import ic2.core.util.Util;
@@ -180,6 +181,15 @@ public class TileEntityPump extends TileEntityElectricMachine
       BlockEntity te = world.getBlockEntity(startPos);
       BlockState state = world.getBlockState(startPos);
       Direction side = this.getFacing().getOpposite();
+
+      if (CauldronUtil.isCauldron(state)) {
+        Ic2FluidStack cauldronFluid =
+            CauldronUtil.drainCauldronIc2(world, startPos, state, freeSpace, sim);
+        if (cauldronFluid != null && !cauldronFluid.isEmpty()) {
+          return cauldronFluid;
+        }
+      }
+
       if (LiquidUtil.isFluidTile(state, te, side)) {
         if (freeSpace > 1000) {
           freeSpace = 1000;

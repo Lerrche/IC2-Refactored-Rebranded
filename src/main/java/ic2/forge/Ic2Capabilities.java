@@ -1,4 +1,5 @@
 package ic2.forge;
+import ic2.core.block.transport.TransportPipeBlockEntity;
 
 import ic2.api.item.INanoSaberState;
 import ic2.core.IC2;
@@ -69,6 +70,9 @@ public final class Ic2Capabilities {
   }
 
   private static IFluidHandler fluidHandler(BlockEntity be, Direction side) {
+    if (be instanceof TransportPipeBlockEntity pipe) {
+      return pipe.getFluidHandler(side);
+    }
     if (!(be instanceof Ic2TileEntity)) {
       return null;
     }
@@ -85,6 +89,9 @@ public final class Ic2Capabilities {
   }
 
   private static IItemHandler itemHandler(BlockEntity be, Direction side) {
+    if (be instanceof TransportPipeBlockEntity pipe) {
+      return pipe.getItemHandler(side);
+    }
     if (!(be instanceof Ic2TileEntity)) {
       return null;
     }

@@ -184,6 +184,14 @@ public final class SideProxyClient implements SideProxy {
     envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.GLASS_FIBRE_CABLE);
     envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.DETECTOR_CABLE);
     envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.SPLITTER_CABLE);
+    envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.BRONZE_PIPE_TINY);
+    envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.BRONZE_PIPE_SMALL);
+    envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.BRONZE_PIPE_MEDIUM);
+    envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.BRONZE_PIPE_LARGE);
+    envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.STEEL_PIPE_TINY);
+    envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.STEEL_PIPE_SMALL);
+    envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.STEEL_PIPE_MEDIUM);
+    envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.STEEL_PIPE_LARGE);
     envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.CROP_STICK);
     envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.WEED_CROP);
     envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.WHEAT_CROP);

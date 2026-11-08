@@ -34,7 +34,7 @@ public class JetpackLogic {
 
     IBoostingJetpack iBoostingJetpack =
         jetpack instanceof IBoostingJetpack ? (IBoostingJetpack) jetpack : null;
-    float power = jetpack.getPower(stack);
+    float power = jetpack.getPower(stack) * (float) ic2.industrialjs.IndustrialJS.getJetpackThrustMultiplier();
     float dropPercentage = jetpack.getDropPercentage(stack);
     if (jetpack.getChargeLevel(stack) <= dropPercentage) {
       power = (float) (power * (jetpack.getChargeLevel(stack) / dropPercentage));
@@ -51,7 +51,7 @@ public class JetpackLogic {
       float thruster, boost;
       if (iBoostingJetpack != null) {
         thruster = iBoostingJetpack.getBaseThrust(stack, hoverMode);
-        boost = iBoostingJetpack.getBoostThrust(player, stack, hoverMode);
+        boost = iBoostingJetpack.getBoostThrust(player, stack, hoverMode) * (float) ic2.industrialjs.IndustrialJS.getJetpackBoostMultiplier();
       } else {
         thruster = hoverMode ? 1.0F : 0.15F;
         boost = 0.0F;
@@ -71,7 +71,7 @@ public class JetpackLogic {
     }
 
     int worldHeight = world.getMaxBuildHeight();
-    int maxFlightHeight = (int) (worldHeight / jetpack.getWorldHeightDivisor(stack));
+    int maxFlightHeight = (int) ((worldHeight / jetpack.getWorldHeightDivisor(stack)) * ic2.industrialjs.IndustrialJS.getJetpackHeightMultiplier());
     double y = player.getY();
     if (y > maxFlightHeight - 25) {
       if (y > maxFlightHeight) {
@@ -142,7 +142,7 @@ public class JetpackLogic {
 
     player.setDeltaMovement(motionX, motionY, motionZ);
 
-    int consume = hoverMode ? 1 : 2;
+    int consume = (int) Math.max(1, Math.round((hoverMode ? 1 : 2) * ic2.industrialjs.IndustrialJS.getJetpackEnergyCostMultiplier()));
     if (!player.onGround()) {
       jetpack.drainEnergy(stack, consume);
     }

@@ -144,7 +144,7 @@ public abstract class ItemArmorElectric extends ItemArmorIC2 implements IElectri
 
   @Override
   public double getMaxCharge(ItemStack stack) {
-    return this.maxCharge;
+    return ic2.industrialjs.IndustrialJS.getArmorCapacity(stack, this.maxCharge);
   }
 
   @Override
@@ -154,7 +154,7 @@ public abstract class ItemArmorElectric extends ItemArmorIC2 implements IElectri
 
   @Override
   public double getTransferLimit(ItemStack stack) {
-    return this.transferLimit;
+    return ic2.industrialjs.IndustrialJS.getArmorTransferLimit(stack, this.transferLimit);
   }
 
   public boolean isBarVisible(ItemStack stack) {
