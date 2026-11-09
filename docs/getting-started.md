@@ -52,15 +52,32 @@ neoForge {
 
 repositories {
     mavenCentral()
-    // Local flatDir or your team Maven repository
+
+    // Option A: JitPack (Recommended for public addons - no credentials required!)
+    maven { url = 'https://jitpack.io' }
+
+    // Option B: GitHub Packages Maven (Requires GitHub PAT)
+    maven {
+        name = "GitHubPackages"
+        url = uri("https://maven.pkg.github.com/Lerrche/IC2-Refactored-Rebranded")
+        credentials {
+            username = project.findProperty("gpr.user") ?: System.getenv("GITHUB_ACTOR")
+            password = project.findProperty("gpr.key") ?: System.getenv("GITHUB_TOKEN")
+        }
+    }
+
+    // Local fallback for offline testing
     flatDir {
         dirs 'libs'
     }
 }
 
 dependencies {
-    // Depend on IC2 Rebranded JAR (in your libs/ folder or Maven)
-    implementation "me.lerche.ic2r.core:ic2r:1.2.1"
+    // If using JitPack:
+    implementation "com.github.Lerrche:IC2-Refactored-Rebranded:1.2.1"
+
+    // Or if using GitHub Packages Maven / local repo:
+    // implementation "me.lerche.ic2r.core:ic2r:1.2.1"
 }
 ```
 

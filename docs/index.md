@@ -10,8 +10,8 @@ This documentation provides everything you need to create custom add-ons: custom
 
 | Resource | Description |
 |---|---|
-| **[Add-on Creation Guide](addon-development-guide.md)** | Master overview and 8 numbered guide chapters covering registration, machines, generators, tools, armor, and upgrades. |
-| **[IndustrialJS & KubeJS Guide](IndustrialJS_Guide.md)** | Complete guide for modpack authors: zero-code JSON balancing, recipe creation, KubeJS server script bindings, and master API reference. |
+| **[Add-on Creation Guide](addon-development-guide.md)** | Master overview and 9 numbered guide chapters covering registration, machines, generators, tools, armor, upgrades, and pipes. |
+| **[IndustrialJS & KubeJS Guide](kubejs/index.md)** | Complete guide for modpack authors: zero-code JSON balancing, recipe creation, KubeJS server script bindings, and master API reference. |
 | **[Energy System & FE Interop](energy-system.md)** | Deep dive into Energy Units (EU), Voltage Tiers (LV to EV), cable loss, and the automatic Forge Energy (FE) cross-mod bridge. |
 | **[Complete Example Add-on](example-addon.md)** | A full, copy-pasteable reference mod template (`ExampleAddonMod.java`) demonstrating all core features in one place. |
 | **[API Reference](api-reference.md)** | A concise index of all verified helper classes, interfaces, and methods in `ic2.api.*`. |
@@ -28,6 +28,7 @@ This documentation provides everything you need to create custom add-ons: custom
 6. **[Electric Armor & Jetpacks](guides/armor.md)**: Quantum/Nano armor suits, wearable Lappacks, and flying jetpacks with hover and boost keys.
 7. **[Machine Upgrades](guides/upgrades.md)**: Overclock/speed, storage buffer, and transformer voltage upgrades using `AddonUpgradeItem`.
 8. **[Recipes & DataGen](guides/recipes.md)**: Programmatic recipe generation with `AddonRecipeBuilder` and circuit tag conventions.
+9. **[Fluid Pipes & Pump Covers](guides/pipes.md)**: Bronze and Steel fluid pipes (Tiny, Small, Medium, Large), LV–EV pump covers, cauldron fluid extraction, and wrench controls.
 
 ---
 

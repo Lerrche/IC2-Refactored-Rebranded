@@ -1,5 +1,5 @@
 site_name: IC2 Refactored Documentation
-site_description: Add-on API documentation for IndustrialCraft 2 Refactored on Minecraft 1.21.1 and NeoForge.
+site_description: Add-on API and KubeJS documentation for IndustrialCraft 2 Refactored on Minecraft 1.21.1 and NeoForge.
 site_url: https://lerrche.github.io/IC2-Refactored-Rebranded/
 repo_url: https://github.com/Lerrche/IC2-Refactored-Rebranded
 repo_name: Lerrche/IC2-Refactored-Rebranded
@@ -10,9 +10,12 @@ copyright: Unofficial community documentation for IC2 Refactored.
 theme:
   name: material
   features:
+    - navigation.tabs
+    - navigation.tabs.sticky
     - navigation.sections
     - navigation.expand
     - navigation.top
+    - navigation.indexes
     - content.code.copy
     - search.suggest
     - search.highlight
@@ -43,9 +46,9 @@ markdown_extensions:
 
 nav:
   - Home: index.md
-  - Getting Started: getting-started.md
-  - Add-on Guides:
-      - Overview: addon-development-guide.md
+  - Add-on Development:
+      - Getting Started: getting-started.md
+      - Guide Overview: addon-development-guide.md
       - 1. Registration & Setup: guides/registration.md
       - 2. Custom Machines: guides/machines.md
       - 3. Custom Generators: guides/generators.md
@@ -54,10 +57,23 @@ nav:
       - 6. Electric Armor & Jetpacks: guides/armor.md
       - 7. Machine Upgrades: guides/upgrades.md
       - 8. Recipes & DataGen: guides/recipes.md
-  - Energy System & FE: energy-system.md
-  - Complete Example Add-on: example-addon.md
-  - Reference:
+      - 9. Fluid Pipes & Pump Covers: guides/pipes.md
+      - Energy System & FE: energy-system.md
+      - Complete Example Add-on: example-addon.md
+  - KubeJS (IndustrialJS):
+      - Overview: kubejs/index.md
+      - Zero-Code Balancing: kubejs/zero-code.md
+      - Quick Start & Syntax: kubejs/quickstart.md
+      - Recipe Creation API: kubejs/recipes.md
+      - Machinery, Generators & Audio: kubejs/machinery.md
+      - Energy Grid & Storage: kubejs/energy-grid.md
+      - Tools, Combat & Jetpacks: kubejs/tools-jetpacks.md
+      - Armor, Hazmat & Radiation: kubejs/armor-radiation.md
+      - Nuclear, Rotors & Crops: kubejs/nuclear-crops.md
+      - Master Reference & Examples: kubejs/examples.md
+      - Full Single-Page Guide: IndustrialJS_Guide.md
+  - Mod Reference:
       - API Reference: api-reference.md
-      - Compatibility: compatibility.md
+      - Compatibility & Troubleshooting: compatibility.md
       - Building the Mod: building.md
       - Contributing: contributing.md

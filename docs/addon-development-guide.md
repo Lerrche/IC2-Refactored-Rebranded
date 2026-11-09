@@ -18,6 +18,7 @@ This guide is designed to be straightforward, practical, and easy to follow. You
 | **[6. Armor & Jetpacks](guides/armor.md)** | `AddonElectricArmor` | Developing Nano/Quantum suits, battery backpacks (Lappacks), and flying jetpacks. |
 | **[7. Machine Upgrades](guides/upgrades.md)** | `AddonUpgradeItem` | Creating Overclock / Speed, Energy Storage, and Transformer upgrades for machines. |
 | **[8. Recipes & DataGen](guides/recipes.md)** | `AddonRecipeBuilder` | Generating recipes for Macerators, Compressors, Extractors, Furnaces, and more. |
+| **[9. Fluid Pipes & Covers](guides/pipes.md)** | `TransportPipeBlock`, `ItemPumpCover` | Bronze & Steel fluid pipes, 4 diameter sizes, LV-EV pump covers, and cauldron extraction. |
 
 ---
 
