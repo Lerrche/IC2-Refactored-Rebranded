@@ -17,7 +17,7 @@ IC2 Rebranded includes a built-in bidirectional Forge Energy (FE) bridge:
 
 ## Common Troubleshooting Tips
 
-- **Missing IC2 Classes**: Ensure `implementation "me.halfcooler.ic2r.core:ic2r-neoforge:1.0.3"` is in your add-on's `build.gradle`, and `ic2` is declared as a required dependency in `neoforge.mods.toml`.
+- **Missing IC2 Classes**: Ensure `implementation "me.lerche.ic2r.core:ic2r:1.2.1"` is in your add-on's `build.gradle`, and `ic2` is declared as a required dependency in `neoforge.mods.toml`.
 - **Block/Item Not Showing Up**: Ensure `CONTENT.register(modEventBus)` is called in your mod constructor, and items are added to your Creative Mode Tab or vanilla tags.
 - **Wrench Not Rotating Block**: Ensure you registered your block with `CONTENT.registerWrenchableBlock(...)`.
 - **Code Style / Build Failures**: Run `.\gradlew.bat spotlessApply` before running `build`.

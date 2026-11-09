@@ -60,7 +60,7 @@ repositories {
 
 dependencies {
     // Depend on IC2 Rebranded JAR (in your libs/ folder or Maven)
-    implementation "me.halfcooler.ic2r.core:ic2r-neoforge:1.0.3"
+    implementation "me.lerche.ic2r.core:ic2r:1.2.1"
 }
 ```
 
