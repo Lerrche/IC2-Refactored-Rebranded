@@ -519,6 +519,9 @@ public final class Ic2TileEntityBlock extends Block
       BlockPos pos,
       BlockState state,
       Direction direction) {
+    if (world == null || pos == null) {
+      return InteractionResult.PASS;
+    }
     return world.getBlockEntity(pos) instanceof Ic2TileEntity ic2TileEntity
         ? ic2TileEntity.onClicked(player)
         : InteractionResult.PASS;
@@ -541,7 +544,9 @@ public final class Ic2TileEntityBlock extends Block
     if (!state.is(newState.getBlock()) && !moved) {
       if (world.getBlockEntity(pos) instanceof Ic2TileEntity tileEntity) {
         for (ItemStack stack : tileEntity.getAuxDrops(0)) {
-          Block.popResource(world, pos, stack);
+          if (stack != null && !stack.isEmpty()) {
+            Block.popResource(world, pos, stack);
+          }
         }
 
         super.onRemove(state, world, pos, newState, moved);

@@ -84,6 +84,7 @@ public class TileEntityReplicator extends TileEntityElectricMachine
     if (this.mode != TileEntityReplicator.Mode.STOPPED
         && this.energy.getEnergy() >= this.euPerTick
         && this.pattern != null
+        && !this.pattern.isEmpty()
         && this.outputSlot.canAdd(this.pattern)) {
       double uuRemaining = this.patternUu - this.uuProcessed;
       boolean finish;
@@ -162,9 +163,12 @@ public class TileEntityReplicator extends TileEntityElectricMachine
       if (patterns.isEmpty()) {
         this.pattern = null;
       } else {
-        this.pattern = patterns.get(this.index);
-        this.patternUu = UuIndex.instance.getInBuckets(this.pattern);
-        this.patternEu = UuIndex.instance.getReplicationEu(this.pattern);
+        ItemStack candidate = patterns.get(this.index);
+        this.pattern = (candidate == null || candidate.isEmpty()) ? null : candidate;
+        if (this.pattern != null) {
+          this.patternUu = UuIndex.instance.getInBuckets(this.pattern);
+          this.patternEu = UuIndex.instance.getReplicationEu(this.pattern);
+        }
         if (!StackUtil.checkItemEqualityStrict(this.pattern, oldPattern)) {
           this.uuProcessed = 0.0;
           this.mode = TileEntityReplicator.Mode.STOPPED;
@@ -172,7 +176,8 @@ public class TileEntityReplicator extends TileEntityElectricMachine
       }
     }
 
-    if (this.pattern == null) {
+    if (this.pattern == null || this.pattern.isEmpty()) {
+      this.pattern = null;
       this.uuProcessed = 0.0;
       this.mode = TileEntityReplicator.Mode.STOPPED;
     }
@@ -180,6 +185,9 @@ public class TileEntityReplicator extends TileEntityElectricMachine
 
   public IPatternStorage getPatternStorage() {
     Level world = this.getLevel();
+    if (world == null || this.worldPosition == null) {
+      return null;
+    }
 
     for (Direction dir : Util.ALL_DIRS) {
       BlockEntity target = world.getBlockEntity(this.worldPosition.relative(dir));
@@ -249,7 +257,8 @@ public class TileEntityReplicator extends TileEntityElectricMachine
             ? TileEntityReplicator.Mode.values()[modeIdx]
             : TileEntityReplicator.Mode.STOPPED;
     CompoundTag contentTag = nbt.getCompound("pattern");
-    this.pattern = ItemStack.parseOptional(registries, contentTag);
+    ItemStack loaded = ItemStack.parseOptional(registries, contentTag);
+    this.pattern = loaded.isEmpty() ? null : loaded;
   }
 
   @Override
@@ -259,7 +268,7 @@ public class TileEntityReplicator extends TileEntityElectricMachine
     nbt.putDouble("uuProcessed", this.uuProcessed);
     nbt.putInt("index", this.index);
     nbt.putInt("mode", this.mode.ordinal());
-    if (this.pattern != null) {
+    if (this.pattern != null && !this.pattern.isEmpty()) {
       nbt.put("pattern", this.pattern.save(registries, new CompoundTag()));
     }
   }
@@ -300,7 +309,7 @@ public class TileEntityReplicator extends TileEntityElectricMachine
         }
         break;
       case 4:
-        if (this.pattern != null) {
+        if (this.pattern != null && !this.pattern.isEmpty()) {
           this.mode = TileEntityReplicator.Mode.SINGLE;
           if (player != null) {
             IC2.grantAdvancement(
@@ -309,7 +318,7 @@ public class TileEntityReplicator extends TileEntityElectricMachine
         }
         break;
       case 5:
-        if (this.pattern != null) {
+        if (this.pattern != null && !this.pattern.isEmpty()) {
           this.mode = TileEntityReplicator.Mode.CONTINUOUS;
           if (player != null) {
             IC2.grantAdvancement(

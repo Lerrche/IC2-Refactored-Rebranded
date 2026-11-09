@@ -30,7 +30,7 @@ public class Ic2BlockNbtProvider implements NbtProvider {
     if (blockEntity instanceof Ic2TileEntity tileEntity) {
       ItemStack stack =
           tileEntity.adjustDrop(state.getBlock().asItem().getDefaultInstance(), false);
-      if (stack.has(DataComponents.CUSTOM_DATA)) {
+      if (stack != null && stack.has(DataComponents.CUSTOM_DATA)) {
         return stack.get(DataComponents.CUSTOM_DATA).copyTag();
       }
     }

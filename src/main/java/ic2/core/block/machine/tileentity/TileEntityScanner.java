@@ -198,6 +198,9 @@ public class TileEntityScanner extends TileEntityElectricMachine
 
   public IPatternStorage getPatternStorage() {
     Level world = this.getLevel();
+    if (world == null || this.worldPosition == null) {
+      return null;
+    }
 
     for (Direction dir : Util.ALL_DIRS) {
       BlockEntity target = world.getBlockEntity(this.worldPosition.relative(dir));

@@ -24,8 +24,9 @@ import net.neoforged.neoforge.common.ModConfigSpec.ValueSpec;
 import org.jetbrains.annotations.Nullable;
 
 public class IC2ConfigSectionScreen extends ConfigurationSectionScreen {
-  private static final int SEARCH_Y = 42;
+  private static final int SEARCH_Y = 28;
   private static final int SEARCH_HEIGHT = 18;
+  private static final int HEADER_HEIGHT = 56;
 
   private EditBox searchBox;
   private String searchQuery = "";
@@ -47,13 +48,15 @@ public class IC2ConfigSectionScreen extends ConfigurationSectionScreen {
 
   @Override
   protected void addTitle() {
-    this.layout.setHeaderHeight(66);
-    super.addTitle();
+    this.layout.setHeaderHeight(HEADER_HEIGHT);
+    this.layout.addToHeader(
+        new StringWidget(this.title, this.font),
+        settings -> settings.alignVerticallyTop().paddingTop(8));
   }
 
   @Override
   protected void repositionElements() {
-    this.layout.setHeaderHeight(66);
+    this.layout.setHeaderHeight(HEADER_HEIGHT);
     super.repositionElements();
     if (this.searchBox != null) {
       int searchWidth = Math.min(240, this.width - 60);
