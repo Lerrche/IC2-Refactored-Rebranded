@@ -3,6 +3,9 @@ name: Publish Packages
 on:
   release:
     types: [published]
+  push:
+    tags:
+      - 'v*'
   workflow_dispatch:
 
 jobs:
@@ -10,7 +13,7 @@ jobs:
     name: Publish Maven Packages
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       packages: write
 
     steps:
@@ -29,5 +32,12 @@ jobs:
       - name: Publish to GitHub Packages
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: ./gradlew publish --no-daemon
+        run: ./gradlew publishMavenJavaPublicationToGithubPackagesRepository --no-daemon
+
+      - name: Attach JARs to GitHub Release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: build/libs/*.jar

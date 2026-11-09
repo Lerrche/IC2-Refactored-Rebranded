@@ -184,17 +184,22 @@ publishing {
     repositories {
         maven {
             name = 'local'
-            url "file://${project.projectDir}/repo"
+            url = uri(file("${project.projectDir}/repo"))
         }
 
         def githubRepository = providers.environmentVariable('GITHUB_REPOSITORY')
+            .orElse(providers.gradleProperty('githubRepository'))
         def githubToken = providers.environmentVariable('GITHUB_TOKEN')
+            .orElse(providers.gradleProperty('githubToken'))
+        def githubActor = providers.environmentVariable('GITHUB_ACTOR')
+            .orElse(providers.gradleProperty('githubActor'))
+
         if (githubRepository.isPresent() && githubToken.isPresent()) {
             maven {
                 name = 'githubPackages'
                 url = uri("https://maven.pkg.github.com/${githubRepository.get()}")
                 credentials {
-                    username = providers.environmentVariable('GITHUB_ACTOR').getOrElse('github-actions')
+                    username = githubActor.getOrElse('github-actions')
                     password = githubToken.get()
                 }
             }
