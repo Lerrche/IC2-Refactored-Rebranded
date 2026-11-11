@@ -6,12 +6,14 @@ import ic2.core.util.Ic2Tooltip;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
 import java.util.List;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.component.CustomData;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractDamageableReactorComponent extends Item implements IReactorComponent {
@@ -88,12 +90,17 @@ public abstract class AbstractDamageableReactorComponent extends Item implements
   }
 
   public void setUse(ItemStack stack, int use) {
-    StackUtil.getOrCreateNbtData(stack).putInt("use", use);
+    if (StackUtil.isEmpty(stack)) {
+      return;
+    }
+    CustomData.update(DataComponents.CUSTOM_DATA, stack, tag -> tag.putInt("use", use));
   }
 
   protected void incrementUse(ItemStack stack) {
-    StackUtil.getOrCreateNbtData(stack)
-        .putInt("use", Math.min(this.getUse(stack) + 1, this.getMaxUse(stack)));
+    if (StackUtil.isEmpty(stack)) {
+      return;
+    }
+    this.setUse(stack, Math.min(this.getUse(stack) + 1, this.getMaxUse(stack)));
   }
 
   public int getMaxUse(ItemStack stack) {

@@ -1318,6 +1318,34 @@ public class ReactorGameTests {
         });
   }
 
+  // Durability and heat changes on reactor components must create fresh component copies so
+  // AbstractContainerMenu#broadcastChanges detects the difference and synchronizes slot updates
+  // to open GUIs.
+  @GameTest(template = EMPTY)
+  public static void reactorComponentDurabilityUpdatesTriggerSlotSync(GameTestHelper helper) {
+    ItemStack fuelRod = new ItemStack(Ic2Items.URANIUM_FUEL_ROD);
+    ItemStack fuelRodSnapshot = fuelRod.copy();
+    AbstractDamageableReactorComponent fuelRodComp =
+        (AbstractDamageableReactorComponent) fuelRod.getItem();
+    fuelRodComp.setUse(fuelRod, 5);
+
+    helper.assertTrue(
+        !ItemStack.matches(fuelRodSnapshot, fuelRod),
+        "fuel rod durability update must be detected by ItemStack.matches for container sync");
+
+    ItemStack vent = new ItemStack(Ic2Items.OVERCLOCKED_HEAT_VENT);
+    ItemStack ventSnapshot = vent.copy();
+    AbstractDamageableReactorComponent ventComp =
+        (AbstractDamageableReactorComponent) vent.getItem();
+    ventComp.setUse(vent, 20);
+
+    helper.assertTrue(
+        !ItemStack.matches(ventSnapshot, vent),
+        "heat vent durability update must be detected by ItemStack.matches for container sync");
+
+    helper.succeed();
+  }
+
   private static boolean hasDepletedQuadRod(TileEntityNuclearReactorElectric reactor) {
     for (int y = 0; y < 6; y++) {
       for (int x = 0; x < 9; x++) {
