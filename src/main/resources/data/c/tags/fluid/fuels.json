@@ -1,0 +1,20 @@
+{
+  "values": [
+    {
+      "id": "ad_astra:fuel",
+      "required": false
+    },
+    {
+      "id": "ad_astra:flowing_fuel",
+      "required": false
+    },
+    {
+      "id": "ad_astra:cryo_fuel",
+      "required": false
+    },
+    {
+      "id": "ad_astra:flowing_cryo_fuel",
+      "required": false
+    }
+  ]
+}

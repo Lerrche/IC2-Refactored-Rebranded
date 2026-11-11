@@ -1,0 +1,14 @@
+{
+  "values": [
+    "ic2:hydrogen",
+    "ic2:flowing_hydrogen",
+    {
+      "id": "ad_astra:hydrogen",
+      "required": false
+    },
+    {
+      "id": "ad_astra:flowing_hydrogen",
+      "required": false
+    }
+  ]
+}

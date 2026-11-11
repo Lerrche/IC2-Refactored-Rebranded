@@ -49,6 +49,7 @@ public class TileEntitySemifluidGenerator extends TileEntityBaseGenerator {
     registerFuel(Ic2Fluids.BIOMASS.still(), 40, gen.semiFluidBiomass);
     registerFuel(Ic2Fluids.HYDROGEN.still(), 4, gen.semiFluidHydrogen);
     registerFuel(Ic2Fluids.CREOSOTE.still(), 8, gen.semiFluidCreosote);
+    ic2.core.fluid.LiquidFuelCompat.init();
   }
 
   private static void registerFuel(

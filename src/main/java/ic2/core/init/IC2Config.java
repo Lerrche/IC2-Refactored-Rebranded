@@ -197,6 +197,11 @@ public class IC2Config {
         public final ModConfigSpec.DoubleValue semiFluidBiomass;
         public final ModConfigSpec.DoubleValue semiFluidHydrogen;
         public final ModConfigSpec.DoubleValue semiFluidCreosote;
+        public final ModConfigSpec.DoubleValue semiFluidOil;
+        public final ModConfigSpec.DoubleValue semiFluidFuel;
+        public final ModConfigSpec.DoubleValue semiFluidBiofuel;
+        public final ModConfigSpec.DoubleValue semiFluidCryoFuel;
+        public final ModConfigSpec.BooleanValue autoDetectLiquidFuels;
         public final ModConfigSpec.DoubleValue stirling;
         public final ModConfigSpec.DoubleValue kinetic;
         public final ModConfigSpec.DoubleValue radioisotope;
@@ -216,6 +221,14 @@ public class IC2Config {
           semiFluidBiomass = b.defineInRange("semiFluidBiomass", 1.0, 0.0, Double.MAX_VALUE);
           semiFluidHydrogen = b.defineInRange("semiFluidHydrogen", 1.0, 0.0, Double.MAX_VALUE);
           semiFluidCreosote = b.defineInRange("semiFluidCreosote", 1.0, 0.0, Double.MAX_VALUE);
+          semiFluidOil = b.defineInRange("semiFluidOil", 1.0, 0.0, Double.MAX_VALUE);
+          semiFluidFuel = b.defineInRange("semiFluidFuel", 1.0, 0.0, Double.MAX_VALUE);
+          semiFluidBiofuel = b.defineInRange("semiFluidBiofuel", 1.0, 0.0, Double.MAX_VALUE);
+          semiFluidCryoFuel = b.defineInRange("semiFluidCryoFuel", 1.0, 0.0, Double.MAX_VALUE);
+          autoDetectLiquidFuels =
+              b.comment(
+                      "Automatically detect and accept liquid fuels from tags and other mods (e.g. Ad Astra oil/fuel/cryo-fuel, c:oil, c:fuels, biofuels).")
+                  .define("autoDetectLiquidFuels", true);
           stirling = b.defineInRange("Stirling", 1.0, 0.0, Double.MAX_VALUE);
           kinetic = b.defineInRange("Kinetic", 1.0, 0.0, Double.MAX_VALUE);
           radioisotope = b.defineInRange("radioisotope", 1.0, 0.0, Double.MAX_VALUE);
