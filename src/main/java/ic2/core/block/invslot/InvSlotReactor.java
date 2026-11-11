@@ -1,6 +1,7 @@
 package ic2.core.block.invslot;
 
 import ic2.core.block.reactor.tileentity.TileEntityNuclearReactorElectric;
+import ic2.core.util.StackUtil;
 import net.minecraft.world.item.ItemStack;
 
 public class InvSlotReactor extends InvSlot {
@@ -22,8 +23,9 @@ public class InvSlotReactor extends InvSlot {
     return ((TileEntityNuclearReactorElectric) this.base).getReactorSize() * 6;
   }
 
+  @Override
   public int rawSize() {
-    return super.size();
+    return super.rawSize();
   }
 
   @Override
@@ -36,8 +38,12 @@ public class InvSlotReactor extends InvSlot {
   }
 
   @Override
-  protected void putFromNBT(int index, ItemStack content) {
-    super.putFromNBT(this.mapIndex(index), content);
+  public boolean isEmpty(int index) {
+    return super.isEmpty(this.mapIndex(index));
+  }
+
+  public boolean isEmpty(int x, int y) {
+    return super.isEmpty(y * 9 + x);
   }
 
   @Override
@@ -47,6 +53,10 @@ public class InvSlotReactor extends InvSlot {
 
   public void put(int x, int y, ItemStack content) {
     super.put(y * 9 + x, content);
+  }
+
+  public void clear(int x, int y) {
+    this.put(x, y, StackUtil.emptyStack);
   }
 
   private int mapIndex(int index) {

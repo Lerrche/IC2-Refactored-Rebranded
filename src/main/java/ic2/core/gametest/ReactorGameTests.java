@@ -1346,6 +1346,49 @@ public class ReactorGameTests {
     helper.succeed();
   }
 
+  // Reactor inventory synchronization and disk save/load must preserve item positions
+  // in base and chambered reactors without dropping row 2+ slots or phantom-shifting slots.
+  @GameTest(template = EMPTY)
+  public static void reactorInventoryPreservesSlotsOnSaveAndLoad(GameTestHelper helper) {
+    TileEntityNuclearReactorElectric reactor = placeReactor(helper);
+    helper.assertValueEqual(reactor.getReactorSize(), 3, "base reactor size without chambers");
+
+    ItemStack rod = new ItemStack(Ic2Items.URANIUM_FUEL_ROD);
+    ItemStack vent = new ItemStack(Ic2Items.OVERCLOCKED_HEAT_VENT);
+    ItemStack plating = new ItemStack(Ic2Items.REACTOR_PLATING);
+    ItemStack reflector = new ItemStack(Ic2Items.NEUTRON_REFLECTOR);
+
+    reactor.reactorSlot.put(0, 0, rod);
+    reactor.reactorSlot.put(1, 1, vent);
+    reactor.reactorSlot.put(0, 2, plating);
+    reactor.reactorSlot.put(2, 5, reflector);
+
+    net.minecraft.nbt.CompoundTag tag = reactor.getUpdateTag(helper.getLevel().registryAccess());
+
+    reactor.reactorSlot.clear();
+    helper.assertTrue(reactor.reactorSlot.isEmpty(), "reactor slot should be empty after clear");
+
+    reactor.handleUpdateTag(tag, helper.getLevel().registryAccess());
+
+    helper.assertTrue(
+        ItemStack.matches(reactor.getItemAt(0, 0), rod), "slot (0,0) must retain rod");
+    helper.assertTrue(
+        ItemStack.matches(reactor.getItemAt(1, 1), vent), "slot (1,1) must retain vent");
+    helper.assertTrue(
+        ItemStack.matches(reactor.getItemAt(0, 2), plating),
+        "slot (0,2) in row 2 must retain plating and not be dropped as out-of-bounds");
+    helper.assertTrue(
+        ItemStack.matches(reactor.getItemAt(2, 5), reflector),
+        "slot (2,5) in row 5 must retain reflector");
+
+    ItemStack phantomSlot = reactor.getItemAt(1, 3);
+    helper.assertTrue(
+        phantomSlot == null || phantomSlot.isEmpty(),
+        "slot (1,3) must remain empty and not contain a phantom item");
+
+    helper.succeed();
+  }
+
   private static boolean hasDepletedQuadRod(TileEntityNuclearReactorElectric reactor) {
     for (int y = 0; y < 6; y++) {
       for (int x = 0; x < 9; x++) {

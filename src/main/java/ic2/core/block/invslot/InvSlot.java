@@ -66,7 +66,7 @@ public class InvSlot implements Iterable<ItemStack> {
     for (int i = 0; i < contentsTag.size(); i++) {
       CompoundTag contentTag = contentsTag.getCompound(i);
       int index = contentTag.getByte("Index") & 255;
-      if (index >= this.size()) {
+      if (index >= this.rawSize()) {
         IC2.log.error(
             LogCategory.Block,
             "Can't load item stack for %s, slot %s, index %d is out of bounds.",
@@ -86,14 +86,14 @@ public class InvSlot implements Iterable<ItemStack> {
               contentTag.getShort("id"),
               contentTag.getShort("Damage"));
         } else {
-          if (!this.isEmpty(index)) {
+          if (!StackUtil.isEmpty(this.contents[index])) {
             IC2.log.error(
                 LogCategory.Block,
                 "Loading content to non-empty slot for %s, slot %s, index %d, replacing %s with %s.",
                 Util.toString(this.base.getParent()),
                 this.name,
                 index,
-                this.get(index),
+                this.contents[index],
                 stack);
           }
 
@@ -122,6 +122,10 @@ public class InvSlot implements Iterable<ItemStack> {
   }
 
   public int size() {
+    return this.contents.length;
+  }
+
+  public int rawSize() {
     return this.contents.length;
   }
 
