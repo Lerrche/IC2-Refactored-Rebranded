@@ -38,6 +38,10 @@ public abstract class TileEntityStandardMachine<RI, RO, I> extends TileEntityEle
   public final InvSlotOutput outputSlot;
   public final InvSlotUpgrade upgradeSlot;
   public int energyConsume;
+  // Dirty flag: defer setOverclockRates() to the next server tick instead of running it
+  // synchronously on every setChanged() call (which fires on every player inventory interaction,
+  // causing a server/client stall).
+  private boolean overclockRatesDirty = false;
   public int operationLength;
   public int operationsPerTick;
   public Sound sound;
@@ -124,8 +128,8 @@ public abstract class TileEntityStandardMachine<RI, RO, I> extends TileEntityEle
   protected void onLoaded() {
     super.onLoaded();
     if (IC2.sideProxy.isSimulating()) {
-      this.setOverclockRates();
-      this.recipeResult = this.getRecipeResult();
+      // Mark dirty so the first server tick computes overclock rates and resolves the recipe.
+      this.overclockRatesDirty = true;
     }
   }
 
@@ -133,13 +137,25 @@ public abstract class TileEntityStandardMachine<RI, RO, I> extends TileEntityEle
   public void setChanged() {
     super.setChanged();
     if (IC2.sideProxy.isSimulating()) {
-      this.setOverclockRates();
+      // Don't run setOverclockRates() eagerly here — it triggers heavy upgrade/recipe scanning
+      // synchronously on every inventory interaction (pick/place), which stalls both client and
+      // server. Instead mark dirty and defer to the next updateEntityServer() tick.
+      this.overclockRatesDirty = true;
     }
   }
 
   @Override
   protected void updateEntityServer() {
     super.updateEntityServer();
+    // Flush deferred overclock-rate recalculation (marked dirty by setChanged()).
+    // Running it here (once per tick) rather than inside setChanged() prevents the stall that
+    // occurs when players pick/place items rapidly, since setChanged() fires on every interaction.
+    if (this.overclockRatesDirty) {
+      this.overclockRatesDirty = false;
+      this.setOverclockRates();
+      // Invalidate the cached recipe result so it is re-evaluated with fresh overclock data.
+      this.recipeResult = null;
+    }
     boolean needsInvUpdate = false;
     MachineRecipeResult<RI, RO, I> result;
     if (this.recipeResult == null) {
