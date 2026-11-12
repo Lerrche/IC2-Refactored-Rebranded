@@ -58,6 +58,7 @@ nav:
       - 7. Machine Upgrades: guides/upgrades.md
       - 8. Recipes & DataGen: guides/recipes.md
       - 9. Fluid Pipes & Pump Covers: guides/pipes.md
+      - 10. Connectable Cables: guides/cable-connectable.md
       - Energy System & FE: energy-system.md
       - Complete Example Add-on: example-addon.md
   - KubeJS (IndustrialJS):
