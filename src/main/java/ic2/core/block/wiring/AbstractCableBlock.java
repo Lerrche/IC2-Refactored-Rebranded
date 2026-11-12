@@ -513,12 +513,8 @@ public abstract class AbstractCableBlock extends PipeBlock
         BlockState cableState =
             cableBlock.withConnectionStates(this.toCableState(state, cableBlock), world, pos);
         world.setBlockAndUpdate(pos, cableState);
-        // Hook: allow other mods to provide their own connectable logic
-        ICableConnectable handler = CableConnectableRegistry.get(state.getBlock().getClass());
-        if (handler != null) {
-          return handler.isCableConnectable(world, pos, sideToNeighbor);
-        }
-        return false;
+        // Hook removed: onDestroyedByPlayer does not need connectivity logic
+        return true;
       }
     }
 
