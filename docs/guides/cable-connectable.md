@@ -92,6 +92,3 @@ CableConnectableRegistry.registerSelf(MyCableBlock.class);
 * The hook is consulted **after** all built‑in IC2 checks (EnergyNet, tile entities, Forge‑Energy capability). 
 * Returning `true` only influences client‑side rendering; energy transfer logic remains unchanged. 
 * The `side` argument may be `null` when the check is performed without a specific neighbour direction.
-
----
-*Generated documentation for the new Cable‑Connectable hook.*
