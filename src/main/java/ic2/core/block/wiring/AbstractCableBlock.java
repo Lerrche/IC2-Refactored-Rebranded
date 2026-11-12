@@ -13,6 +13,8 @@ import ic2.core.block.comp.Energy;
 import ic2.core.block.misc.FoamBlock;
 import ic2.core.block.reactor.tileentity.TileEntityNuclearReactorElectric;
 import ic2.core.block.reactor.tileentity.TileEntityReactorChamberElectric;
+import ic2.api.energy.CableConnectableRegistry;
+import ic2.api.energy.ICableConnectable;
 import ic2.core.block.tileentity.Ic2TileEntity;
 import ic2.core.item.tool.ItemToolCutter;
 import ic2.core.ref.Ic2Fluids;
@@ -511,6 +513,11 @@ public abstract class AbstractCableBlock extends PipeBlock
         BlockState cableState =
             cableBlock.withConnectionStates(this.toCableState(state, cableBlock), world, pos);
         world.setBlockAndUpdate(pos, cableState);
+        // Hook: allow other mods to provide their own connectable logic
+        ICableConnectable handler = CableConnectableRegistry.get(state.getBlock().getClass());
+        if (handler != null) {
+            return handler.isCableConnectable(world, pos, sideToNeighbor);
+        }
         return false;
       }
     }

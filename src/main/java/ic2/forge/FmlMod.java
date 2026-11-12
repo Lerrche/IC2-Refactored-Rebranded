@@ -69,6 +69,8 @@ public final class FmlMod {
     NeoForge.EVENT_BUS.register(new EventHandlerForge());
     NeoForge.EVENT_BUS.register(new Ic2ForgeEnergyBridge.EventHandler());
     NeoForge.EVENT_BUS.register(new Ic2Ae2Plugin.ForgeEventHandler());
+    NeoForge.EVENT_BUS.register(
+        new ic2.integration.farmersdelight.FarmersDelightCompat.EventHandler());
     if (FMLEnvironment.dist.isClient()) {
       NeoForge.EVENT_BUS.register(new ClientEventHandlerForge());
     }

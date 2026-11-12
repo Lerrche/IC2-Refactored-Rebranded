@@ -1404,6 +1404,8 @@
   "ic2.configuration.balance.semiFluidCryoFuel": "低温燃料发电机倍率",
   "ic2.configuration.autoDetectLiquidFuels": "自动检测模组液体燃料",
   "ic2.configuration.balance.autoDetectLiquidFuels": "自动检测模组液体燃料",
+  "ic2.jade.reactor.heat": "堆芯温度: %s / %s (%s)",
+  "ic2.jade.reactor.cycle": "输出: %s (周期: %s)",
   "ic2.configuration.stirling": "斯特林热机发电倍率",
   "ic2.configuration.balance.stirling": "斯特林热机发电倍率",
   "ic2.configuration.kinetic": "动能发电机发电倍率",

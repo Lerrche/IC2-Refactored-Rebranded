@@ -1,0 +1,10 @@
+{
+  "replace": false,
+  "values": [
+    "ic2:chainsaw",
+    {
+      "id": "gravisuite:advanced_chainsaw",
+      "required": false
+    }
+  ]
+}

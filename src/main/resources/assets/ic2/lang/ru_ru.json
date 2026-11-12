@@ -1438,6 +1438,8 @@
   "ic2.configuration.balance.semiFluidCryoFuel": "Множитель генератора на криотопливе",
   "ic2.configuration.autoDetectLiquidFuels": "Автоопределение жидкого топлива модов",
   "ic2.configuration.balance.autoDetectLiquidFuels": "Автоопределение жидкого топлива модов",
+  "ic2.jade.reactor.heat": "Нагрев активной зоны: %s / %s (%s)",
+  "ic2.jade.reactor.cycle": "Выход: %s (Цикл: %s)",
   "ic2.configuration.stirling": "Множитель двигателя Стирлинга",
   "ic2.configuration.balance.stirling": "Множитель двигателя Стирлинга",
   "ic2.configuration.kinetic": "Множитель кинетического генератора",

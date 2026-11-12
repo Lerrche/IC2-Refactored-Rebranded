@@ -141,6 +141,10 @@ dependencies {
     // Optional Mekanism integration (Minecraft 1.21.1 / NeoForge).
     compileOnly "mekanism:Mekanism:${mekanism_version}:api"
 
+    // Optional Jade integration (Minecraft 1.21.1 / NeoForge).
+    compileOnly("maven.modrinth:jade:15.10.3+neoforge") { transitive = false }
+    testImplementation("maven.modrinth:jade:15.10.3+neoforge") { transitive = false }
+
     // Available in development runs, but not bundled into IC2.
     localRuntime "mekanism:Mekanism:${mekanism_version}"
 
