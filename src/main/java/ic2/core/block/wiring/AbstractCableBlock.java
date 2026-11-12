@@ -1,8 +1,6 @@
 package ic2.core.block.wiring;
 
-import ic2.api.energy.CableConnectableRegistry;
 import ic2.api.energy.EnergyNet;
-import ic2.api.energy.ICableConnectable;
 import ic2.api.energy.tile.IColoredEnergyTile;
 import ic2.api.energy.tile.IEnergyAcceptor;
 import ic2.api.energy.tile.IEnergyConductor;
