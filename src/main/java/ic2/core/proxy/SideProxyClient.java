@@ -407,21 +407,15 @@ public final class SideProxyClient implements SideProxy {
   }
 
   private static void registerMaterialItemColors(ClientEnvProxy envProxy) {
-    // Brighter material colors
-    int copperColor = 0xFF9E56;
-    int goldColor = 0xFFF458;
-    int tinColor = 0xE0EFF6;
+    // Plate-based material colors
+    int copperColor = 0xE47B55;
+    int goldColor = 0xFAF25E;
+    int tinColor = 0xE0E0E0;
     int ironColor = 0xE4E4E4;
     int bronzeColor = 0xDE8C38;
     int leadColor = 0x828AA2;
     int silverColor = 0xF4F8FA;
     int uraniumColor = 0x6AF438;
-
-    // Cable-specific bright colors to compensate for the darker wire base texture
-    int copperCableColor = 0xFFB468;
-    int goldCableColor = 0xFFFF68;
-    int tinCableColor = 0xF0F8FC;
-    int ironCableColor = 0xF4F6F8;
 
     ItemColor copperTint = layer0Color(copperColor);
     ItemColor tinTint = layer0Color(tinColor);
@@ -432,31 +426,26 @@ public final class SideProxyClient implements SideProxy {
     ItemColor silverTint = layer0Color(silverColor);
     ItemColor uraniumTint = layer0Color(uraniumColor);
 
-    ItemColor copperCableTint = layer0Color(copperCableColor);
-    ItemColor tinCableTint = layer0Color(tinCableColor);
-    ItemColor goldCableTint = layer0Color(goldCableColor);
-    ItemColor ironCableTint = layer0Color(ironCableColor);
-
     // Cables (tintIndex 0 = wire metal / exposed tips, tintIndex 1 = untinted insulation)
     envProxy.registerColorProvider(
-        copperCableTint, Ic2Items.COPPER_CABLE, Ic2Items.INSULATED_COPPER_CABLE);
+        copperTint, Ic2Items.COPPER_CABLE, Ic2Items.INSULATED_COPPER_CABLE);
     envProxy.registerColorProvider(
-        tinCableTint, Ic2Items.TIN_CABLE, Ic2Items.INSULATED_TIN_CABLE);
+        tinTint, Ic2Items.TIN_CABLE, Ic2Items.INSULATED_TIN_CABLE);
     envProxy.registerColorProvider(
-        goldCableTint,
+        goldTint,
         Ic2Items.GOLD_CABLE,
         Ic2Items.INSULATED_GOLD_CABLE,
         Ic2Items.DOUBLE_INSULATED_GOLD_CABLE);
     envProxy.registerColorProvider(
-        ironCableTint,
+        ironTint,
         Ic2Items.IRON_CABLE,
         Ic2Items.INSULATED_IRON_CABLE,
         Ic2Items.DOUBLE_INSULATED_IRON_CABLE,
         Ic2Items.TRIPLE_INSULATED_IRON_CABLE);
 
     // Coil (mixed: tintIndex 0 = iron core, tintIndex 1 = copper winding overlay)
-    int coilCoreColor = 0xFF000000 | ironColor;
-    int coilWireColor = 0xFF000000 | copperCableColor;
+    int coilCoreColor = 0xFF000000 | 0xE4E4E4;
+    int coilWireColor = 0xFF000000 | 0xFFB468;
     ItemColor coilTint =
         (stack, tintIndex) -> {
           if (tintIndex == 0) return coilCoreColor;
@@ -464,15 +453,6 @@ public final class SideProxyClient implements SideProxy {
           return -1;
         };
     envProxy.registerColorProvider(coilTint, Ic2Items.COIL);
-
-    // Crushed Ores (tintIndex 0 = metal base, tintIndex 1 = untinted dirt)
-    envProxy.registerColorProvider(copperTint, Ic2Items.CRUSHED_COPPER);
-    envProxy.registerColorProvider(goldTint, Ic2Items.CRUSHED_GOLD);
-    envProxy.registerColorProvider(ironTint, Ic2Items.CRUSHED_IRON);
-    envProxy.registerColorProvider(leadTint, Ic2Items.CRUSHED_LEAD);
-    envProxy.registerColorProvider(silverTint, Ic2Items.CRUSHED_SILVER);
-    envProxy.registerColorProvider(tinTint, Ic2Items.CRUSHED_TIN);
-    envProxy.registerColorProvider(uraniumTint, Ic2Items.CRUSHED_URANIUM);
 
     // Purified Ores
     envProxy.registerColorProvider(copperTint, Ic2Items.PURIFIED_COPPER);

@@ -103,11 +103,6 @@ public class IndustrialJSConfig {
         def.add("hazmat_suits", hazmatSuits);
 
         JsonArray radioactive = new JsonArray();
-        JsonObject radEx = new JsonObject();
-        radEx.addProperty("item", "ic2:uranium_ore");
-        radEx.addProperty("duration", 10);
-        radEx.addProperty("amplifier", 1);
-        radioactive.add(radEx);
         def.add("radioactive_items", radioactive);
 
         JsonArray mutes = new JsonArray();
