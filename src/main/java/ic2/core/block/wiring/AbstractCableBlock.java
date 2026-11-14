@@ -1,6 +1,8 @@
 package ic2.core.block.wiring;
 
+import ic2.api.energy.CableConnectableRegistry;
 import ic2.api.energy.EnergyNet;
+import ic2.api.energy.ICableConnectable;
 import ic2.api.energy.tile.IColoredEnergyTile;
 import ic2.api.energy.tile.IEnergyAcceptor;
 import ic2.api.energy.tile.IEnergyConductor;
@@ -347,6 +349,17 @@ public abstract class AbstractCableBlock extends PipeBlock
       if (MekanismEnergyCompat.canReceiveFrom(handler, sideFromNeighbor)) {
         return true;
       }
+    }
+
+    if (state.getBlock() instanceof ICableConnectable connectable) {
+      if (connectable.isCableConnectable(world, pos, sideToNeighbor)) {
+        return true;
+      }
+    }
+
+    ICableConnectable handler = CableConnectableRegistry.get(state.getBlock().getClass());
+    if (handler != null && handler.isCableConnectable(world, pos, sideToNeighbor)) {
+      return true;
     }
 
     return false;

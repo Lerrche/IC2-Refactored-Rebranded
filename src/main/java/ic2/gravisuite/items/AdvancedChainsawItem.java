@@ -6,6 +6,7 @@ import ic2.core.IC2;
 import ic2.core.util.KeyboardClient;
 import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
+import ic2.gravisuite.GraviSuiteMod;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -111,10 +112,10 @@ public class AdvancedChainsawItem extends AddonElectricTool implements BlockBrea
       level.playSound(
           null,
           player.blockPosition(),
-          SoundEvents.UI_BUTTON_CLICK.value(),
+          GraviSuiteMod.SOUND_TOOL_CHANGE.get(),
           SoundSource.PLAYERS,
-          0.6F,
-          1.2F);
+          0.8F,
+          1.0F);
     }
   }
 

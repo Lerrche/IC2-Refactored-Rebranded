@@ -1,9 +1,11 @@
 package ic2.forge;
 
 import ic2.api.energy.EnergyNet;
+import ic2.api.energy.tile.IEnergyAcceptor;
 import ic2.api.energy.tile.IEnergyEmitter;
 import ic2.api.energy.tile.IEnergySink;
 import ic2.api.energy.tile.IEnergyTile;
+import ic2.api.energy.tile.IMultiEnergySource;
 import ic2.api.info.ILocatable;
 import ic2.core.block.tileentity.Ic2TileEntity;
 import ic2.core.block.wiring.AbstractCableBlock;
@@ -24,6 +26,7 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.neoforge.capabilities.Capabilities;
@@ -33,7 +36,7 @@ import net.neoforged.neoforge.event.level.ChunkEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
-/** Bridges IC2's EU network directly to external FE and Mekanism energy receivers. */
+/** Bridges IC2's EU network directly to external FE and Mekanism energy receivers and generators. */
 public final class Ic2ForgeEnergyBridge {
   private static final Map<Level, Map<BlockPos, ForgeEnergySink>> sinks = new ConcurrentHashMap<>();
 
@@ -78,9 +81,23 @@ public final class Ic2ForgeEnergyBridge {
     return EnergyNet.instance.getTile(world, pos) instanceof IEnergyEmitter;
   }
 
+  /** Checks whether an adjacent position contains an IC2 sink registered in the energy net. */
+  private static boolean isIc2SinkAt(Level world, BlockPos pos) {
+    if (EnergyNet.instance == null || !world.hasChunkAt(pos)) {
+      return false;
+    }
+
+    IEnergyTile subTile = EnergyNet.instance.getSubTile(world, pos);
+    if (subTile instanceof IEnergySink) {
+      return true;
+    }
+
+    return EnergyNet.instance.getTile(world, pos) instanceof IEnergySink;
+  }
+
   /**
-   * Returns faces touching either an IC2 cable or an IC2 energy emitter. The direction is from the
-   * external target toward the IC2 energy source, matching IC2's sink-side convention.
+   * Returns faces touching either an IC2 cable, energy emitter, or energy sink. The direction is
+   * from the external target toward the IC2 energy node, matching IC2's grid convention.
    */
   private static EnumSet<Direction> getConnectedEnergySides(Level world, BlockPos targetPos) {
     EnumSet<Direction> connectedSides = EnumSet.noneOf(Direction.class);
@@ -91,14 +108,15 @@ public final class Ic2ForgeEnergyBridge {
       }
 
       if (world.getBlockState(neighborPos).getBlock() instanceof AbstractCableBlock
-          || isIc2EmitterAt(world, neighborPos)) {
+          || isIc2EmitterAt(world, neighborPos)
+          || isIc2SinkAt(world, neighborPos)) {
         connectedSides.add(side);
       }
     }
     return connectedSides;
   }
 
-  private static boolean hasAdjacentIc2EnergySource(Level world, BlockPos pos) {
+  private static boolean hasAdjacentIc2EnergyNode(Level world, BlockPos pos) {
     return !getConnectedEnergySides(world, pos).isEmpty();
   }
 
@@ -109,7 +127,7 @@ public final class Ic2ForgeEnergyBridge {
   }
 
   /**
-   * Queues only loaded neighbors when a source disappears; unloaded targets cannot have live sinks.
+   * Queues only loaded neighbors when an IC2 node disappears; unloaded targets cannot have live sinks.
    */
   private static void queueAdjacentLoadedPositions(Level world, BlockPos pos) {
     if (world == null || world.isClientSide) {
@@ -121,7 +139,7 @@ public final class Ic2ForgeEnergyBridge {
       if (world.hasChunkAt(neighborPos)) {
         queuePosition(world, neighborPos);
       } else if (queued != null) {
-        // The source is gone, so an unloaded target no longer needs a deferred registration.
+        // The node is gone, so an unloaded target no longer needs a deferred registration.
         queued.remove(neighborPos);
       }
     }
@@ -130,15 +148,15 @@ public final class Ic2ForgeEnergyBridge {
     }
   }
 
-  /** Performs the one-time registration check only on faces touching IC2 energy sources. */
-  private static boolean hasReceivingCapability(
+  /** Performs the one-time registration check on faces touching IC2 energy nodes. */
+  private static boolean hasEnergyCapability(
       Level world, BlockPos pos, EnumSet<Direction> connectedSides) {
     if (!isExternalEnergyTarget(world, pos)) {
       return false;
     }
     for (Direction side : connectedSides) {
       IEnergyStorage storage = world.getCapability(Capabilities.EnergyStorage.BLOCK, pos, side);
-      if (storage != null && storage.canReceive()) {
+      if (storage != null && (storage.canReceive() || storage.canExtract())) {
         return true;
       }
       Object handler = MekanismEnergyCompat.getHandler(world, pos, side);
@@ -210,12 +228,12 @@ public final class Ic2ForgeEnergyBridge {
       existing.setConnectedSides(connectedSides);
       return;
     }
-    if (!hasReceivingCapability(world, pos, connectedSides)) {
+    if (!hasEnergyCapability(world, pos, connectedSides)) {
       return;
     }
 
-    // Capability discovery happens only when a sink is first registered, and only on faces
-    // physically touching IC2 sources. The live sink then refreshes those cached faces once per
+    // Capability discovery happens only when a bridge tile is first registered, and only on faces
+    // physically touching IC2 nodes. The live bridge then refreshes those cached faces once per
     // tick so side-configuration changes are picked up without rescanning unrelated faces.
     ForgeEnergySink sink = new ForgeEnergySink(world, pos.immutable(), connectedSides);
     ForgeEnergySink prev = worldSinks.putIfAbsent(pos.immutable(), sink);
@@ -260,8 +278,8 @@ public final class Ic2ForgeEnergyBridge {
     Iterator<BlockPos> iterator = queued.iterator();
     while (iterator.hasNext() && toProcess.size() < MAX_PENDING_POSITIONS_PER_TICK) {
       BlockPos pos = iterator.next();
-      // Keep positions in unloaded chunks queued. The source chunk may load before the
-      // receiving machine's chunk; its pending registration must survive until that chunk loads.
+      // Keep positions in unloaded chunks queued. The node chunk may load before the
+      // target machine's chunk; its pending registration must survive until that chunk loads.
       if (!world.hasChunkAt(pos)) {
         continue;
       }
@@ -339,18 +357,19 @@ public final class Ic2ForgeEnergyBridge {
         return;
       }
 
-      // Register an external machine placed next to an existing IC2 cable or energy emitter.
-      if (hasAdjacentIc2EnergySource(world, placedPos)) {
+      // Register an external machine placed next to an existing IC2 cable or energy node.
+      if (hasAdjacentIc2EnergyNode(world, placedPos)) {
         registerSink(world, placedPos);
         if (!isSinkRegistered(world, placedPos)) {
           queuePosition(world, placedPos);
         }
       }
 
-      // IC2 generators add themselves to the energy net during their load callback. Defer the
+      // IC2 tiles add themselves to the energy net during their load callback. Defer the
       // adjacent sink checks until the next server tick so that registration has completed.
       BlockEntity placedEntity = world.getBlockEntity(placedPos);
       if (placedEntity instanceof IEnergyEmitter
+          || placedEntity instanceof IEnergySink
           || placedEntity instanceof Ic2TileEntity
           || placedEntity instanceof IEnergyTile) {
         // Queue IC2 tile positions even if their EnergyNet registration completes after this event.
@@ -363,13 +382,16 @@ public final class Ic2ForgeEnergyBridge {
       if (event.getLevel() instanceof Level world && !world.isClientSide) {
         BlockPos brokenPos = event.getPos();
         BlockEntity blockEntity = world.getBlockEntity(brokenPos);
-        boolean wasEnergySource =
+        boolean wasEnergyNode =
             blockEntity instanceof IEnergyEmitter
-                || (blockEntity instanceof Ic2TileEntity && isIc2EmitterAt(world, brokenPos));
+                || blockEntity instanceof IEnergySink
+                || blockEntity instanceof IEnergyTile
+                || (blockEntity instanceof Ic2TileEntity
+                    && (isIc2EmitterAt(world, brokenPos) || isIc2SinkAt(world, brokenPos)));
 
         unregisterSink(world, brokenPos);
-        // Only a removed IC2 energy source can invalidate neighboring external sinks.
-        if (wasEnergySource) {
+        // Only a removed IC2 energy node can invalidate neighboring external sinks.
+        if (wasEnergyNode) {
           queueAdjacentLoadedPositions(world, brokenPos);
         }
       }
@@ -382,10 +404,12 @@ public final class Ic2ForgeEnergyBridge {
         for (BlockEntity blockEntity : chunk.getBlockEntities().values()) {
           // Do not inspect every third-party machine in the chunk. Only IC2 energy tiles can
           // create new direct-adjacency registrations; their six neighbors are checked later.
-          if (blockEntity instanceof IEnergyEmitter) {
-            queueAdjacentPositions(world, blockEntity.getBlockPos());
-          } else if (blockEntity instanceof Ic2TileEntity
-              && isIc2EmitterAt(world, blockEntity.getBlockPos())) {
+          if (blockEntity instanceof IEnergyEmitter
+              || blockEntity instanceof IEnergySink
+              || blockEntity instanceof IEnergyTile
+              || (blockEntity instanceof Ic2TileEntity
+                  && (isIc2EmitterAt(world, blockEntity.getBlockPos())
+                      || isIc2SinkAt(world, blockEntity.getBlockPos())))) {
             queueAdjacentPositions(world, blockEntity.getBlockPos());
           }
         }
@@ -397,10 +421,12 @@ public final class Ic2ForgeEnergyBridge {
       if (event.getChunk() instanceof LevelChunk chunk && !chunk.getLevel().isClientSide) {
         Level world = chunk.getLevel();
         for (BlockEntity blockEntity : chunk.getBlockEntities().values()) {
-          if (blockEntity instanceof IEnergyEmitter) {
-            queueAdjacentLoadedPositions(world, blockEntity.getBlockPos());
-          } else if (blockEntity instanceof Ic2TileEntity
-              && isIc2EmitterAt(world, blockEntity.getBlockPos())) {
+          if (blockEntity instanceof IEnergyEmitter
+              || blockEntity instanceof IEnergySink
+              || blockEntity instanceof IEnergyTile
+              || (blockEntity instanceof Ic2TileEntity
+                  && (isIc2EmitterAt(world, blockEntity.getBlockPos())
+                      || isIc2SinkAt(world, blockEntity.getBlockPos())))) {
             queueAdjacentLoadedPositions(world, blockEntity.getBlockPos());
           }
         }
@@ -434,17 +460,17 @@ public final class Ic2ForgeEnergyBridge {
     return (long) Math.floor(joules);
   }
 
-  private static final class ForgeEnergySink implements ILocatable, IEnergySink {
+  private static final class ForgeEnergySink implements ILocatable, IEnergySink, IMultiEnergySource {
     private final Level world;
     private final BlockPos pos;
     private EnumSet<Direction> connectedSides;
 
-    // Capabilities are refreshed once per world tick and only for faces touching IC2 sources.
+    // Capabilities are refreshed once per world tick and only for faces touching IC2 nodes.
     // They are deliberately not cached across ticks, so Mekanism side-configuration changes and
     // NeoForge capability invalidations are picked up promptly.
     private long capabilityCacheTick = Long.MIN_VALUE;
     private final Map<Direction, Object> mekanismHandlers = new EnumMap<>(Direction.class);
-    private final Map<Direction, IEnergyStorage> receivingStorages = new EnumMap<>(Direction.class);
+    private final Map<Direction, IEnergyStorage> energyStorages = new EnumMap<>(Direction.class);
 
     private ForgeEnergySink(Level world, BlockPos pos, EnumSet<Direction> connectedSides) {
       this.world = world;
@@ -462,7 +488,7 @@ public final class Ic2ForgeEnergyBridge {
     private void invalidateCapabilityCache() {
       capabilityCacheTick = Long.MIN_VALUE;
       mekanismHandlers.clear();
-      receivingStorages.clear();
+      energyStorages.clear();
     }
 
     private void refreshCapabilities() {
@@ -472,7 +498,7 @@ public final class Ic2ForgeEnergyBridge {
       }
       capabilityCacheTick = gameTime;
       mekanismHandlers.clear();
-      receivingStorages.clear();
+      energyStorages.clear();
 
       if (!isExternalEnergyTarget(world, pos)) {
         return;
@@ -486,7 +512,7 @@ public final class Ic2ForgeEnergyBridge {
 
         IEnergyStorage storage = world.getCapability(Capabilities.EnergyStorage.BLOCK, pos, side);
         if (storage != null) {
-          receivingStorages.put(side, storage);
+          energyStorages.put(side, storage);
         }
       }
     }
@@ -498,8 +524,14 @@ public final class Ic2ForgeEnergyBridge {
 
     private IEnergyStorage getReceivingStorage(Direction side) {
       refreshCapabilities();
-      IEnergyStorage storage = receivingStorages.get(side);
+      IEnergyStorage storage = energyStorages.get(side);
       return storage != null && storage.canReceive() ? storage : null;
+    }
+
+    private IEnergyStorage getExtractingStorage(Direction side) {
+      refreshCapabilities();
+      IEnergyStorage storage = energyStorages.get(side);
+      return storage != null && storage.canExtract() ? storage : null;
     }
 
     private boolean canReceiveFrom(Direction side) {
@@ -514,10 +546,23 @@ public final class Ic2ForgeEnergyBridge {
 
     @Override
     public boolean acceptsEnergyFrom(IEnergyEmitter emitter, Direction direction) {
+      // Disallow looping energy back into the same bridge instance.
+      if (emitter == this) {
+        return false;
+      }
       // The IC2-side topology is stable independently of a machine's current input-side
       // configuration. Actual capability acceptance is checked again when energy is injected.
       // This also means changing a Mekanism side from output/none to input does not require
       // breaking and replacing the IC2 cable.
+      return direction == null ? !connectedSides.isEmpty() : connectedSides.contains(direction);
+    }
+
+    @Override
+    public boolean emitsEnergyTo(IEnergyAcceptor receiver, Direction direction) {
+      // Disallow looping energy back into the same bridge instance.
+      if (receiver == this) {
+        return false;
+      }
       return direction == null ? !connectedSides.isEmpty() : connectedSides.contains(direction);
     }
 
@@ -569,7 +614,7 @@ public final class Ic2ForgeEnergyBridge {
       }
 
       // Direction can be unknown for some IC2 paths. In that case, try only faces actually
-      // connected to IC2 sources instead of probing all six block faces.
+      // connected to IC2 nodes instead of probing all six block faces.
       double remaining = amount;
       for (Direction side : connectedSides) {
         remaining = injectFromSide(side, remaining);
@@ -616,6 +661,100 @@ public final class Ic2ForgeEnergyBridge {
     }
 
     @Override
+    public double getOfferedEnergy() {
+      refreshCapabilities();
+
+      int maxExtractableFe = 0;
+      for (Direction side : connectedSides) {
+        IEnergyStorage storage = getExtractingStorage(side);
+        if (storage != null) {
+          int simulated = Math.max(0, storage.extractEnergy(Integer.MAX_VALUE, true));
+          if (simulated > maxExtractableFe) {
+            maxExtractableFe = simulated;
+          }
+        }
+      }
+
+      if (maxExtractableFe <= 0) {
+        return 0.0;
+      }
+      return EnergyBridgeMath.feToEu(maxExtractableFe);
+    }
+
+    @Override
+    public void drawEnergy(double amount) {
+      if (amount <= 0.0) {
+        return;
+      }
+      refreshCapabilities();
+
+      long feNeeded = EnergyBridgeMath.euToFeCeil(amount);
+      int toExtract = EnergyBridgeMath.clampToIntEnergy(feNeeded);
+      if (toExtract <= 0) {
+        return;
+      }
+
+      for (Direction side : connectedSides) {
+        IEnergyStorage storage = getExtractingStorage(side);
+        if (storage != null) {
+          int extracted = Math.max(0, storage.extractEnergy(toExtract, false));
+          toExtract -= extracted;
+          if (toExtract <= 0) {
+            break;
+          }
+        }
+      }
+    }
+
+    @Override
+    public int getSourceTier() {
+      int maxTier = 1;
+      boolean found = false;
+      for (Direction side : connectedSides) {
+        BlockPos neighborPos = pos.relative(side);
+        if (!world.hasChunkAt(neighborPos)) {
+          continue;
+        }
+        BlockState state = world.getBlockState(neighborPos);
+        if (state.getBlock() instanceof AbstractCableBlock cable) {
+          int cableTier = EnergyNet.instance != null
+              ? EnergyNet.instance.getTierFromPower(cable.type.capacity)
+              : 1;
+          maxTier = Math.max(maxTier, cableTier);
+          found = true;
+        } else if (EnergyNet.instance != null) {
+          IEnergyTile subTile = EnergyNet.instance.getSubTile(world, neighborPos);
+          IEnergyTile tile = subTile != null ? subTile : EnergyNet.instance.getTile(world, neighborPos);
+          if (tile instanceof IEnergySink sink) {
+            maxTier = Math.max(maxTier, sink.getSinkTier());
+            found = true;
+          }
+        }
+      }
+      return found ? Math.max(1, Math.min(maxTier, 5)) : EXTERNAL_SINK_TIER;
+    }
+
+    @Override
+    public boolean sendMultipleEnergyPackets() {
+      return true;
+    }
+
+    @Override
+    public int getMultipleEnergyPacketAmount() {
+      double offered = getOfferedEnergy();
+      if (offered <= 0.0) {
+        return 1;
+      }
+      int tier = getSourceTier();
+      double packetSize = EnergyNet.instance != null ? EnergyNet.instance.getPowerFromTier(tier) : 32.0;
+      if (packetSize <= 0.0) {
+        return 1;
+      }
+      int packets = (int) Math.ceil(offered / packetSize);
+      return Math.max(1, Math.min(packets, 1000));
+    }
+
+    @Override
     public Level getWorldObj() {
       return world;
     }
@@ -626,3 +765,4 @@ public final class Ic2ForgeEnergyBridge {
     }
   }
 }
+

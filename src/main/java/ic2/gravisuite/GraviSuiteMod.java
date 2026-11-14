@@ -11,6 +11,7 @@ import ic2.gravisuite.items.LappackItem;
 import ic2.gravisuite.items.VajraItem;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -23,12 +24,17 @@ import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
 import net.neoforged.fml.loading.FMLEnvironment;
 import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.entity.living.LivingEquipmentChangeEvent;
+import net.neoforged.neoforge.registries.DeferredHolder;
 import net.neoforged.neoforge.registries.DeferredItem;
 
 @Mod(GraviSuiteMod.MOD_ID)
 public class GraviSuiteMod {
   public static final String MOD_ID = "gravisuite";
   public static final Ic2AddonContent CONTENT = Ic2AddonContent.create(MOD_ID);
+
+  // Sounds
+  public static final DeferredHolder<SoundEvent, SoundEvent> SOUND_TOOL_CHANGE =
+      CONTENT.registerSoundEvent("tool_change");
 
   // Tools
   public static final DeferredItem<VajraItem> VAJRA = CONTENT.registerItem("vajra", VajraItem::new);

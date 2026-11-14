@@ -9,6 +9,7 @@ import ic2.core.item.tool.ItemToolWrench;
 import ic2.core.item.tool.ItemTreetap;
 import ic2.core.ref.Ic2Blocks;
 import ic2.core.util.KeyboardClient;
+import ic2.gravisuite.GraviSuiteMod;
 import java.util.List;
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
@@ -117,10 +118,10 @@ public class GraviToolItem extends AddonElectricTool
       level.playSound(
           null,
           player.blockPosition(),
-          SoundEvents.UI_BUTTON_CLICK.value(),
+          GraviSuiteMod.SOUND_TOOL_CHANGE.get(),
           SoundSource.PLAYERS,
-          0.6F,
-          1.2F);
+          0.8F,
+          1.0F);
     }
   }
 

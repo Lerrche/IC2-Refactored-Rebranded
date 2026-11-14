@@ -267,6 +267,13 @@ public final class Ic2TileEntityBlock extends Block
       return null;
     }
 
+    if (this.teClass == ic2.core.block.reactor.tileentity.TileEntityReactorChamberElectric.class) {
+      if (!ic2.core.block.reactor.tileentity.TileEntityReactorChamberElectric.hasAdjacentReactor(
+          ctx.getLevel(), ctx.getClickedPos())) {
+        return null;
+      }
+    }
+
     if (this.facingProperty != null) {
       Direction facing =
           this.teClass == TileEntityLuminator.class
@@ -320,6 +327,11 @@ public final class Ic2TileEntityBlock extends Block
   }
 
   public boolean canSurvive(BlockState state, LevelReader world, BlockPos pos) {
+    if (this.teClass == ic2.core.block.reactor.tileentity.TileEntityReactorChamberElectric.class) {
+      return ic2.core.block.reactor.tileentity.TileEntityReactorChamberElectric.hasAdjacentReactor(
+          world, pos);
+    }
+
     if (this.teClass == TileEntityLuminator.class && this.facingProperty != null) {
       Direction facing = state.getValue(this.facingProperty);
       return TileEntityLuminator.isValidPosition(world, pos.relative(facing.getOpposite()), facing);
@@ -338,6 +350,10 @@ public final class Ic2TileEntityBlock extends Block
       LevelAccessor world,
       BlockPos pos,
       BlockPos neighborPos) {
+    if (this.teClass == ic2.core.block.reactor.tileentity.TileEntityReactorChamberElectric.class
+        && !state.canSurvive(world, pos)) {
+      return Blocks.AIR.defaultBlockState();
+    }
     if (this.cropType == null) {
       return super.updateShape(state, direction, neighborState, world, pos, neighborPos);
     } else {
@@ -345,6 +361,23 @@ public final class Ic2TileEntityBlock extends Block
           ? Blocks.AIR.defaultBlockState()
           : super.updateShape(state, direction, neighborState, world, pos, neighborPos);
     }
+  }
+
+  @Override
+  public boolean onDestroyedByPlayer(
+      BlockState state,
+      Level level,
+      BlockPos pos,
+      Player player,
+      boolean willHarvest,
+      net.minecraft.world.level.material.FluidState fluid) {
+    BlockEntity be = level.getBlockEntity(pos);
+    if (be instanceof ic2.core.block.personal.IPersonalBlock personal && personal.getOwner() != null) {
+      if (!player.isCreative() && !personal.permitsAccess(player.getGameProfile())) {
+        return false;
+      }
+    }
+    return super.onDestroyedByPlayer(state, level, pos, player, willHarvest, fluid);
   }
 
   public void neighborChanged(

@@ -6,6 +6,7 @@ import ic2.core.IC2;
 import ic2.core.util.KeyboardClient;
 import java.util.List;
 import net.minecraft.client.Minecraft;
+import ic2.gravisuite.GraviSuiteMod;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Holder;
@@ -95,7 +96,7 @@ public class VajraItem extends AddonElectricTool implements BlockBreakableItem {
       level.playSound(
           null,
           player.blockPosition(),
-          SoundEvents.UI_BUTTON_CLICK.value(),
+          GraviSuiteMod.SOUND_TOOL_CHANGE.get(),
           SoundSource.PLAYERS,
           0.6F,
           next ? 1.4F : 0.9F);

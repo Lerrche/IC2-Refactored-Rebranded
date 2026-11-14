@@ -1,6 +1,8 @@
 package ic2.forge;
 
+import ic2.api.item.IElectricItem;
 import ic2.api.item.INanoSaberState;
+import ic2.api.item.ISpecialElectricItem;
 import ic2.core.IC2;
 import ic2.core.block.comp.Fluids;
 import ic2.core.block.tileentity.Ic2TileEntity;
@@ -46,12 +48,16 @@ public final class Ic2Capabilities {
 
     List<Item> fluidItems = new ArrayList<>();
     List<Item> nanoSabers = new ArrayList<>();
+    List<Item> electricItems = new ArrayList<>();
     for (Item item : BuiltInRegistries.ITEM) {
       if (item instanceof Ic2FluidItem) {
         fluidItems.add(item);
       }
       if (item instanceof AbstractItemNanoSaber) {
         nanoSabers.add(item);
+      }
+      if (item instanceof IElectricItem || item instanceof ISpecialElectricItem) {
+        electricItems.add(item);
       }
     }
 
@@ -67,6 +73,14 @@ public final class Ic2Capabilities {
           (stack, ctx) -> new NanoSaberStateImpl(stack),
           nanoSabers.toArray(new Item[0]));
     }
+    if (!electricItems.isEmpty()) {
+      event.registerItem(
+          Capabilities.EnergyStorage.ITEM,
+          (stack, ctx) -> new Ic2ItemEnergyStorage(stack),
+          electricItems.toArray(new Item[0]));
+    }
+
+    ForgeEnergyItemManager.init();
   }
 
   private static IFluidHandler fluidHandler(BlockEntity be, Direction side) {

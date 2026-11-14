@@ -13,6 +13,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.flag.FeatureFlags;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -53,6 +54,7 @@ public final class Ic2AddonContent {
   private final DeferredRegister<RecipeSerializer<?>> recipeSerializers;
   private final DeferredRegister<MenuType<?>> menuTypes;
   private final DeferredRegister<CreativeModeTab> creativeTabs;
+  private final DeferredRegister<SoundEvent> soundEvents;
   private boolean registered;
 
   private Ic2AddonContent(String namespace) {
@@ -65,6 +67,7 @@ public final class Ic2AddonContent {
     this.recipeSerializers = DeferredRegister.create(Registries.RECIPE_SERIALIZER, namespace);
     this.menuTypes = DeferredRegister.create(Registries.MENU, namespace);
     this.creativeTabs = DeferredRegister.create(Registries.CREATIVE_MODE_TAB, namespace);
+    this.soundEvents = DeferredRegister.create(Registries.SOUND_EVENT, namespace);
   }
 
   /** Creates a content registry for an add-on's mod id (for example {@code my_ic2_addon}). */
@@ -338,6 +341,13 @@ public final class Ic2AddonContent {
         () -> new AddonElectricTool(properties, capacity, transferLimit, tier, energyPerOperation));
   }
 
+  /** Registers a custom SoundEvent in this add-on's namespace. */
+  public DeferredHolder<SoundEvent, SoundEvent> registerSoundEvent(String name) {
+    ensureNotRegistered();
+    ResourceLocation id = id(name);
+    return this.soundEvents.register(name, () -> SoundEvent.createVariableRangeEvent(id));
+  }
+
   /**
    * Adds this add-on's blocks and items to its mod event bus. Call once from the mod constructor.
    */
@@ -352,6 +362,7 @@ public final class Ic2AddonContent {
     this.recipeSerializers.register(modEventBus);
     this.menuTypes.register(modEventBus);
     this.creativeTabs.register(modEventBus);
+    this.soundEvents.register(modEventBus);
   }
 
   /** Builds a resource id inside this add-on's namespace. */

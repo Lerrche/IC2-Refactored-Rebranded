@@ -30,6 +30,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -271,6 +272,25 @@ public class TileEntityPersonalChest extends TileEntityInventory
   @Override
   public void setOwner(GameProfile owner) {
     this.owner = owner;
+  }
+
+  @Override
+  public void onPlaced(ItemStack stack, LivingEntity placer, Direction facing) {
+    super.onPlaced(stack, placer, facing);
+    if (placer instanceof Player player && this.getLevel() != null && !this.getLevel().isClientSide) {
+      this.setOwner(player.getGameProfile());
+      this.setChanged();
+      IC2.network.get(true).updateTileEntityField(this, "owner");
+    }
+  }
+
+  @Override
+  protected List<ItemStack> getAuxDrops(int fortune) {
+    // If the safe is claimed, never drop contents upon unauthorized block removal.
+    if (this.owner != null) {
+      return Collections.emptyList();
+    }
+    return super.getAuxDrops(fortune);
   }
 
   @Override

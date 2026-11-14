@@ -1,0 +1,31 @@
+{
+  "tool_change": {
+    "sounds": [
+      "gravisuite:tool_change"
+    ],
+    "subtitle": "subtitles.gravisuite.tool_change"
+  },
+  "jetpack_fire": {
+    "sounds": [
+      "gravisuite:jetpack_fire"
+    ]
+  },
+  "jetpack_loop": {
+    "sounds": [
+      {
+        "name": "gravisuite:jetpack_loop",
+        "stream": true
+      }
+    ]
+  },
+  "treetap": {
+    "sounds": [
+      "gravisuite:treetap"
+    ]
+  },
+  "wrench": {
+    "sounds": [
+      "gravisuite:wrench"
+    ]
+  }
+}

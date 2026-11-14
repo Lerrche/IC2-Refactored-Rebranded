@@ -224,6 +224,14 @@ public final class EventHandlerForge {
     Level world = (Level) event.getLevel();
     BlockPos pos = event.getPos();
     BlockEntity blockEntity = world.getBlockEntity(pos);
+    if (blockEntity instanceof ic2.core.block.personal.IPersonalBlock personal
+        && personal.getOwner() != null) {
+      if (!event.getPlayer().isCreative()
+          && !personal.permitsAccess(event.getPlayer().getGameProfile())) {
+        event.setCanceled(true);
+        return;
+      }
+    }
     if (!EventHandler.beforeBlockBreak(
         world, event.getPlayer(), pos, event.getState(), blockEntity)) {
       event.setCanceled(true);

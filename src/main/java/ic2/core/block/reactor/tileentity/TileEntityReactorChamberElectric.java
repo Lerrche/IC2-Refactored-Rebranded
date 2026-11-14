@@ -19,6 +19,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -49,6 +50,9 @@ public class TileEntityReactorChamberElectric extends Ic2TileEntity
   protected void onLoaded() {
     super.onLoaded();
     this.updateRedstoneLink();
+    if (this.getLevel() != null && !this.getLevel().isClientSide && this.getReactor() == null) {
+      this.destroyChamber(false);
+    }
   }
 
   private void updateRedstoneLink() {
@@ -205,5 +209,23 @@ public class TileEntityReactorChamberElectric extends Ic2TileEntity
         break;
       }
     }
+  }
+
+  public static boolean hasAdjacentReactor(LevelReader world, BlockPos pos) {
+    if (world == null || pos == null) {
+      return false;
+    }
+    for (Direction facing : Util.ALL_DIRS) {
+      BlockPos neighborPos = pos.relative(facing);
+      BlockState state = world.getBlockState(neighborPos);
+      if (state.is(ic2.core.ref.Ic2Blocks.NUCLEAR_REACTOR)) {
+        return true;
+      }
+      BlockEntity te = world.getBlockEntity(neighborPos);
+      if (te instanceof TileEntityNuclearReactorElectric) {
+        return true;
+      }
+    }
+    return false;
   }
 }

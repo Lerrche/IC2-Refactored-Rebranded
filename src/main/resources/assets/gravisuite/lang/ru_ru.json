@@ -78,5 +78,6 @@
   "gravisuite.tooltip.gravichestplate.desc": "Объединяет защиту квантового костюма, емкость ультимативного лаппака и полет гравитационного двигателя.",
   "gravisuite.tooltip.nanochestplate.desc": "Объединяет защиту нано-костюма со встроенным электрическим джетпаком.",
   "item.ic2.jetpack.tooltip.boost": "Нажмите %s+%s для ускорения",
-  "item.ic2.tooltip.jetpack.boost": "Нажмите %s+%s для ускорения"
+  "item.ic2.tooltip.jetpack.boost": "Нажмите %s+%s для ускорения",
+  "subtitles.gravisuite.tool_change": "Режим инструмента изменён"
 }

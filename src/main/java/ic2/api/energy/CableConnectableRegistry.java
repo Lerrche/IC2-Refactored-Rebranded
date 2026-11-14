@@ -41,6 +41,18 @@ public final class CableConnectableRegistry {
 
   /** Retrieve the handler for a block class, or {@code null} if none is registered. */
   @Nullable public static ICableConnectable get(Class<?> blockClass) {
-    return REGISTRY.get(blockClass);
+    if (blockClass == null) {
+      return null;
+    }
+    ICableConnectable handler = REGISTRY.get(blockClass);
+    if (handler != null) {
+      return handler;
+    }
+    for (Map.Entry<Class<?>, ICableConnectable> entry : REGISTRY.entrySet()) {
+      if (entry.getKey().isAssignableFrom(blockClass)) {
+        return entry.getValue();
+      }
+    }
+    return null;
   }
 }
