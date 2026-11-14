@@ -713,6 +713,17 @@ public final class Ic2Items {
   public static final Item LEAD_CASING = register("lead_casing", new Item(new Properties()));
   public static final Item STEEL_CASING = register("steel_casing", new Item(new Properties()));
   public static final Item TIN_CASING = register("tin_casing", new Item(new Properties()));
+  public static final Item COPPER_GEAR = register("copper_gear", new Item(new Properties()));
+  public static final Item BRONZE_GEAR = register("bronze_gear", new Item(new Properties()));
+  public static final Item IRON_GEAR = register("iron_gear", new Item(new Properties()));
+  public static final Item TIN_GEAR = register("tin_gear", new Item(new Properties()));
+  public static final Item LEAD_GEAR = register("lead_gear", new Item(new Properties()));
+  public static final Item GOLD_GEAR = register("gold_gear", new Item(new Properties()));
+  public static final Item COPPER_NUGGET = register("copper_nugget", new Item(new Properties()));
+  public static final Item TIN_NUGGET = register("tin_nugget", new Item(new Properties()));
+  public static final Item LEAD_NUGGET = register("lead_nugget", new Item(new Properties()));
+  public static final Item BRONZE_NUGGET = register("bronze_nugget", new Item(new Properties()));
+  public static final Item SILVER_NUGGET = register("silver_nugget", new Item(new Properties()));
   public static final Item URANIUM =
       register("uranium", new ItemNuclearResource(new Properties(), 60, 100));
   public static final Item URANIUM_235 =
@@ -1814,6 +1825,17 @@ public final class Ic2Items {
     addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> URANIUM_PELLET);
     addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> WATER_SHEET);
     addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> WOODEN_ROTOR_BLADE);
+    addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> COPPER_GEAR);
+    addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> BRONZE_GEAR);
+    addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> IRON_GEAR);
+    addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> TIN_GEAR);
+    addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> LEAD_GEAR);
+    addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> GOLD_GEAR);
+    addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> COPPER_NUGGET);
+    addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> TIN_NUGGET);
+    addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> LEAD_NUGGET);
+    addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> BRONZE_NUGGET);
+    addToCreativeTab(Ic2ItemGroupType.MATERIALS, () -> SILVER_NUGGET);
     addToCreativeTab(Ic2ItemGroupType.REACTOR, () -> ADVANCED_HEAT_EXCHANGER);
     addToCreativeTab(Ic2ItemGroupType.REACTOR, () -> ADVANCED_HEAT_VENT);
     addToCreativeTab(Ic2ItemGroupType.REACTOR, () -> COMPONENT_HEAT_EXCHANGER);

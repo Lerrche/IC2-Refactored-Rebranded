@@ -77,6 +77,7 @@ import ic2.forge.ClientEnvProxyForge;
 import java.io.File;
 import java.util.Objects;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.color.item.ItemColor;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.SignRenderer;
 import net.minecraft.network.chat.Component;
@@ -167,6 +168,7 @@ public final class SideProxyClient implements SideProxy {
         (state, world, post, tintIndex) -> 6723908, Ic2Blocks.RUBBER_LEAVES);
     envProxy.registerColorProvider((var1, var2) -> 6723908, Ic2Items.RUBBER_LEAVES);
     envProxy.registerColorProvider(SideProxyClient::getFluidCellTintColor, Ic2Items.EMPTY_CELL);
+    registerMaterialItemColors(envProxy);
     envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.FOAM);
     envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.REINFORCED_GLASS);
     envProxy.registerBlockLayer(RenderType.cutoutMipped(), Ic2Blocks.REINFORCED_DOOR);
@@ -397,5 +399,133 @@ public final class SideProxyClient implements SideProxy {
     return fluidStack != null && !fluidStack.isEmpty()
         ? FluidHandler.getColor(fluidStack.getFluid())
         : -1;
+  }
+
+  private static ItemColor layer0Color(int rgb) {
+    int argb = 0xFF000000 | rgb;
+    return (stack, tintIndex) -> tintIndex == 0 ? argb : -1;
+  }
+
+  private static void registerMaterialItemColors(ClientEnvProxy envProxy) {
+    // Brighter material colors
+    int copperColor = 0xFF9E56;
+    int goldColor = 0xFFF458;
+    int tinColor = 0xE0EFF6;
+    int ironColor = 0xE4E4E4;
+    int bronzeColor = 0xDE8C38;
+    int leadColor = 0x828AA2;
+    int silverColor = 0xF4F8FA;
+    int uraniumColor = 0x6AF438;
+
+    // Cable-specific bright colors to compensate for the darker wire base texture
+    int copperCableColor = 0xFFB468;
+    int goldCableColor = 0xFFFF68;
+    int tinCableColor = 0xF0F8FC;
+    int ironCableColor = 0xF4F6F8;
+
+    ItemColor copperTint = layer0Color(copperColor);
+    ItemColor tinTint = layer0Color(tinColor);
+    ItemColor goldTint = layer0Color(goldColor);
+    ItemColor ironTint = layer0Color(ironColor);
+    ItemColor bronzeTint = layer0Color(bronzeColor);
+    ItemColor leadTint = layer0Color(leadColor);
+    ItemColor silverTint = layer0Color(silverColor);
+    ItemColor uraniumTint = layer0Color(uraniumColor);
+
+    ItemColor copperCableTint = layer0Color(copperCableColor);
+    ItemColor tinCableTint = layer0Color(tinCableColor);
+    ItemColor goldCableTint = layer0Color(goldCableColor);
+    ItemColor ironCableTint = layer0Color(ironCableColor);
+
+    // Cables (tintIndex 0 = wire metal / exposed tips, tintIndex 1 = untinted insulation)
+    envProxy.registerColorProvider(
+        copperCableTint, Ic2Items.COPPER_CABLE, Ic2Items.INSULATED_COPPER_CABLE);
+    envProxy.registerColorProvider(
+        tinCableTint, Ic2Items.TIN_CABLE, Ic2Items.INSULATED_TIN_CABLE);
+    envProxy.registerColorProvider(
+        goldCableTint,
+        Ic2Items.GOLD_CABLE,
+        Ic2Items.INSULATED_GOLD_CABLE,
+        Ic2Items.DOUBLE_INSULATED_GOLD_CABLE);
+    envProxy.registerColorProvider(
+        ironCableTint,
+        Ic2Items.IRON_CABLE,
+        Ic2Items.INSULATED_IRON_CABLE,
+        Ic2Items.DOUBLE_INSULATED_IRON_CABLE,
+        Ic2Items.TRIPLE_INSULATED_IRON_CABLE);
+
+    // Coil (mixed: tintIndex 0 = iron core, tintIndex 1 = copper winding overlay)
+    int coilCoreColor = 0xFF000000 | ironColor;
+    int coilWireColor = 0xFF000000 | copperCableColor;
+    ItemColor coilTint =
+        (stack, tintIndex) -> {
+          if (tintIndex == 0) return coilCoreColor;
+          if (tintIndex == 1) return coilWireColor;
+          return -1;
+        };
+    envProxy.registerColorProvider(coilTint, Ic2Items.COIL);
+
+    // Crushed Ores (tintIndex 0 = metal base, tintIndex 1 = untinted dirt)
+    envProxy.registerColorProvider(copperTint, Ic2Items.CRUSHED_COPPER);
+    envProxy.registerColorProvider(goldTint, Ic2Items.CRUSHED_GOLD);
+    envProxy.registerColorProvider(ironTint, Ic2Items.CRUSHED_IRON);
+    envProxy.registerColorProvider(leadTint, Ic2Items.CRUSHED_LEAD);
+    envProxy.registerColorProvider(silverTint, Ic2Items.CRUSHED_SILVER);
+    envProxy.registerColorProvider(tinTint, Ic2Items.CRUSHED_TIN);
+    envProxy.registerColorProvider(uraniumTint, Ic2Items.CRUSHED_URANIUM);
+
+    // Purified Ores
+    envProxy.registerColorProvider(copperTint, Ic2Items.PURIFIED_COPPER);
+    envProxy.registerColorProvider(goldTint, Ic2Items.PURIFIED_GOLD);
+    envProxy.registerColorProvider(ironTint, Ic2Items.PURIFIED_IRON);
+    envProxy.registerColorProvider(leadTint, Ic2Items.PURIFIED_LEAD);
+    envProxy.registerColorProvider(silverTint, Ic2Items.PURIFIED_SILVER);
+    envProxy.registerColorProvider(tinTint, Ic2Items.PURIFIED_TIN);
+    envProxy.registerColorProvider(uraniumTint, Ic2Items.PURIFIED_URANIUM);
+
+    // Dusts
+    envProxy.registerColorProvider(bronzeTint, Ic2Items.BRONZE_DUST, Ic2Items.SMALL_BRONZE_DUST);
+    envProxy.registerColorProvider(layer0Color(0x9EA8BC), Ic2Items.CLAY_DUST);
+    envProxy.registerColorProvider(layer0Color(0x3C3C3C), Ic2Items.COAL_DUST);
+    envProxy.registerColorProvider(layer0Color(0x30343C), Ic2Items.COAL_FUEL_DUST);
+    envProxy.registerColorProvider(copperTint, Ic2Items.COPPER_DUST, Ic2Items.SMALL_COPPER_DUST);
+    envProxy.registerColorProvider(
+        layer0Color(0x50F4E0), Ic2Items.DIAMOND_DUST, Ic2Items.SMALL_DIAMOND_DUST);
+    envProxy.registerColorProvider(layer0Color(0xF02828), Ic2Items.ENERGIUM_DUST);
+    envProxy.registerColorProvider(goldTint, Ic2Items.GOLD_DUST, Ic2Items.SMALL_GOLD_DUST);
+    envProxy.registerColorProvider(ironTint, Ic2Items.IRON_DUST, Ic2Items.SMALL_IRON_DUST);
+    envProxy.registerColorProvider(
+        layer0Color(0x3060E0), Ic2Items.LAPIS_DUST, Ic2Items.SMALL_LAPIS_DUST);
+    envProxy.registerColorProvider(leadTint, Ic2Items.LEAD_DUST, Ic2Items.SMALL_LEAD_DUST);
+    envProxy.registerColorProvider(
+        layer0Color(0xE4ECF0), Ic2Items.LITHIUM_DUST, Ic2Items.SMALL_LITHIUM_DUST);
+    envProxy.registerColorProvider(
+        layer0Color(0x443058), Ic2Items.OBSIDIAN_DUST, Ic2Items.SMALL_OBSIDIAN_DUST);
+    envProxy.registerColorProvider(layer0Color(0xE2D8CC), Ic2Items.SILICON_DIOXIDE_DUST);
+    envProxy.registerColorProvider(silverTint, Ic2Items.SILVER_DUST, Ic2Items.SMALL_SILVER_DUST);
+    envProxy.registerColorProvider(layer0Color(0x989898), Ic2Items.STONE_DUST);
+    envProxy.registerColorProvider(
+        layer0Color(0xF0E834), Ic2Items.SULFUR_DUST, Ic2Items.SMALL_SULFUR_DUST);
+    envProxy.registerColorProvider(tinTint, Ic2Items.TIN_DUST, Ic2Items.SMALL_TIN_DUST);
+    envProxy.registerColorProvider(layer0Color(0xB4BCC8), Ic2Items.HYDRATED_TIN_DUST);
+    envProxy.registerColorProvider(layer0Color(0x943030), Ic2Items.NETHERRACK_DUST);
+    envProxy.registerColorProvider(layer0Color(0x38B098), Ic2Items.ENDER_PEARL_DUST);
+    envProxy.registerColorProvider(layer0Color(0xB0B0B0), Ic2Items.ASHES);
+
+    // Gears
+    envProxy.registerColorProvider(copperTint, Ic2Items.COPPER_GEAR);
+    envProxy.registerColorProvider(bronzeTint, Ic2Items.BRONZE_GEAR);
+    envProxy.registerColorProvider(ironTint, Ic2Items.IRON_GEAR);
+    envProxy.registerColorProvider(tinTint, Ic2Items.TIN_GEAR);
+    envProxy.registerColorProvider(leadTint, Ic2Items.LEAD_GEAR);
+    envProxy.registerColorProvider(goldTint, Ic2Items.GOLD_GEAR);
+
+    // Nuggets
+    envProxy.registerColorProvider(copperTint, Ic2Items.COPPER_NUGGET);
+    envProxy.registerColorProvider(tinTint, Ic2Items.TIN_NUGGET);
+    envProxy.registerColorProvider(leadTint, Ic2Items.LEAD_NUGGET);
+    envProxy.registerColorProvider(bronzeTint, Ic2Items.BRONZE_NUGGET);
+    envProxy.registerColorProvider(silverTint, Ic2Items.SILVER_NUGGET);
+    envProxy.registerColorProvider(layer0Color(0xE4EDF4), Ic2Items.IRIDIUM_SHARD);
   }
 }

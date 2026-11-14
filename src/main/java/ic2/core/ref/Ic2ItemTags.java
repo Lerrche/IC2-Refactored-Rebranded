@@ -36,6 +36,17 @@ public final class Ic2ItemTags {
   public static final TagKey<Item> LAPIS_PLATES = createResource("lapis", "plates");
   public static final TagKey<Item> OBSIDIAN_PLATES = createResource("obsidian", "plates");
   public static final TagKey<Item> STEEL_PLATES = createResource("steel", "plates");
+  public static final TagKey<Item> COPPER_GEARS = createResource("copper", "gears");
+  public static final TagKey<Item> BRONZE_GEARS = createResource("bronze", "gears");
+  public static final TagKey<Item> IRON_GEARS = createResource("iron", "gears");
+  public static final TagKey<Item> TIN_GEARS = createResource("tin", "gears");
+  public static final TagKey<Item> LEAD_GEARS = createResource("lead", "gears");
+  public static final TagKey<Item> GOLD_GEARS = createResource("gold", "gears");
+  public static final TagKey<Item> COPPER_NUGGETS = createResource("copper", "nuggets");
+  public static final TagKey<Item> TIN_NUGGETS = createResource("tin", "nuggets");
+  public static final TagKey<Item> LEAD_NUGGETS = createResource("lead", "nuggets");
+  public static final TagKey<Item> BRONZE_NUGGETS = createResource("bronze", "nuggets");
+  public static final TagKey<Item> SILVER_NUGGETS = createResource("silver", "nuggets");
   public static final TagKey<Item> ORES = create("c:ores", "c:ores");
   public static final TagKey<Item> LEAD_ORES = createResource("lead", "ores");
   public static final TagKey<Item> LEAD_raw_materials = createResource("lead", "raw_materials");

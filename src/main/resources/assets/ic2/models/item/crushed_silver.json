@@ -1,6 +1,7 @@
 {
   "parent": "ic2:item/default",
   "textures": {
-    "layer0": "ic2:item/resource/crushed/silver"
+    "layer0": "ic2:item/resource/crushed/crushed_ore_base",
+    "layer1": "ic2:item/resource/crushed/crushed_ore_dirt"
   }
 }

@@ -1,0 +1,12 @@
+{
+  "type": "ic2:shapeless",
+  "ingredients": [
+    {
+      "tag": "c:ingots/silver"
+    }
+  ],
+  "result": {
+    "item": "ic2:silver_nugget",
+    "count": 9
+  }
+}
