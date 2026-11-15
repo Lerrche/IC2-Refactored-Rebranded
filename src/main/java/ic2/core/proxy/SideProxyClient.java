@@ -42,6 +42,7 @@ import ic2.core.block.personal.GuiEnergyOMatClosed;
 import ic2.core.block.personal.GuiEnergyOMatOpen;
 import ic2.core.block.personal.GuiTradeOMatClosed;
 import ic2.core.block.personal.GuiTradeOMatOpen;
+import ic2.core.block.personal.PersonalChestRenderer;
 import ic2.core.block.reactor.gui.GuiNuclearReactor;
 import ic2.core.block.renderer.KineticGeneratorRenderer;
 import ic2.core.block.wiring.GuiChargepadBlock;
@@ -264,6 +265,8 @@ public final class SideProxyClient implements SideProxy {
         Ic2Entities.CARBON_BOAT, context -> new BoatEntityRenderer(context, false, "ic2"));
     envProxy.registerBlockEntityRenderer(Ic2BlockEntities.SIGN, SignRenderer::new);
     envProxy.registerBlockEntityRenderer(Ic2BlockEntities.CROP_STICK, CropStickRenderer::new);
+    envProxy.registerBlockEntityRenderer(
+        Ic2BlockEntities.PERSONAL_CHEST, PersonalChestRenderer::new);
   }
 
   @Override
@@ -429,8 +432,7 @@ public final class SideProxyClient implements SideProxy {
     // Cables (tintIndex 0 = wire metal / exposed tips, tintIndex 1 = untinted insulation)
     envProxy.registerColorProvider(
         copperTint, Ic2Items.COPPER_CABLE, Ic2Items.INSULATED_COPPER_CABLE);
-    envProxy.registerColorProvider(
-        tinTint, Ic2Items.TIN_CABLE, Ic2Items.INSULATED_TIN_CABLE);
+    envProxy.registerColorProvider(tinTint, Ic2Items.TIN_CABLE, Ic2Items.INSULATED_TIN_CABLE);
     envProxy.registerColorProvider(
         goldTint,
         Ic2Items.GOLD_CABLE,

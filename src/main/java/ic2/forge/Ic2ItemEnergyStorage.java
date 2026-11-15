@@ -45,8 +45,7 @@ public class Ic2ItemEnergyStorage implements IEnergyStorage {
       return 0;
     }
     double euDrawn =
-        ElectricItem.manager.discharge(
-            stack, euNeeded, Integer.MAX_VALUE, true, true, simulate);
+        ElectricItem.manager.discharge(stack, euNeeded, Integer.MAX_VALUE, true, true, simulate);
     if (euDrawn <= 0.0) {
       return 0;
     }

@@ -5,16 +5,17 @@ import ic2.api.recipe.MachineRecipeResult;
 import ic2.api.recipe.Recipes;
 import ic2.core.block.IInventorySlotHolder;
 import ic2.core.util.StackUtil;
-import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 
 public abstract class InvSlotProcessable<RI, RO, I> extends InvSlotConsumable {
   protected Recipes.IGetter<? extends IMachineRecipeManager<RI, RO, I>> recipeManager;
   // Cache: item type → whether this slot accepts it.
   // Avoids a full recipe-manager lookup on every player hover / canPlaceItem call.
-  private final Map<Item, Boolean> acceptsCache = new IdentityHashMap<>();
+  private final Map<Item, Boolean> acceptsCache = new ConcurrentHashMap<>();
 
   public InvSlotProcessable(
       IInventorySlotHolder<?> base,
@@ -71,7 +72,15 @@ public abstract class InvSlotProcessable<RI, RO, I> extends InvSlotConsumable {
   }
 
   protected MachineRecipeResult<RI, RO, I> getOutputFor(I input, boolean forAccept) {
-    return this.recipeManager.get(this.base.getParent().getLevel()).apply(input, forAccept);
+    if (this.base == null || this.base.getParent() == null) {
+      return null;
+    }
+    Level level = this.base.getParent().getLevel();
+    if (level == null) {
+      return null;
+    }
+    IMachineRecipeManager<RI, RO, I> manager = this.recipeManager.get(level);
+    return manager == null ? null : manager.apply(input, forAccept);
   }
 
   protected abstract I getInput(ItemStack var1);

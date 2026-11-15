@@ -28,6 +28,7 @@ import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -69,9 +70,7 @@ public class TileEntityTradeOMat extends TileEntityInventory
     }
 
     this.totalTradeCount = nbt.getInt("totalTradeCount");
-    if (nbt.contains("infinite")) {
-      this.infinite = nbt.getBoolean("infinite");
-    }
+    this.infinite = false;
   }
 
   @Override
@@ -80,9 +79,6 @@ public class TileEntityTradeOMat extends TileEntityInventory
     PersonalOwnerNbt.write(nbt, this.owner);
 
     nbt.putInt("totalTradeCount", this.totalTradeCount);
-    if (this.infinite) {
-      nbt.putBoolean("infinite", this.infinite);
-    }
   }
 
   @Override
@@ -116,9 +112,7 @@ public class TileEntityTradeOMat extends TileEntityInventory
   protected void updateEntityServer() {
     super.updateEntityServer();
     this.trade();
-    if (this.infinite) {
-      this.stock = -1;
-    } else if (++this.ticker % 64 == 0) {
+    if (++this.ticker % 64 == 0) {
       this.updateStock();
     }
   }
@@ -130,38 +124,33 @@ public class TileEntityTradeOMat extends TileEntityInventory
         ItemStack offer = this.offerSlot.get();
         if (!StackUtil.isEmpty(offer)) {
           if (this.outputSlot.canAdd(offer)) {
-            if (this.infinite) {
-              this.inputSlot.consumeLinked(false);
-              this.outputSlot.add(offer);
-            } else {
-              int amount = StackUtil.fetch(this, offer, true);
-              if (amount != StackUtil.getSize(offer)) {
-                return;
-              }
-
-              int transferredOut = StackUtil.distribute(this, tradedIn, true);
-              if (transferredOut != StackUtil.getSize(tradedIn)) {
-                return;
-              }
-
-              amount = StackUtil.fetch(this, offer, false);
-              if (amount == 0) {
-                return;
-              }
-
-              if (amount != StackUtil.getSize(offer)) {
-                IC2.log.warn(
-                    LogCategory.Block,
-                    "The Trade-O-Mat at %s received an inconsistent result from an adjacent trade supply inventory, the %s items will be lost.",
-                    Util.formatPosition(this),
-                    amount);
-                return;
-              }
-
-              StackUtil.distribute(this, this.inputSlot.consumeLinked(false), false);
-              this.outputSlot.add(offer);
-              this.stock--;
+            int amount = StackUtil.fetch(this, offer, true);
+            if (amount != StackUtil.getSize(offer)) {
+              return;
             }
+
+            int transferredOut = StackUtil.distribute(this, tradedIn, true);
+            if (transferredOut != StackUtil.getSize(tradedIn)) {
+              return;
+            }
+
+            amount = StackUtil.fetch(this, offer, false);
+            if (amount == 0) {
+              return;
+            }
+
+            if (amount != StackUtil.getSize(offer)) {
+              IC2.log.warn(
+                  LogCategory.Block,
+                  "The Trade-O-Mat at %s received an inconsistent result from an adjacent trade supply inventory, the %s items will be lost.",
+                  Util.formatPosition(this),
+                  amount);
+              return;
+            }
+
+            StackUtil.distribute(this, this.inputSlot.consumeLinked(false), false);
+            this.outputSlot.add(offer);
+            this.stock--;
 
             this.totalTradeCount++;
             IC2.network.get(true).initiateTileEntityEvent(this, 0, true);
@@ -287,6 +276,26 @@ public class TileEntityTradeOMat extends TileEntityInventory
   }
 
   @Override
+  public void onPlaced(ItemStack stack, LivingEntity placer, Direction facing) {
+    super.onPlaced(stack, placer, facing);
+    if (placer instanceof Player player
+        && this.getLevel() != null
+        && !this.getLevel().isClientSide) {
+      this.setOwner(player.getGameProfile());
+      this.setChanged();
+      IC2.network.get(true).updateTileEntityField(this, "owner");
+    }
+  }
+
+  @Override
+  public void setChanged() {
+    super.setChanged();
+    if (this.level != null && !this.level.isClientSide) {
+      this.updateStock();
+    }
+  }
+
+  @Override
   protected boolean canEntityDestroy(Entity entity) {
     return false;
   }
@@ -295,7 +304,7 @@ public class TileEntityTradeOMat extends TileEntityInventory
   public ContainerBase<?> createServerScreenHandler(int syncId, Player player) {
     return this.permitsAccess(player.getGameProfile())
         ? new ContainerTradeOMatOpen(
-            syncId, player.getInventory(), this, this.canToggleInfinite(player))
+            syncId, player.getInventory(), this, false)
         : new ContainerTradeOMatClosed(syncId, player.getInventory(), this);
   }
 
@@ -304,7 +313,7 @@ public class TileEntityTradeOMat extends TileEntityInventory
     boolean open = this.permitsAccess(player.getGameProfile());
     buffer.writeBoolean(open);
     if (open) {
-      buffer.writeBoolean(this.canToggleInfinite(player));
+      buffer.writeBoolean(false);
     }
   }
 
@@ -336,16 +345,9 @@ public class TileEntityTradeOMat extends TileEntityInventory
 
   @Override
   public void onNetworkEvent(Player player, int event) {
-    if (event == 0 && this.canToggleInfinite(player)) {
-      this.infinite = !this.infinite;
-      if (!this.infinite) {
-        this.updateStock();
-      }
-    }
   }
 
   private boolean canToggleInfinite(Player player) {
-    MinecraftServer server = player.getServer();
-    return server != null && server.getPlayerList().isOp(player.getGameProfile());
+    return false;
   }
 }

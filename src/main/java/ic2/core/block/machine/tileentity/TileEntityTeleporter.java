@@ -177,15 +177,21 @@ public class TileEntityTeleporter extends TileEntityBase
           return false;
         }
       }
-      if (targetLvl.getBlockEntity(this.target) instanceof TileEntityTeleporter) {
+      if (targetLvl.hasChunkAt(this.target)) {
+        if (targetLvl.getBlockState(this.target).is(ic2.core.ref.Ic2Blocks.TELEPORTER)) {
+          return true;
+        }
+        this.target = null;
+        this.targetDimension = null;
+        this.updateComparatorLevel();
+        this.shutdown(false);
+        return false;
+      } else {
+        // Chunk is not currently loaded; preserve target link
         return true;
       }
     }
 
-    this.target = null;
-    this.targetDimension = null;
-    this.updateComparatorLevel();
-    this.shutdown(false);
     return false;
   }
 
@@ -228,8 +234,13 @@ public class TileEntityTeleporter extends TileEntityBase
                     * 5.0
                     * ic2.industrialjs.IndustrialJS.getTeleporterCostMultiplier());
       }
+      if (user instanceof Player player && player.isCreative()) {
+        energyCost = 0;
+      }
       if (energyCost <= this.getAvailableEnergy()) {
-        this.consumeEnergy(energyCost);
+        if (energyCost > 0) {
+          this.consumeEnergy(energyCost);
+        }
         Level targetLvl = this.getTargetLevel();
         if (targetLvl == null) {
           return;
@@ -239,7 +250,17 @@ public class TileEntityTeleporter extends TileEntityBase
         double ty = this.target.getY() + 1.5;
         double tz = this.target.getZ() + 0.5;
 
-        if (isCrossDim && targetLvl instanceof ServerLevel targetServerLevel) {
+        if (targetLvl instanceof ServerLevel targetServerLevel) {
+          if (!targetServerLevel.hasChunkAt(this.target)) {
+            targetServerLevel
+                .getChunkSource()
+                .getChunk(
+                    this.target.getX() >> 4,
+                    this.target.getZ() >> 4,
+                    net.minecraft.world.level.chunk.status.ChunkStatus.FULL,
+                    true);
+          }
+
           if (user instanceof ServerPlayer player) {
             player.teleportTo(
                 targetServerLevel,
@@ -249,7 +270,7 @@ public class TileEntityTeleporter extends TileEntityBase
                 java.util.Collections.emptySet(),
                 user.getYRot(),
                 user.getXRot());
-          } else {
+          } else if (isCrossDim) {
             user.changeDimension(
                 new net.minecraft.world.level.portal.DimensionTransition(
                     targetServerLevel,
@@ -258,15 +279,12 @@ public class TileEntityTeleporter extends TileEntityBase
                     user.getYRot(),
                     user.getXRot(),
                     net.minecraft.world.level.portal.DimensionTransition.DO_NOTHING));
-          }
-        } else {
-          if (user instanceof ServerPlayer) {
-            user.teleportTo(tx, ty, tz);
           } else {
             user.absMoveTo(tx, ty, tz, user.getYRot(), user.getXRot());
           }
         }
 
+        this.cooldown = 20;
         BlockEntity te = targetLvl.getBlockEntity(this.target);
         if (te instanceof TileEntityTeleporter targetTp) {
           targetTp.onTeleportTo();
@@ -317,18 +335,29 @@ public class TileEntityTeleporter extends TileEntityBase
 
   public void consumeEnergy(int energy) {
     Level world = this.getLevel();
+    if (world == null || energy <= 0) return;
     List<IEnergyStorage> energySources = new LinkedList<>();
+    List<net.neoforged.neoforge.energy.IEnergyStorage> feSources = new LinkedList<>();
 
     for (Direction dir : Util.ALL_DIRS) {
-      if (world.getBlockEntity(this.worldPosition.relative(dir))
-              instanceof IEnergyStorage energySource
+      BlockPos neighborPos = this.worldPosition.relative(dir);
+      if (world.getBlockEntity(neighborPos) instanceof IEnergyStorage energySource
           && energySource.isTeleporterCompatible(dir.getOpposite())
           && energySource.getStored() > 0) {
         energySources.add(energySource);
+      } else {
+        net.neoforged.neoforge.energy.IEnergyStorage feStorage =
+            world.getCapability(
+                net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK,
+                neighborPos,
+                dir.getOpposite());
+        if (feStorage != null && feStorage.canExtract() && feStorage.getEnergyStored() >= 4) {
+          feSources.add(feStorage);
+        }
       }
     }
 
-    while (energy > 0) {
+    while (energy > 0 && !energySources.isEmpty()) {
       int drain = (energy + energySources.size() - 1) / energySources.size();
       Iterator<IEnergyStorage> it = energySources.iterator();
 
@@ -348,16 +377,45 @@ public class TileEntityTeleporter extends TileEntityBase
         }
       }
     }
+
+    while (energy > 0 && !feSources.isEmpty()) {
+      int drainFe = Math.max(4, (energy * 4 + feSources.size() - 1) / feSources.size());
+      Iterator<net.neoforged.neoforge.energy.IEnergyStorage> it = feSources.iterator();
+
+      while (it.hasNext() && energy > 0) {
+        net.neoforged.neoforge.energy.IEnergyStorage feSource = it.next();
+        int toExtract = Math.min(drainFe, energy * 4);
+        int extracted = feSource.extractEnergy(toExtract, false);
+        int euExtracted = extracted / 4;
+        if (euExtracted > 0) {
+          energy -= euExtracted;
+        }
+        if (feSource.getEnergyStored() < 4) {
+          it.remove();
+        }
+      }
+    }
   }
 
   public int getAvailableEnergy() {
     Level world = this.getLevel();
+    if (world == null) return 0;
     int energy = 0;
 
     for (Direction dir : Util.ALL_DIRS) {
-      if (world.getBlockEntity(this.worldPosition.relative(dir)) instanceof IEnergyStorage storage
+      BlockPos neighborPos = this.worldPosition.relative(dir);
+      if (world.getBlockEntity(neighborPos) instanceof IEnergyStorage storage
           && storage.isTeleporterCompatible(dir.getOpposite())) {
         energy += storage.getStored();
+      } else {
+        net.neoforged.neoforge.energy.IEnergyStorage feStorage =
+            world.getCapability(
+                net.neoforged.neoforge.capabilities.Capabilities.EnergyStorage.BLOCK,
+                neighborPos,
+                dir.getOpposite());
+        if (feStorage != null && feStorage.canExtract()) {
+          energy += feStorage.getEnergyStored() / 4;
+        }
       }
     }
 

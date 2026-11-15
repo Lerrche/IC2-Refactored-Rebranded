@@ -1421,7 +1421,8 @@ public final class Ic2Blocks {
                   .mapColor(MapColor.COLOR_LIGHT_GRAY)
                   .strength(-1.0F, 3600000.0F)
                   .requiresCorrectToolForDrops()
-                  .sound(SoundType.METAL),
+                  .sound(SoundType.METAL)
+                  .noOcclusion(),
               TileEntityPersonalChest.class,
               false,
               Ic2TileEntityBlock.DefaultDrop.Self,

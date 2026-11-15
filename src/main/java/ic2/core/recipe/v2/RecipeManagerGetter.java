@@ -15,10 +15,26 @@ public class RecipeManagerGetter<T> implements Recipes.IGetter<T> {
     this.factory = factory;
   }
 
+  public T get(RecipeManager recipeManager) {
+    if (recipeManager == null) {
+      return null;
+    }
+    synchronized (this.cache) {
+      return this.cache.computeIfAbsent(recipeManager, this.factory);
+    }
+  }
+
   @Override
   public T get(Level world) {
-    return world.isClientSide()
-        ? this.factory.apply(world.getRecipeManager())
-        : this.cache.computeIfAbsent(world.getRecipeManager(), this.factory);
+    if (world == null) {
+      return null;
+    }
+    return this.get(world.getRecipeManager());
+  }
+
+  public void clear() {
+    synchronized (this.cache) {
+      this.cache.clear();
+    }
   }
 }

@@ -12,6 +12,7 @@ import ic2.core.block.machine.tileentity.TileEntityExplosive;
 import ic2.core.block.wiring.tileentity.TileEntityLuminator;
 import ic2.core.crop.Ic2CropType;
 import ic2.core.crop.TileEntityCrop;
+import ic2.core.block.personal.TileEntityPersonalChest;
 import ic2.core.util.Util;
 import java.util.Collections;
 import java.util.HashMap;
@@ -44,6 +45,7 @@ import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -372,7 +374,8 @@ public final class Ic2TileEntityBlock extends Block
       boolean willHarvest,
       net.minecraft.world.level.material.FluidState fluid) {
     BlockEntity be = level.getBlockEntity(pos);
-    if (be instanceof ic2.core.block.personal.IPersonalBlock personal && personal.getOwner() != null) {
+    if (be instanceof ic2.core.block.personal.IPersonalBlock personal
+        && personal.getOwner() != null) {
       if (!player.isCreative() && !personal.permitsAccess(player.getGameProfile())) {
         return false;
       }
@@ -489,6 +492,23 @@ public final class Ic2TileEntityBlock extends Block
     } else {
       return be.getCullingShape();
     }
+  }
+
+  @Override
+  public RenderShape getRenderShape(BlockState state) {
+    if (this.teClass == TileEntityPersonalChest.class) {
+      return RenderShape.ENTITYBLOCK_ANIMATED;
+    }
+    return super.getRenderShape(state);
+  }
+
+  @Override
+  public VoxelShape getVisualShape(
+      BlockState state, BlockGetter world, BlockPos pos, CollisionContext context) {
+    if (this.teClass == TileEntityPersonalChest.class) {
+      return Shapes.empty();
+    }
+    return super.getVisualShape(state, world, pos, context);
   }
 
   @Override

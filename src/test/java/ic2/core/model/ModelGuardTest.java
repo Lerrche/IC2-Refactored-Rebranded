@@ -19,15 +19,16 @@ import org.junit.jupiter.api.Test;
  */
 class ModelGuardTest {
 
-  // The old elements-based personal_chest_shape parent left gaps you could see the world through
-  // (x-ray). The model must be a full opaque cube with a distinct front face (upstream 3ad6936d).
+  // The personal chest uses a 3D chest shape with elements (body, lid, latch)
+  // and noOcclusion on its block properties to prevent x-ray.
   @Test
-  void personalChestModelIsFullCube() {
+  void personalChestModelHas3DChestShape() {
     JsonObject model = readModel("assets/ic2/models/block/personal/personal_chest.json");
     assertEquals(
-        "block/cube",
+        "block/block",
         model.get("parent").getAsString(),
-        "personal chest model must use the full block/cube parent");
+        "personal chest model must use the block/block parent");
+    assertTrue(model.has("elements"), "personal chest model must define 3D elements");
     JsonObject textures = model.getAsJsonObject("textures");
     for (String face : new String[] {"down", "up", "north", "east", "south", "west"}) {
       assertTrue(textures.has(face), "personal chest model must texture face " + face);

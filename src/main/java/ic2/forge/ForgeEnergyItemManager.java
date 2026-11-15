@@ -12,8 +12,8 @@ import net.neoforged.neoforge.capabilities.Capabilities;
 import net.neoforged.neoforge.energy.IEnergyStorage;
 
 /**
- * Backup electric item manager allowing IC2 machines (BatBox, CESU, MFE, MFSU, Chargepad, etc.)
- * to charge and discharge external Forge Energy items (such as Mekanism Energy Tablets, tools, etc.).
+ * Backup electric item manager allowing IC2 machines (BatBox, CESU, MFE, MFSU, Chargepad, etc.) to
+ * charge and discharge external Forge Energy items (such as Mekanism Energy Tablets, tools, etc.).
  */
 public final class ForgeEnergyItemManager implements IBackupElectricItemManager {
   private static final AtomicBoolean REGISTERED = new AtomicBoolean(false);
@@ -30,7 +30,8 @@ public final class ForgeEnergyItemManager implements IBackupElectricItemManager 
       return false;
     }
     // Never hijack native IC2 electric items.
-    if (stack.getItem() instanceof IElectricItem || stack.getItem() instanceof ISpecialElectricItem) {
+    if (stack.getItem() instanceof IElectricItem
+        || stack.getItem() instanceof ISpecialElectricItem) {
       return false;
     }
     IEnergyStorage storage = stack.getCapability(Capabilities.EnergyStorage.ITEM);

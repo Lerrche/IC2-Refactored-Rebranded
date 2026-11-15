@@ -5,10 +5,13 @@ import ic2.core.IC2;
 import ic2.core.util.LogCategory;
 import java.lang.reflect.Method;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.core.registries.Registries;
@@ -39,6 +42,21 @@ public final class MaceratorCompatibility {
   private static final TagKey<Item> DUSTS = itemTag("c:dusts");
   private static final TagKey<Item> GEMS = itemTag("c:gems");
   private static final TagKey<Item> STORAGE_BLOCKS = itemTag("c:storage_blocks");
+
+  private static final Map<Class<?>, Method> RESULT_METHOD_CACHE = new ConcurrentHashMap<>();
+  private static final Map<Class<?>, Method> INGREDIENT_METHOD_CACHE = new ConcurrentHashMap<>();
+  private static final Method NO_METHOD;
+  private static final Map<Item, Item> DUST_FOR_INGOT_CACHE = new ConcurrentHashMap<>();
+
+  static {
+    try {
+      NO_METHOD = MaceratorCompatibility.class.getDeclaredMethod("noMethodSentinel");
+    } catch (Exception e) {
+      throw new RuntimeException(e);
+    }
+  }
+
+  private static void noMethodSentinel() {}
 
   private MaceratorCompatibility() {}
 
@@ -192,27 +210,52 @@ public final class MaceratorCompatibility {
       }
     } catch (Throwable ignored) {
     }
+
+    Class<?> clazz = recipe.getClass();
+    Method cached = RESULT_METHOD_CACHE.get(clazz);
+    if (cached == NO_METHOD) {
+      return ItemStack.EMPTY;
+    }
+    if (cached != null) {
+      try {
+        Object obj = cached.invoke(recipe);
+        return extractItemStackFromObject(obj);
+      } catch (Throwable ignored) {
+        return ItemStack.EMPTY;
+      }
+    }
+
     for (String methodName :
         new String[] {"getResult", "getOutput", "getResultItem", "getRollableResults"}) {
       try {
-        Method m = recipe.getClass().getMethod(methodName);
+        Method m = clazz.getMethod(methodName);
         Object obj = m.invoke(recipe);
-        if (obj instanceof ItemStack is && !is.isEmpty()) {
+        ItemStack is = extractItemStackFromObject(obj);
+        if (!is.isEmpty()) {
+          RESULT_METHOD_CACHE.put(clazz, m);
           return is;
         }
-        if (obj instanceof List<?> list && !list.isEmpty()) {
-          Object first = list.get(0);
-          if (first instanceof ItemStack is && !is.isEmpty()) {
-            return is;
-          }
-          try {
-            Method getStack = first.getClass().getMethod("getStack");
-            Object stackObj = getStack.invoke(first);
-            if (stackObj instanceof ItemStack is && !is.isEmpty()) {
-              return is;
-            }
-          } catch (Throwable ignored) {
-          }
+      } catch (Throwable ignored) {
+      }
+    }
+    RESULT_METHOD_CACHE.put(clazz, NO_METHOD);
+    return ItemStack.EMPTY;
+  }
+
+  private static ItemStack extractItemStackFromObject(Object obj) {
+    if (obj instanceof ItemStack is && !is.isEmpty()) {
+      return is;
+    }
+    if (obj instanceof List<?> list && !list.isEmpty()) {
+      Object first = list.get(0);
+      if (first instanceof ItemStack is && !is.isEmpty()) {
+        return is;
+      }
+      try {
+        Method getStack = first.getClass().getMethod("getStack");
+        Object stackObj = getStack.invoke(first);
+        if (stackObj instanceof ItemStack is && !is.isEmpty()) {
+          return is;
         }
       } catch (Throwable ignored) {
       }
@@ -228,22 +271,47 @@ public final class MaceratorCompatibility {
       }
     } catch (Throwable ignored) {
     }
+
+    Class<?> clazz = recipe.getClass();
+    Method cached = INGREDIENT_METHOD_CACHE.get(clazz);
+    if (cached == NO_METHOD) {
+      return List.of();
+    }
+    if (cached != null) {
+      try {
+        Object obj = cached.invoke(recipe);
+        return extractIngredientsFromObject(obj);
+      } catch (Throwable ignored) {
+        return List.of();
+      }
+    }
+
     for (String methodName : new String[] {"getInput", "getIngredient"}) {
       try {
-        Method m = recipe.getClass().getMethod(methodName);
+        Method m = clazz.getMethod(methodName);
         Object obj = m.invoke(recipe);
-        if (obj instanceof Ingredient ing && !ing.isEmpty()) {
-          return List.of(ing);
+        List<Ingredient> ings = extractIngredientsFromObject(obj);
+        if (!ings.isEmpty()) {
+          INGREDIENT_METHOD_CACHE.put(clazz, m);
+          return ings;
         }
-        if (obj != null) {
-          try {
-            Method asIng = obj.getClass().getMethod("asIngredient");
-            Object ingObj = asIng.invoke(obj);
-            if (ingObj instanceof Ingredient ing && !ing.isEmpty()) {
-              return List.of(ing);
-            }
-          } catch (Throwable ignored) {
-          }
+      } catch (Throwable ignored) {
+      }
+    }
+    INGREDIENT_METHOD_CACHE.put(clazz, NO_METHOD);
+    return List.of();
+  }
+
+  private static List<Ingredient> extractIngredientsFromObject(Object obj) {
+    if (obj instanceof Ingredient ing && !ing.isEmpty()) {
+      return List.of(ing);
+    }
+    if (obj != null) {
+      try {
+        Method asIng = obj.getClass().getMethod("asIngredient");
+        Object ingObj = asIng.invoke(obj);
+        if (ingObj instanceof Ingredient ing && !ing.isEmpty()) {
+          return List.of(ing);
         }
       } catch (Throwable ignored) {
       }
@@ -256,24 +324,35 @@ public final class MaceratorCompatibility {
   // -------------------------------------------------------------------------
 
   private static void addFromModdedDusts(BasicMachineRecipeManager macerator) {
-    Set<Item> registeredDusts = new HashSet<>();
+    Map<String, Item> materialToDust = new HashMap<>();
 
-    // Collect all dust items in the game
+    // Collect all dust items in the game and group by extracted material
     for (Item item : BuiltInRegistries.ITEM) {
       if (item == null || item == Items.AIR) {
         continue;
       }
       ItemStack stack = new ItemStack(item);
       if (isDust(stack)) {
-        registeredDusts.add(item);
+        String material = extractMaterialFromDust(item);
+        if (material != null && !material.isBlank()) {
+          Item existing = materialToDust.get(material);
+          if (existing == null) {
+            materialToDust.put(material, item);
+          } else {
+            // Prefer IC2's own dust if present
+            ResourceLocation id = BuiltInRegistries.ITEM.getKey(item);
+            if (id != null && "ic2".equals(id.getNamespace())) {
+              materialToDust.put(material, item);
+            }
+          }
+        }
       }
     }
 
-    for (Item dustItem : registeredDusts) {
-      String material = extractMaterialFromDust(dustItem);
-      if (material == null || material.isBlank()) {
-        continue;
-      }
+    // Register tag mappings and known direct inputs once per material
+    for (Map.Entry<String, Item> entry : materialToDust.entrySet()) {
+      String material = entry.getKey();
+      Item dustItem = entry.getValue();
 
       // 1. Tag based mappings
       // c:ores/<material> -> 2x dust
@@ -291,12 +370,12 @@ public final class MaceratorCompatibility {
       // c:storage_blocks/<material> -> 9x dust
       addFromTag(itemTag("c:storage_blocks/" + material), macerator, dustItem, 9);
 
-      // 2. Direct name matching across all loaded items (covers mod items without proper tags)
-      addFromItemNames(material, dustItem, macerator);
-
       // 3. Specific known mappings for materials that are common vanilla/mod blocks or items
       addKnownDirectInputs(material, dustItem, macerator);
     }
+
+    // 2. Direct name matching across all loaded items (single O(N) pass across all items)
+    addFromItemNames(materialToDust, macerator);
   }
 
   private static void addFromTag(
@@ -324,10 +403,9 @@ public final class MaceratorCompatibility {
   }
 
   private static void addFromItemNames(
-      String material, Item dustItem, BasicMachineRecipeManager macerator) {
-    String lowerMat = material.toLowerCase(Locale.ROOT);
+      Map<String, Item> materialToDust, BasicMachineRecipeManager macerator) {
     for (Item item : BuiltInRegistries.ITEM) {
-      if (item == null || item == Items.AIR || item == dustItem) {
+      if (item == null || item == Items.AIR) {
         continue;
       }
       ResourceLocation id = BuiltInRegistries.ITEM.getKey(item);
@@ -336,25 +414,50 @@ public final class MaceratorCompatibility {
       }
       String path = id.getPath().toLowerCase(Locale.ROOT);
 
-      // Match raw ore: raw_<material>
-      if (path.equals("raw_" + lowerMat) || path.equals(lowerMat + "_raw")) {
-        tryAddDirectItem(id, macerator, dustItem, 2);
+      String mat = null;
+      int count = 0;
+
+      if (path.startsWith("raw_")) {
+        mat = path.substring(4);
+        count = 2;
+      } else if (path.endsWith("_raw")) {
+        mat = path.substring(0, path.length() - 4);
+        count = 2;
+      } else if (path.endsWith("_ore")) {
+        mat = path.substring(0, path.length() - 4);
+        count = 2;
+        if (mat.startsWith("deepslate_")) {
+          mat = mat.substring(10);
+        } else if (mat.startsWith("nether_")) {
+          mat = mat.substring(7);
+        } else if (mat.startsWith("end_")) {
+          mat = mat.substring(4);
+        }
+      } else if (path.endsWith("_ingot")) {
+        mat = path.substring(0, path.length() - 6);
+        count = 1;
+      } else if (path.startsWith("ingot_")) {
+        mat = path.substring(6);
+        count = 1;
+      } else if (path.endsWith("_gem")) {
+        mat = path.substring(0, path.length() - 4);
+        count = 1;
+      } else if (path.startsWith("gem_")) {
+        mat = path.substring(4);
+        count = 1;
+      } else if (path.endsWith("_block")) {
+        mat = path.substring(0, path.length() - 6);
+        count = 9;
+      } else if (path.startsWith("block_")) {
+        mat = path.substring(6);
+        count = 9;
       }
-      // Match ore: <material>_ore, deepslate_<material>_ore, etc.
-      else if (path.equals(lowerMat + "_ore") || path.endsWith("_" + lowerMat + "_ore")) {
-        tryAddDirectItem(id, macerator, dustItem, 2);
-      }
-      // Match ingot: <material>_ingot, ingot_<material>
-      else if (path.equals(lowerMat + "_ingot") || path.equals("ingot_" + lowerMat)) {
-        tryAddDirectItem(id, macerator, dustItem, 1);
-      }
-      // Match gem: <material>_gem, gem_<material>
-      else if (path.equals(lowerMat + "_gem") || path.equals("gem_" + lowerMat)) {
-        tryAddDirectItem(id, macerator, dustItem, 1);
-      }
-      // Match storage block: <material>_block, block_<material>
-      else if (path.equals(lowerMat + "_block") || path.equals("block_" + lowerMat)) {
-        tryAddDirectItem(id, macerator, dustItem, 9);
+
+      if (mat != null && !mat.isBlank()) {
+        Item dustItem = materialToDust.get(mat);
+        if (dustItem != null && dustItem != item) {
+          tryAddDirectItem(id, macerator, dustItem, count);
+        }
       }
     }
   }
@@ -583,6 +686,20 @@ public final class MaceratorCompatibility {
   }
 
   private static Item findDustForIngot(ItemStack ingot) {
+    if (ingot.isEmpty()) {
+      return null;
+    }
+    Item ingotItem = ingot.getItem();
+    Item cached = DUST_FOR_INGOT_CACHE.get(ingotItem);
+    if (cached != null) {
+      return cached == Items.AIR ? null : cached;
+    }
+    Item resolved = resolveDustForIngot(ingot);
+    DUST_FOR_INGOT_CACHE.put(ingotItem, resolved != null ? resolved : Items.AIR);
+    return resolved;
+  }
+
+  private static Item resolveDustForIngot(ItemStack ingot) {
     String material = materialName(ingot);
     if (material == null || material.isBlank()) {
       return null;

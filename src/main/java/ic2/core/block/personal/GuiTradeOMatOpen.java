@@ -15,10 +15,6 @@ public class GuiTradeOMatOpen extends Ic2Gui<ContainerTradeOMatOpen> {
   public GuiTradeOMatOpen(
       ContainerTradeOMatOpen container, Inventory playerInventory, Component title) {
     super(container, playerInventory, title);
-    if (this.menu.canToggleInfinite) {
-      this.addElement(
-          new VanillaButton(this, 152, 4, 20, 20, this.createEventSender(0)).withText("∞"));
-    }
   }
 
   @Override
@@ -59,9 +55,9 @@ public class GuiTradeOMatOpen extends Ic2Gui<ContainerTradeOMatOpen> {
         guiGraphics,
         108,
         60,
-        Component.translatable("ic2.container.personalTrader.stock")
+        Component.translatable("ic2.container.personalTrader.stock").getString()
             + " "
-            + (this.menu.base.stock < 0 ? "∞" : this.menu.base.stock + ""),
+            + this.menu.base.stock,
         4210752);
   }
 

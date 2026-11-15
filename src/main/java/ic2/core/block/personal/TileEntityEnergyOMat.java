@@ -20,6 +20,7 @@ import ic2.core.block.tileentity.TileEntityInventory;
 import ic2.core.network.GrowingBuffer;
 import ic2.core.ref.Ic2BlockEntities;
 import ic2.core.util.StackUtil;
+import ic2.core.util.Util;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -30,6 +31,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -112,6 +114,18 @@ public class TileEntityEnergyOMat extends TileEntityInventory
   }
 
   @Override
+  public void onPlaced(ItemStack stack, LivingEntity placer, Direction facing) {
+    super.onPlaced(stack, placer, facing);
+    if (placer instanceof Player player
+        && this.getLevel() != null
+        && !this.getLevel().isClientSide) {
+      this.setOwner(player.getGameProfile());
+      this.setChanged();
+      IC2.network.get(true).updateTileEntityField(this, "owner");
+    }
+  }
+
+  @Override
   protected void updateEntityServer() {
     super.updateEntityServer();
     boolean invChanged = false;
@@ -125,12 +139,58 @@ public class TileEntityEnergyOMat extends TileEntityInventory
     }
 
     ItemStack tradedIn = this.inputSlot.consumeLinked(true);
-    if (tradedIn != null) {
+    if (!StackUtil.isEmpty(tradedIn)) {
       int transferred = StackUtil.distribute(this, tradedIn, true);
+      if (transferred < StackUtil.getSize(tradedIn)) {
+        transferred +=
+            this.depositToPersonalChest(
+                StackUtil.copyWithSize(tradedIn, StackUtil.getSize(tradedIn) - transferred),
+                true);
+      }
+
       if (transferred == StackUtil.getSize(tradedIn)) {
-        StackUtil.distribute(this, this.inputSlot.consumeLinked(false), false);
-        this.paidFor = this.paidFor + this.euOffer;
-        invChanged = true;
+        ItemStack actualTradedIn = this.inputSlot.consumeLinked(false);
+        if (!StackUtil.isEmpty(actualTradedIn)) {
+          int actualTransferred = StackUtil.distribute(this, actualTradedIn, false);
+          if (actualTransferred < StackUtil.getSize(actualTradedIn)) {
+            actualTransferred +=
+                this.depositToPersonalChest(
+                    StackUtil.copyWithSize(
+                        actualTradedIn, StackUtil.getSize(actualTradedIn) - actualTransferred),
+                    false);
+          }
+
+          if (actualTransferred == StackUtil.getSize(actualTradedIn)) {
+            this.paidFor = this.paidFor + this.euOffer;
+            invChanged = true;
+            if (this.level != null) {
+              IC2.network.get(true).initiateTileEntityEvent(this, 0, true);
+              this.level.playLocalSound(
+                  this.worldPosition.getX(),
+                  this.worldPosition.getY(),
+                  this.worldPosition.getZ(),
+                  ic2.core.ref.Ic2SoundEvents.MACHINE_OMAT_OPERATE,
+                  net.minecraft.sounds.SoundSource.BLOCKS,
+                  1.0F,
+                  1.0F,
+                  true);
+            }
+          } else {
+            int refundCount = StackUtil.getSize(actualTradedIn) - actualTransferred;
+            if (refundCount > 0) {
+              ItemStack currentInInput = this.inputSlot.get();
+              if (StackUtil.isEmpty(currentInInput)) {
+                this.inputSlot.put(StackUtil.copyWithSize(actualTradedIn, refundCount));
+              } else {
+                this.inputSlot.put(StackUtil.incSize(currentInInput, refundCount));
+              }
+            }
+            if (actualTransferred > 0) {
+              this.paidFor += this.euOffer;
+            }
+            invChanged = true;
+          }
+        }
       }
     }
 
@@ -145,6 +205,54 @@ public class TileEntityEnergyOMat extends TileEntityInventory
     if (invChanged) {
       this.setChanged();
     }
+  }
+
+  private int depositToPersonalChest(ItemStack stack, boolean simulate) {
+    if (this.level == null || StackUtil.isEmpty(stack)) {
+      return 0;
+    }
+    int totalAdded = 0;
+    ItemStack toInsert = stack.copy();
+
+    for (Direction dir : Util.ALL_DIRS) {
+      net.minecraft.world.level.block.entity.BlockEntity be =
+          this.level.getBlockEntity(this.worldPosition.relative(dir));
+      if (be instanceof TileEntityPersonalChest chest) {
+        for (int i = 0; i < chest.contentSlot.size(); i++) {
+          ItemStack existing = chest.contentSlot.get(i);
+          if (StackUtil.isEmpty(existing)) {
+            int count = Math.min(toInsert.getCount(), toInsert.getMaxStackSize());
+            if (!simulate) {
+              chest.contentSlot.put(i, StackUtil.copyWithSize(toInsert, count));
+              chest.setChanged();
+            }
+            totalAdded += count;
+            toInsert.shrink(count);
+            if (toInsert.isEmpty()) {
+              return totalAdded;
+            }
+          } else if (StackUtil.checkItemEqualityStrict(existing, toInsert)
+              && existing.getCount()
+                  < Math.min(chest.contentSlot.getStackSizeLimit(), existing.getMaxStackSize())) {
+            int limit =
+                Math.min(chest.contentSlot.getStackSizeLimit(), existing.getMaxStackSize());
+            int space = limit - existing.getCount();
+            int count = Math.min(toInsert.getCount(), space);
+            if (!simulate) {
+              existing.grow(count);
+              chest.contentSlot.put(i, existing);
+              chest.setChanged();
+            }
+            totalAdded += count;
+            toInsert.shrink(count);
+            if (toInsert.isEmpty()) {
+              return totalAdded;
+            }
+          }
+        }
+      }
+    }
+    return totalAdded;
   }
 
   @Override
@@ -167,6 +275,18 @@ public class TileEntityEnergyOMat extends TileEntityInventory
 
   @Override
   public GameProfile getOwner() {
+    if (this.owner == null && this.level != null && !this.level.isClientSide) {
+      for (Direction dir : Util.ALL_DIRS) {
+        net.minecraft.world.level.block.entity.BlockEntity be =
+            this.level.getBlockEntity(this.worldPosition.relative(dir));
+        if (be instanceof IPersonalBlock personalBlock && personalBlock.getOwner() != null) {
+          this.owner = personalBlock.getOwner();
+          this.setChanged();
+          IC2.network.get(true).updateTileEntityField(this, "owner");
+          break;
+        }
+      }
+    }
     return this.owner;
   }
 
@@ -300,7 +420,7 @@ public class TileEntityEnergyOMat extends TileEntityInventory
   @Override
   public boolean useEnergy(double amount) {
     if (amount <= this.euBuffer) {
-      amount -= this.euBuffer;
+      this.euBuffer -= amount;
       return true;
     } else {
       return false;

@@ -39,12 +39,15 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraft.world.phys.shapes.Shapes;
+import net.minecraft.world.phys.shapes.VoxelShape;
 import net.neoforged.api.distmarker.Dist;
 import net.neoforged.api.distmarker.OnlyIn;
 
 public class TileEntityPersonalChest extends TileEntityInventory
     implements IPersonalBlock, IHasGui {
-  private static final List<AABB> aabbs = List.of(new AABB(0.0, 0.0, 0.0, 1.0, 1.0, 1.0));
+  private static final List<AABB> aabbs =
+      List.of(new AABB(1.0 / 16.0, 0.0, 1.0 / 16.0, 15.0 / 16.0, 14.0 / 16.0, 15.0 / 16.0));
   public final InvSlot contentSlot;
   private final Set<Player> usingPlayers = Collections.newSetFromMap(new WeakHashMap<>());
   private GameProfile owner = null;
@@ -145,6 +148,11 @@ public class TileEntityPersonalChest extends TileEntityInventory
   }
 
   @Override
+  protected VoxelShape getCullingShape() {
+    return Shapes.empty();
+  }
+
+  @Override
   public void startOpen(Player player) {
     if (!this.getLevel().isClientSide) {
       this.usingPlayers.add(player);
@@ -176,10 +184,10 @@ public class TileEntityPersonalChest extends TileEntityInventory
   @Override
   public boolean wrenchCanRemove(Player player) {
     if (!this.permitsAccess(player.getGameProfile())) {
-      IC2.sideProxy.messagePlayer(player, "This safe is owned by " + this.owner.getName());
+      IC2.sideProxy.messagePlayer(player, "This chest is owned by " + this.owner.getName());
       return false;
     } else if (!this.contentSlot.isEmpty()) {
-      IC2.sideProxy.messagePlayer(player, "Can't wrench non-empty safe");
+      IC2.sideProxy.messagePlayer(player, "Can't wrench non-empty chest");
       return false;
     } else {
       return true;
@@ -277,7 +285,9 @@ public class TileEntityPersonalChest extends TileEntityInventory
   @Override
   public void onPlaced(ItemStack stack, LivingEntity placer, Direction facing) {
     super.onPlaced(stack, placer, facing);
-    if (placer instanceof Player player && this.getLevel() != null && !this.getLevel().isClientSide) {
+    if (placer instanceof Player player
+        && this.getLevel() != null
+        && !this.getLevel().isClientSide) {
       this.setOwner(player.getGameProfile());
       this.setChanged();
       IC2.network.get(true).updateTileEntityField(this, "owner");
@@ -314,7 +324,7 @@ public class TileEntityPersonalChest extends TileEntityInventory
   protected InteractionResult onActivated(
       Player player, InteractionHand hand, Direction side, Vec3 hit) {
     if (!this.getLevel().isClientSide && !this.permitsAccess(player.getGameProfile())) {
-      IC2.sideProxy.messagePlayer(player, "This safe is owned by " + this.getOwner().getName());
+      IC2.sideProxy.messagePlayer(player, "This chest is owned by " + this.getOwner().getName());
       return InteractionResult.FAIL;
     } else {
       return super.onActivated(player, hand, side, hit);

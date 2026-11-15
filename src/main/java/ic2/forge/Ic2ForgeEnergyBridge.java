@@ -36,7 +36,9 @@ import net.neoforged.neoforge.event.level.ChunkEvent;
 import net.neoforged.neoforge.event.level.LevelEvent;
 import net.neoforged.neoforge.event.tick.LevelTickEvent;
 
-/** Bridges IC2's EU network directly to external FE and Mekanism energy receivers and generators. */
+/**
+ * Bridges IC2's EU network directly to external FE and Mekanism energy receivers and generators.
+ */
 public final class Ic2ForgeEnergyBridge {
   private static final Map<Level, Map<BlockPos, ForgeEnergySink>> sinks = new ConcurrentHashMap<>();
 
@@ -127,7 +129,8 @@ public final class Ic2ForgeEnergyBridge {
   }
 
   /**
-   * Queues only loaded neighbors when an IC2 node disappears; unloaded targets cannot have live sinks.
+   * Queues only loaded neighbors when an IC2 node disappears; unloaded targets cannot have live
+   * sinks.
    */
   private static void queueAdjacentLoadedPositions(Level world, BlockPos pos) {
     if (world == null || world.isClientSide) {
@@ -460,7 +463,8 @@ public final class Ic2ForgeEnergyBridge {
     return (long) Math.floor(joules);
   }
 
-  private static final class ForgeEnergySink implements ILocatable, IEnergySink, IMultiEnergySource {
+  private static final class ForgeEnergySink
+      implements ILocatable, IEnergySink, IMultiEnergySource {
     private final Level world;
     private final BlockPos pos;
     private EnumSet<Direction> connectedSides;
@@ -717,14 +721,16 @@ public final class Ic2ForgeEnergyBridge {
         }
         BlockState state = world.getBlockState(neighborPos);
         if (state.getBlock() instanceof AbstractCableBlock cable) {
-          int cableTier = EnergyNet.instance != null
-              ? EnergyNet.instance.getTierFromPower(cable.type.capacity)
-              : 1;
+          int cableTier =
+              EnergyNet.instance != null
+                  ? EnergyNet.instance.getTierFromPower(cable.type.capacity)
+                  : 1;
           maxTier = Math.max(maxTier, cableTier);
           found = true;
         } else if (EnergyNet.instance != null) {
           IEnergyTile subTile = EnergyNet.instance.getSubTile(world, neighborPos);
-          IEnergyTile tile = subTile != null ? subTile : EnergyNet.instance.getTile(world, neighborPos);
+          IEnergyTile tile =
+              subTile != null ? subTile : EnergyNet.instance.getTile(world, neighborPos);
           if (tile instanceof IEnergySink sink) {
             maxTier = Math.max(maxTier, sink.getSinkTier());
             found = true;
@@ -746,7 +752,8 @@ public final class Ic2ForgeEnergyBridge {
         return 1;
       }
       int tier = getSourceTier();
-      double packetSize = EnergyNet.instance != null ? EnergyNet.instance.getPowerFromTier(tier) : 32.0;
+      double packetSize =
+          EnergyNet.instance != null ? EnergyNet.instance.getPowerFromTier(tier) : 32.0;
       if (packetSize <= 0.0) {
         return 1;
       }
@@ -765,4 +772,3 @@ public final class Ic2ForgeEnergyBridge {
     }
   }
 }
-

@@ -2,8 +2,11 @@ package ic2.forge;
 
 import com.mojang.authlib.GameProfile;
 import ic2.core.block.personal.IPersonalBlock;
+import ic2.core.block.personal.TileEntityPersonalChest;
 import ic2.core.block.tileentity.TileEntityInventory;
 import ic2.core.item.EnvItemHandler;
+import ic2.core.util.DelegatingInventory;
+import ic2.core.util.StackUtil;
 import ic2.core.util.Util;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -30,13 +33,99 @@ final class EnvItemHandlerForge implements EnvItemHandler {
       Direction side,
       GameProfile profile,
       @Nullable Set<Container> personalInventories) {
-    if (target instanceof IPersonalBlock && profile != null) {
-      Container privilegedInventory = ((IPersonalBlock) target).getPrivilegedInventory(profile);
+    if (target instanceof TileEntityPersonalChest personalChest) {
+      Container privilegedInventory =
+          new DelegatingInventory(personalChest) {
+            @Override
+            public int getContainerSize() {
+              return personalChest.contentSlot.size();
+            }
+
+            @Override
+            public ItemStack getItem(int index) {
+              return personalChest.contentSlot.get(index);
+            }
+
+            @Override
+            public ItemStack removeItem(int index, int amount) {
+              ItemStack stack = this.getItem(index);
+              if (StackUtil.isEmpty(stack)) {
+                return StackUtil.emptyStack;
+              }
+
+              if (amount >= StackUtil.getSize(stack)) {
+                this.setItem(index, StackUtil.emptyStack);
+                return stack;
+              }
+
+              if (amount != 0) {
+                if (amount < 0) {
+                  int space =
+                      Math.min(
+                              personalChest.contentSlot.getStackSizeLimit(),
+                              stack.getMaxStackSize())
+                          - StackUtil.getSize(stack);
+                  amount = Math.max(amount, -space);
+                }
+
+                stack = StackUtil.decSize(stack, amount);
+                this.setItem(index, stack);
+              }
+
+              return StackUtil.copyWithSize(stack, amount);
+            }
+
+            @Override
+            public ItemStack removeItemNoUpdate(int index) {
+              ItemStack ret = this.getItem(index);
+              if (!StackUtil.isEmpty(ret)) {
+                this.setItem(index, StackUtil.emptyStack);
+              }
+
+              return ret;
+            }
+
+            @Override
+            public void setItem(int index, ItemStack stack) {
+              personalChest.contentSlot.put(index, stack);
+              personalChest.setChanged();
+            }
+
+            @Override
+            public int getMaxStackSize() {
+              return personalChest.contentSlot.getStackSizeLimit();
+            }
+
+            @Override
+            public boolean canPlaceItem(int index, ItemStack stack) {
+              return personalChest.contentSlot.accepts(stack);
+            }
+          };
+
       if (personalInventories != null) {
         personalInventories.add(privilegedInventory);
       }
 
       return privilegedInventory;
+    } else if (target instanceof IPersonalBlock personalTarget) {
+      GameProfile targetOwner = personalTarget.getOwner();
+      if (profile == null) {
+        profile = targetOwner;
+      }
+      if (profile != null) {
+        Container privilegedInventory = personalTarget.getPrivilegedInventory(profile);
+        if (privilegedInventory == target && targetOwner != null) {
+          privilegedInventory = personalTarget.getPrivilegedInventory(targetOwner);
+        }
+        if (privilegedInventory != target) {
+          if (personalInventories != null) {
+            personalInventories.add(privilegedInventory);
+          }
+
+          return privilegedInventory;
+        }
+      }
+      return target instanceof TileEntityInventory tileEntityInventory ? tileEntityInventory : null;
     } else if (target instanceof RandomizableContainerBlockEntity containerBlockEntity) {
       BlockState state = target.getBlockState();
       if (state.getBlock() instanceof ChestBlock chestBlock) {
@@ -62,7 +151,7 @@ final class EnvItemHandlerForge implements EnvItemHandler {
     GameProfile profile =
         source instanceof IPersonalBlock ? ((IPersonalBlock) source).getOwner() : null;
     return EnvItemHandlerForge.HandlerForge.ofNullable(
-        getStorage(target, dir.getOpposite(), profile, personalInventories), dir);
+        getStorage(target, dir.getOpposite(), profile, personalInventories), dir.getOpposite());
   }
 
   private ItemStack extractItemFrom(
@@ -94,23 +183,57 @@ final class EnvItemHandlerForge implements EnvItemHandler {
 
   private int insertItemTo(
       EnvItemHandlerForge.HandlerForge storage, ItemStack stack, boolean simulate) {
+    ItemStack remaining = stack.copy();
+    int initialCount = remaining.getCount();
+
     for (int i = 0; i < storage.getSlots(); i++) {
       ItemStack itemStack = storage.getStackInSlot(i);
-      if (storage.canInsertItem(i, stack)
+      if (storage.canInsertItem(i, remaining)
           && (itemStack.isEmpty()
-              || ItemStack.isSameItemSameComponents(itemStack, stack)
-                  && itemStack.getCount() < itemStack.getMaxStackSize())) {
-        ItemStack remainStack = storage.insertItem(i, stack, simulate);
-        return stack.getCount() - remainStack.getCount();
+              || ItemStack.isSameItemSameComponents(itemStack, remaining)
+                  && itemStack.getCount() < storage.getSlotLimit(i))) {
+        ItemStack remainStack = storage.insertItem(i, remaining, simulate);
+        int inserted = remaining.getCount() - remainStack.getCount();
+        remaining.shrink(inserted);
+        if (remaining.isEmpty()) {
+          break;
+        }
       }
     }
 
-    return 0;
+    return initialCount - remaining.getCount();
   }
 
   @Override
   public int fetch(BlockEntity source, ItemStack stack, boolean simulate) {
-    return 0;
+    if (stack.isEmpty()) {
+      return 0;
+    }
+
+    int remainingNeeded = stack.getCount();
+    int totalFetched = 0;
+
+    for (EnvItemHandler.AdjacentInventory inv : this.getAdjacentInventories(source)) {
+      EnvItemHandlerForge.HandlerForge storage = (EnvItemHandlerForge.HandlerForge) inv;
+      for (int i = 0; i < storage.getSlots(); i++) {
+        ItemStack slotStack = storage.getStackInSlot(i);
+        if (!slotStack.isEmpty()
+            && storage.canExtractItem(i, slotStack)
+            && ItemStack.isSameItemSameComponents(slotStack, stack)) {
+          int toExtract = Math.min(remainingNeeded, slotStack.getCount());
+          ItemStack extracted = storage.extractItem(i, toExtract, simulate);
+          if (!extracted.isEmpty()) {
+            totalFetched += extracted.getCount();
+            remainingNeeded -= extracted.getCount();
+            if (remainingNeeded <= 0) {
+              return totalFetched;
+            }
+          }
+        }
+      }
+    }
+
+    return totalFetched;
   }
 
   @Override
@@ -170,7 +293,7 @@ final class EnvItemHandlerForge implements EnvItemHandler {
 
     inventories.sort(
         Comparator.<EnvItemHandlerForge.HandlerForge, Boolean>comparing(
-                storage -> personalInventories.contains(storage.getDelegate()))
+                storage -> !personalInventories.contains(storage.getDelegate()))
             .thenComparingInt(
                 storage -> {
                   int slotsEstimate = 0;
