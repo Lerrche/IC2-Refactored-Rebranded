@@ -145,7 +145,7 @@ public class EventHandlerClient {
 
    简单说：想给特殊工具（线缆剪、撬棍等）在指向方块时加自定义准星高亮效果，但还没写完。
    */
-  public static void onDrawBlockHighlight(
+  public static boolean onDrawBlockHighlight(
       Player player,
       BlockHitResult target,
       float partialTicks,
@@ -153,7 +153,7 @@ public class EventHandlerClient {
       MultiBufferSource buffers,
       Camera camera) {
     if (player == null || target == null || target.getType() != Type.BLOCK) {
-      return;
+      return false;
     }
     ItemStack inHand = StackUtil.get(player, InteractionHand.MAIN_HAND);
     if (!(inHand.getItem() instanceof IEnhancedOverlayProvider)) {
@@ -164,9 +164,10 @@ public class EventHandlerClient {
       BlockPos pos = target.getBlockPos();
       Direction side = target.getDirection();
       if (provider.providesEnhancedOverlay(world, pos, side, player, inHand)) {
-        EnhancedOverlay.render(player, target, matrix, buffers, camera);
+        return EnhancedOverlay.render(player, target, matrix, buffers, camera);
       }
     }
+    return false;
   }
 
   public static boolean onDrawBlockHighlightLast(

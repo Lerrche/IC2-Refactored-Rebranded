@@ -83,7 +83,7 @@ public class EnhancedOverlay {
     }
   }
 
-  public static void render(
+  public static boolean render(
       Player player,
       BlockHitResult target,
       PoseStack matrix,
@@ -94,7 +94,7 @@ public class EnhancedOverlay {
     Direction side = target.getDirection();
     BlockState state = world.getBlockState(blockPos);
     if (!(state.getBlock() instanceof IWrenchAble wrenchAble)) {
-      return;
+      return false;
     }
 
     Direction hoveredSpin = RotationUtil.rotateByRay(target);
@@ -103,26 +103,18 @@ public class EnhancedOverlay {
     double camY = camPos.y;
     double camZ = camPos.z;
 
-    matrix.pushPose();
-    transformToFace(matrix, blockPos, side, camX, camY, camZ);
-    Matrix4f facePose = matrix.last().pose();
-
-    VertexConsumer lineBuffer = buffers.getBuffer(RenderType.lines());
+    // -------------------------------------------------------------
+    // PASS 1: Render All Quads
+    // -------------------------------------------------------------
     VertexConsumer quadBuffer = buffers.getBuffer(RenderType.debugQuads());
 
-    // 3x3 Grid lines
-    drawLine(facePose, lineBuffer, 0.5F, -0.25F, -0.5F, -0.25F, 0, 0, 0, 180);
-    drawLine(facePose, lineBuffer, 0.5F, 0.25F, -0.5F, 0.25F, 0, 0, 0, 180);
-    drawLine(facePose, lineBuffer, 0.25F, -0.5F, 0.25F, 0.5F, 0, 0, 0, 180);
-    drawLine(facePose, lineBuffer, -0.25F, -0.5F, -0.25F, 0.5F, 0, 0, 0, 180);
-    // Outer border lines
-    drawLine(facePose, lineBuffer, 0.5F, -0.5F, -0.5F, -0.5F, 0, 0, 0, 180);
-    drawLine(facePose, lineBuffer, 0.5F, 0.5F, -0.5F, 0.5F, 0, 0, 0, 180);
-    drawLine(facePose, lineBuffer, 0.5F, -0.5F, 0.5F, 0.5F, 0, 0, 0, 180);
-    drawLine(facePose, lineBuffer, -0.5F, -0.5F, -0.5F, 0.5F, 0, 0, 0, 180);
-
+    // 1. Quads on the targeted face (sector highlights)
     EnhancedOverlay overlay = forFace(side);
     if (overlay != null) {
+      matrix.pushPose();
+      transformToFace(matrix, blockPos, side, camX, camY, camZ);
+      Matrix4f facePose = matrix.last().pose();
+
       for (Segment segment : Segment.values()) {
         Direction spin = getTargetFacing(side, segment);
         if (wrenchAble.canSetFacing(world, blockPos, spin, player)) {
@@ -144,27 +136,62 @@ public class EnhancedOverlay {
           }
         }
       }
+      matrix.popPose();
     }
 
+    // 2. Quad on the destination face (if valid)
+    if (hoveredSpin != null && wrenchAble.canSetFacing(world, blockPos, hoveredSpin, player)) {
+      matrix.pushPose();
+      transformToFace(matrix, blockPos, hoveredSpin, camX, camY, camZ);
+      Matrix4f destPose = matrix.last().pose();
+      drawFaceQuad(destPose, quadBuffer, 0, 255, 0, 90);
+      matrix.popPose();
+    }
+
+    if (buffers instanceof MultiBufferSource.BufferSource bufferSource) {
+      bufferSource.endBatch(RenderType.debugQuads());
+    }
+
+    // -------------------------------------------------------------
+    // PASS 2: Render All Lines
+    // -------------------------------------------------------------
+    VertexConsumer lineBuffer = buffers.getBuffer(RenderType.lines());
+
+    // 1. Grid lines on the targeted face
+    matrix.pushPose();
+    transformToFace(matrix, blockPos, side, camX, camY, camZ);
+    Matrix4f facePose = matrix.last().pose();
+
+    // 3x3 Grid lines
+    drawLine(facePose, lineBuffer, 0.5F, -0.25F, -0.5F, -0.25F, 0, 0, 0, 180);
+    drawLine(facePose, lineBuffer, 0.5F, 0.25F, -0.5F, 0.25F, 0, 0, 0, 180);
+    drawLine(facePose, lineBuffer, 0.25F, -0.5F, 0.25F, 0.5F, 0, 0, 0, 180);
+    drawLine(facePose, lineBuffer, -0.25F, -0.5F, -0.25F, 0.5F, 0, 0, 0, 180);
+    // Outer border lines
+    drawLine(facePose, lineBuffer, 0.5F, -0.5F, -0.5F, -0.5F, 0, 0, 0, 180);
+    drawLine(facePose, lineBuffer, 0.5F, 0.5F, -0.5F, 0.5F, 0, 0, 0, 180);
+    drawLine(facePose, lineBuffer, 0.5F, -0.5F, 0.5F, 0.5F, 0, 0, 0, 180);
+    drawLine(facePose, lineBuffer, -0.5F, -0.5F, -0.5F, 0.5F, 0, 0, 0, 180);
     matrix.popPose();
 
-    // Render destination face highlight
+    // 2. Border lines on the destination face
     if (hoveredSpin != null && wrenchAble.canSetFacing(world, blockPos, hoveredSpin, player)) {
       matrix.pushPose();
       transformToFace(matrix, blockPos, hoveredSpin, camX, camY, camZ);
       Matrix4f destPose = matrix.last().pose();
 
-      // Destination face quad (translucent green)
-      drawFaceQuad(destPose, quadBuffer, 0, 255, 0, 90);
-
-      // Destination face border lines (dark green)
       drawLine(destPose, lineBuffer, 0.5F, -0.5F, -0.5F, -0.5F, 0, 180, 0, 220);
       drawLine(destPose, lineBuffer, 0.5F, 0.5F, -0.5F, 0.5F, 0, 180, 0, 220);
       drawLine(destPose, lineBuffer, 0.5F, -0.5F, 0.5F, 0.5F, 0, 180, 0, 220);
       drawLine(destPose, lineBuffer, -0.5F, -0.5F, -0.5F, 0.5F, 0, 180, 0, 220);
-
       matrix.popPose();
     }
+
+    if (buffers instanceof MultiBufferSource.BufferSource bufferSource) {
+      bufferSource.endBatch(RenderType.lines());
+    }
+
+    return true;
   }
 
   private static void drawLine(
