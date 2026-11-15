@@ -217,7 +217,7 @@ public class TileEntityEnergyOMat extends TileEntityInventory
     for (Direction dir : Util.ALL_DIRS) {
       net.minecraft.world.level.block.entity.BlockEntity be =
           this.level.getBlockEntity(this.worldPosition.relative(dir));
-      if (be instanceof TileEntityPersonalChest chest) {
+      if (be instanceof TileEntityPersonalChest chest && chest.permitsAccess(this.getOwner())) {
         for (int i = 0; i < chest.contentSlot.size(); i++) {
           ItemStack existing = chest.contentSlot.get(i);
           if (StackUtil.isEmpty(existing)) {
@@ -239,8 +239,8 @@ public class TileEntityEnergyOMat extends TileEntityInventory
             int space = limit - existing.getCount();
             int count = Math.min(toInsert.getCount(), space);
             if (!simulate) {
-              existing.grow(count);
-              chest.contentSlot.put(i, existing);
+              chest.contentSlot.put(
+                  i, StackUtil.copyWithSize(existing, existing.getCount() + count));
               chest.setChanged();
             }
             totalAdded += count;
@@ -301,7 +301,7 @@ public class TileEntityEnergyOMat extends TileEntityInventory
   }
 
   @Override
-  protected boolean canSetFacingWrench(Direction facing, Player player) {
+  public boolean canSetFacingWrench(Direction facing, Player player) {
     return player != null && this.permitsAccess(player.getGameProfile())
         ? super.canSetFacingWrench(facing, player)
         : false;

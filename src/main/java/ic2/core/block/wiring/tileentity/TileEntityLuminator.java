@@ -176,7 +176,7 @@ public class TileEntityLuminator extends Ic2TileEntity {
   }
 
   @Override
-  protected boolean canSetFacingWrench(Direction facing, Player player) {
+  public boolean canSetFacingWrench(Direction facing, Player player) {
     return true;
   }
 

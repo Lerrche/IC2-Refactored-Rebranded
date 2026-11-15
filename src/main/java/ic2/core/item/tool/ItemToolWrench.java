@@ -2,6 +2,7 @@ package ic2.core.item.tool;
 
 import ic2.api.item.BlockBreakableItem;
 import ic2.api.item.IBoxable;
+import ic2.api.item.IEnhancedOverlayProvider;
 import ic2.api.tile.IWrenchAble;
 import ic2.core.IC2;
 import ic2.core.IHitSoundOverride;
@@ -48,12 +49,22 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ItemToolWrench extends Item
-    implements PriorityUsableItem, IBoxable, BlockBreakableItem, IHitSoundOverride {
+    implements PriorityUsableItem,
+        IBoxable,
+        BlockBreakableItem,
+        IHitSoundOverride,
+        IEnhancedOverlayProvider {
   private static final int MINE_DAMAGE = 1;
   public static final float WRENCH_DESTROY_SPEED = 6.0F;
 
   public ItemToolWrench(Properties settings) {
     super(settings);
+  }
+
+  @Override
+  public boolean providesEnhancedOverlay(
+      Level world, BlockPos pos, Direction side, Player player, ItemStack stack) {
+    return world.getBlockState(pos).getBlock() instanceof IWrenchAble;
   }
 
   public static int onWrenchUse(Player player, UseOnContext context, boolean removeBlock) {

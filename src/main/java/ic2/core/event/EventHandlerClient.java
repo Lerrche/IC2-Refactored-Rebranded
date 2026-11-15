@@ -2,8 +2,10 @@ package ic2.core.event;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import ic2.api.item.ElectricItem;
+import ic2.api.item.IEnhancedOverlayProvider;
 import ic2.core.GuiOverlayer;
 import ic2.core.IC2;
+import ic2.core.block.renderer.EnhancedOverlay;
 import ic2.core.fluid.FluidHandler;
 import ic2.core.item.IHandHeldInventory;
 import ic2.core.item.armor.jetpack.JetpackLogic;
@@ -19,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import net.minecraft.client.Camera;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.events.GuiEventListener;
 import net.minecraft.client.gui.screens.Screen;
@@ -147,10 +150,23 @@ public class EventHandlerClient {
       BlockHitResult target,
       float partialTicks,
       PoseStack matrix,
-      MultiBufferSource buffers) {
-    assert target.getType() == Type.BLOCK;
+      MultiBufferSource buffers,
+      Camera camera) {
+    if (player == null || target == null || target.getType() != Type.BLOCK) {
+      return;
+    }
     ItemStack inHand = StackUtil.get(player, InteractionHand.MAIN_HAND);
-    inHand.getItem();
+    if (!(inHand.getItem() instanceof IEnhancedOverlayProvider)) {
+      inHand = StackUtil.get(player, InteractionHand.OFF_HAND);
+    }
+    if (inHand.getItem() instanceof IEnhancedOverlayProvider provider) {
+      Level world = player.level();
+      BlockPos pos = target.getBlockPos();
+      Direction side = target.getDirection();
+      if (provider.providesEnhancedOverlay(world, pos, side, player, inHand)) {
+        EnhancedOverlay.render(player, target, matrix, buffers, camera);
+      }
+    }
   }
 
   public static boolean onDrawBlockHighlightLast(

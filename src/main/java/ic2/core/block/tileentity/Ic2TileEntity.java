@@ -467,7 +467,7 @@ public abstract class Ic2TileEntity extends BlockEntity
         : this.getBlockState().getValue(this.teBlock.facingProperty);
   }
 
-  protected boolean canSetFacingWrench(Direction facing, Player player) {
+  public boolean canSetFacingWrench(Direction facing, Player player) {
     if (!this.teBlock.allowWrenchRotating()) {
       return false;
     } else {

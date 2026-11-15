@@ -2,6 +2,7 @@ package ic2.gravisuite.items;
 
 import ic2.api.item.AddonElectricTool;
 import ic2.api.item.BlockBreakableItem;
+import ic2.api.item.IEnhancedOverlayProvider;
 import ic2.api.tile.IWrenchAble;
 import ic2.core.IC2;
 import ic2.core.item.PriorityUsableItem;
@@ -49,10 +50,16 @@ import org.jetbrains.annotations.Nullable;
  * </ul>
  */
 public class GraviToolItem extends AddonElectricTool
-    implements PriorityUsableItem, BlockBreakableItem {
+    implements PriorityUsableItem, BlockBreakableItem, IEnhancedOverlayProvider {
   public static final double MAX_CHARGE = 300_000.0;
   public static final double TRANSFER_LIMIT = 5_000.0;
   public static final int TIER = 2;
+
+  @Override
+  public boolean providesEnhancedOverlay(
+      Level world, BlockPos pos, Direction side, Player player, ItemStack stack) {
+    return getMode(stack) == Mode.WRENCH && world.getBlockState(pos).getBlock() instanceof IWrenchAble;
+  }
 
   public enum Mode {
     HOE("hoe", 50.0),

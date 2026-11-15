@@ -623,6 +623,12 @@ public final class Ic2TileEntityBlock extends Block
   }
 
   @Override
+  public boolean canSetFacing(Level world, BlockPos pos, Direction newDirection, Player player) {
+    Ic2TileEntity te = getTe(world, pos);
+    return te != null && te.canSetFacingWrench(newDirection, player);
+  }
+
+  @Override
   public boolean wrenchCanRemove(Level world, BlockPos pos, Player player) {
     Ic2TileEntity te = getTe(world, pos);
     return te != null && te.wrenchCanRemove(player);

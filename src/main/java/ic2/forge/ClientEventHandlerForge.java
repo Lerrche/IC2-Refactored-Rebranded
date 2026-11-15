@@ -74,7 +74,8 @@ public final class ClientEventHandlerForge {
         event.getTarget(),
         event.getDeltaTracker().getGameTimeDeltaPartialTick(false),
         event.getPoseStack(),
-        event.getMultiBufferSource());
+        event.getMultiBufferSource(),
+        event.getCamera());
   }
 
   @SubscribeEvent(priority = EventPriority.LOWEST)

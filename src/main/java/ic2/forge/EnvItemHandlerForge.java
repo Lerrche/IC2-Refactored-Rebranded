@@ -34,6 +34,9 @@ final class EnvItemHandlerForge implements EnvItemHandler {
       GameProfile profile,
       @Nullable Set<Container> personalInventories) {
     if (target instanceof TileEntityPersonalChest personalChest) {
+      if (profile != null && !personalChest.permitsAccess(profile)) {
+        return null;
+      }
       Container privilegedInventory =
           new DelegatingInventory(personalChest) {
             @Override
@@ -192,7 +195,8 @@ final class EnvItemHandlerForge implements EnvItemHandler {
           && (itemStack.isEmpty()
               || ItemStack.isSameItemSameComponents(itemStack, remaining)
                   && itemStack.getCount() < storage.getSlotLimit(i))) {
-        ItemStack remainStack = storage.insertItem(i, remaining, simulate);
+        ItemStack toInsert = remaining.copy();
+        ItemStack remainStack = storage.insertItem(i, toInsert, simulate);
         int inserted = remaining.getCount() - remainStack.getCount();
         remaining.shrink(inserted);
         if (remaining.isEmpty()) {
@@ -343,18 +347,19 @@ final class EnvItemHandlerForge implements EnvItemHandler {
     }
   }
 
-  private static class HandlerForge extends ItemStackHandler
+  static class HandlerForge extends ItemStackHandler
       implements EnvItemHandler.AdjacentInventory {
     final Direction side;
     Container inventory;
 
-    private HandlerForge(Container inventory, Direction side) {
+    HandlerForge(Container inventory, Direction side) {
       super(inventory.getContainerSize());
       this.side = side;
       this.inventory = inventory;
 
       for (int i = 0; i < inventory.getContainerSize(); i++) {
-        this.stacks.set(i, inventory.getItem(i));
+        ItemStack item = inventory.getItem(i);
+        this.stacks.set(i, item.isEmpty() ? ItemStack.EMPTY : item.copy());
       }
     }
 
@@ -364,8 +369,8 @@ final class EnvItemHandlerForge implements EnvItemHandler {
 
     @Override
     public void setStackInSlot(int slot, @NotNull ItemStack stack) {
-      super.setStackInSlot(slot, stack);
-      this.inventory.setItem(slot, stack);
+      super.setStackInSlot(slot, stack.copy());
+      this.inventory.setItem(slot, stack.copy());
     }
 
     public int size() {
@@ -374,10 +379,10 @@ final class EnvItemHandlerForge implements EnvItemHandler {
 
     @NotNull @Override
     public ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
-      ItemStack remainStack = super.insertItem(slot, stack, simulate);
+      ItemStack remainStack = super.insertItem(slot, stack.copy(), simulate);
       if (!simulate) {
         for (int i = 0; i < this.inventory.getContainerSize(); i++) {
-          this.inventory.setItem(i, this.getStackInSlot(i));
+          this.inventory.setItem(i, this.getStackInSlot(i).copy());
         }
       }
 
@@ -389,7 +394,7 @@ final class EnvItemHandlerForge implements EnvItemHandler {
       ItemStack extractedStack = super.extractItem(slot, amount, simulate);
       if (!simulate) {
         for (int i = 0; i < this.inventory.getContainerSize(); i++) {
-          this.inventory.setItem(i, this.getStackInSlot(i));
+          this.inventory.setItem(i, this.getStackInSlot(i).copy());
         }
       }
 

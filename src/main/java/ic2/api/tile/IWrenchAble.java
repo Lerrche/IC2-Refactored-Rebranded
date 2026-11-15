@@ -14,6 +14,10 @@ public interface IWrenchAble {
 
   boolean setFacing(Level var1, BlockPos var2, Direction var3, Player var4);
 
+  default boolean canSetFacing(Level world, BlockPos pos, Direction newDirection, Player player) {
+    return newDirection != getFacing(world, pos);
+  }
+
   boolean wrenchCanRemove(Level var1, BlockPos var2, Player var3);
 
   List<ItemStack> getWrenchDrops(

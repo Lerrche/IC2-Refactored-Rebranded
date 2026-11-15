@@ -67,7 +67,7 @@ public class TileEntityPersonalChest extends TileEntityInventory
     }
 
     GameProfile teOwner = te.getOwner();
-    if (!te.getLevel().isClientSide) {
+    if (te.getLevel() != null && !te.getLevel().isClientSide) {
       if (teOwner == null) {
         te.setOwner(profile);
         // without marking dirty, a claim followed by a chunk unload silently loses the owner
@@ -76,7 +76,9 @@ public class TileEntityPersonalChest extends TileEntityInventory
         return true;
       }
 
-      if (te.getLevel().getServer().getPlayerList().isOp(profile)) {
+      if (te.getLevel().getServer() != null
+          && te.getLevel().getServer().getPlayerList() != null
+          && te.getLevel().getServer().getPlayerList().isOp(profile)) {
         return true;
       }
     } else if (teOwner == null) {
