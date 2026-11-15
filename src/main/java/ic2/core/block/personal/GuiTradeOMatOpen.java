@@ -2,7 +2,6 @@ package ic2.core.block.personal;
 
 import ic2.core.IC2;
 import ic2.core.Ic2Gui;
-import ic2.core.gui.VanillaButton;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;

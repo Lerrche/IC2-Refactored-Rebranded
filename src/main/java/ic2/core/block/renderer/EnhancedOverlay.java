@@ -440,11 +440,7 @@ public class EnhancedOverlay {
     public static Segment forRayTrace(BlockHitResult ray) {
       Vec3 hit = ray.getLocation();
       BlockPos pos = ray.getBlockPos();
-      return forHit(
-          ray.getDirection(),
-          hit.x - pos.getX(),
-          hit.y - pos.getY(),
-          hit.z - pos.getZ());
+      return forHit(ray.getDirection(), hit.x - pos.getX(), hit.y - pos.getY(), hit.z - pos.getZ());
     }
   }
 }

@@ -6,7 +6,6 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 import ic2.core.recipe.v2.RecipeManagerGetter;
-import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
@@ -35,10 +34,12 @@ class RecipeManagerGetterTest {
   @DisplayName("RecipeManagerGetter handles null world and null RecipeManager safely")
   void testNullSafety() {
     AtomicInteger callCount = new AtomicInteger();
-    RecipeManagerGetter<String> getter = new RecipeManagerGetter<>(rm -> {
-      callCount.incrementAndGet();
-      return "result";
-    });
+    RecipeManagerGetter<String> getter =
+        new RecipeManagerGetter<>(
+            rm -> {
+              callCount.incrementAndGet();
+              return "result";
+            });
 
     assertNull(getter.get((Level) null));
     assertNull(getter.get((RecipeManager) null));
@@ -49,10 +50,12 @@ class RecipeManagerGetterTest {
   @DisplayName("RecipeManagerGetter caches per RecipeManager and does not re-invoke factory")
   void testCaching() {
     AtomicInteger callCount = new AtomicInteger();
-    RecipeManagerGetter<String> getter = new RecipeManagerGetter<>(rm -> {
-      callCount.incrementAndGet();
-      return "manager_" + callCount.get();
-    });
+    RecipeManagerGetter<String> getter =
+        new RecipeManagerGetter<>(
+            rm -> {
+              callCount.incrementAndGet();
+              return "manager_" + callCount.get();
+            });
 
     RecipeManager rm1 = createRecipeManager();
     RecipeManager rm2 = createRecipeManager();
@@ -86,7 +89,8 @@ class RecipeManagerGetterTest {
   @DisplayName("RecipeManagerGetter clear() purges cached managers")
   void testClear() {
     AtomicInteger callCount = new AtomicInteger();
-    RecipeManagerGetter<String> getter = new RecipeManagerGetter<>(rm -> "val_" + callCount.incrementAndGet());
+    RecipeManagerGetter<String> getter =
+        new RecipeManagerGetter<>(rm -> "val_" + callCount.incrementAndGet());
 
     RecipeManager rm = createRecipeManager();
 
@@ -103,13 +107,16 @@ class RecipeManagerGetterTest {
   @DisplayName("RecipeManagerGetter is thread-safe under concurrent access")
   void testConcurrentAccess() throws InterruptedException {
     AtomicInteger callCount = new AtomicInteger();
-    RecipeManagerGetter<String> getter = new RecipeManagerGetter<>(rm -> {
-      callCount.incrementAndGet();
-      try {
-        Thread.sleep(5);
-      } catch (InterruptedException ignored) {}
-      return "result";
-    });
+    RecipeManagerGetter<String> getter =
+        new RecipeManagerGetter<>(
+            rm -> {
+              callCount.incrementAndGet();
+              try {
+                Thread.sleep(5);
+              } catch (InterruptedException ignored) {
+              }
+              return "result";
+            });
 
     RecipeManager rm = createRecipeManager();
 
@@ -119,18 +126,19 @@ class RecipeManagerGetterTest {
     CountDownLatch doneLatch = new CountDownLatch(threadCount);
 
     for (int i = 0; i < threadCount; i++) {
-      executor.submit(() -> {
-        try {
-          startLatch.await();
-          for (int j = 0; j < 50; j++) {
-            assertEquals("result", getter.get(rm));
-          }
-        } catch (Exception e) {
-          throw new RuntimeException(e);
-        } finally {
-          doneLatch.countDown();
-        }
-      });
+      executor.submit(
+          () -> {
+            try {
+              startLatch.await();
+              for (int j = 0; j < 50; j++) {
+                assertEquals("result", getter.get(rm));
+              }
+            } catch (Exception e) {
+              throw new RuntimeException(e);
+            } finally {
+              doneLatch.countDown();
+            }
+          });
     }
 
     startLatch.countDown();

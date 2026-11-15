@@ -58,7 +58,8 @@ public class GraviToolItem extends AddonElectricTool
   @Override
   public boolean providesEnhancedOverlay(
       Level world, BlockPos pos, Direction side, Player player, ItemStack stack) {
-    return getMode(stack) == Mode.WRENCH && world.getBlockState(pos).getBlock() instanceof IWrenchAble;
+    return getMode(stack) == Mode.WRENCH
+        && world.getBlockState(pos).getBlock() instanceof IWrenchAble;
   }
 
   public enum Mode {

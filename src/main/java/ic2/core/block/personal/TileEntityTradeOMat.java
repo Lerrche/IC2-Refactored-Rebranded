@@ -22,7 +22,6 @@ import java.util.List;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
@@ -303,8 +302,7 @@ public class TileEntityTradeOMat extends TileEntityInventory
   @Override
   public ContainerBase<?> createServerScreenHandler(int syncId, Player player) {
     return this.permitsAccess(player.getGameProfile())
-        ? new ContainerTradeOMatOpen(
-            syncId, player.getInventory(), this, false)
+        ? new ContainerTradeOMatOpen(syncId, player.getInventory(), this, false)
         : new ContainerTradeOMatClosed(syncId, player.getInventory(), this);
   }
 
@@ -344,8 +342,7 @@ public class TileEntityTradeOMat extends TileEntityInventory
   }
 
   @Override
-  public void onNetworkEvent(Player player, int event) {
-  }
+  public void onNetworkEvent(Player player, int event) {}
 
   private boolean canToggleInfinite(Player player) {
     return false;

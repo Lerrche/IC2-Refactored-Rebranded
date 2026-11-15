@@ -144,8 +144,7 @@ public class TileEntityEnergyOMat extends TileEntityInventory
       if (transferred < StackUtil.getSize(tradedIn)) {
         transferred +=
             this.depositToPersonalChest(
-                StackUtil.copyWithSize(tradedIn, StackUtil.getSize(tradedIn) - transferred),
-                true);
+                StackUtil.copyWithSize(tradedIn, StackUtil.getSize(tradedIn) - transferred), true);
       }
 
       if (transferred == StackUtil.getSize(tradedIn)) {
@@ -234,8 +233,7 @@ public class TileEntityEnergyOMat extends TileEntityInventory
           } else if (StackUtil.checkItemEqualityStrict(existing, toInsert)
               && existing.getCount()
                   < Math.min(chest.contentSlot.getStackSizeLimit(), existing.getMaxStackSize())) {
-            int limit =
-                Math.min(chest.contentSlot.getStackSizeLimit(), existing.getMaxStackSize());
+            int limit = Math.min(chest.contentSlot.getStackSizeLimit(), existing.getMaxStackSize());
             int space = limit - existing.getCount();
             int count = Math.min(toInsert.getCount(), space);
             if (!simulate) {

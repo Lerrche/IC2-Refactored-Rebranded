@@ -347,8 +347,7 @@ final class EnvItemHandlerForge implements EnvItemHandler {
     }
   }
 
-  static class HandlerForge extends ItemStackHandler
-      implements EnvItemHandler.AdjacentInventory {
+  static class HandlerForge extends ItemStackHandler implements EnvItemHandler.AdjacentInventory {
     final Direction side;
     Container inventory;
 
