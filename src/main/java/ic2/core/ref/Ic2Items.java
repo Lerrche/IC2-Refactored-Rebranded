@@ -939,15 +939,20 @@ public final class Ic2Items {
   public static final Item BREW_MUG =
       register("brew_mug", new ItemMug(new Properties().stacksTo(1), ItemMug.MugType.brew));
   public static final Item YOUNGSTER_MUG =
-      register("youngster_mug", new ItemMug(new Properties().stacksTo(1), ItemMug.MugType.youngster));
+      register(
+          "youngster_mug", new ItemMug(new Properties().stacksTo(1), ItemMug.MugType.youngster));
   public static final Item BEER_MUG =
       register("beer_mug", new ItemMug(new Properties().stacksTo(1), ItemMug.MugType.beer));
   public static final Item ALE_MUG =
       register("ale_mug", new ItemMug(new Properties().stacksTo(1), ItemMug.MugType.ale));
   public static final Item BLACK_STUFF_MUG =
-      register("black_stuff_mug", new ItemMug(new Properties().stacksTo(1), ItemMug.MugType.black_stuff));
+      register(
+          "black_stuff_mug",
+          new ItemMug(new Properties().stacksTo(1), ItemMug.MugType.black_stuff));
   public static final Item DRAGON_BLOOD_MUG =
-      register("dragon_blood_mug", new ItemMug(new Properties().stacksTo(1), ItemMug.MugType.dragon_blood));
+      register(
+          "dragon_blood_mug",
+          new ItemMug(new Properties().stacksTo(1), ItemMug.MugType.dragon_blood));
   public static final Item RUM_MUG =
       register("rum_mug", new ItemMug(new Properties().stacksTo(1), ItemMug.MugType.rum));
   public static final Item CROP_STICK = register("crop_stick", new ItemCrop(new Properties()));
@@ -1024,7 +1029,8 @@ public final class Ic2Items {
   public static final Item CHAINSAW =
       register("chainsaw", new ItemElectricToolChainsaw(new Properties().stacksTo(1)));
   public static final Item DIAMOND_CHAINSAW =
-      register("diamond_chainsaw", new ItemElectricToolDiamondChainsaw(new Properties().stacksTo(1)));
+      register(
+          "diamond_chainsaw", new ItemElectricToolDiamondChainsaw(new Properties().stacksTo(1)));
   public static final Item DIAMOND_DRILL =
       register(
           "diamond_drill",

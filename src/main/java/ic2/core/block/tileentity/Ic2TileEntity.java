@@ -425,7 +425,10 @@ public abstract class Ic2TileEntity extends BlockEntity
   }
 
   public ItemInteractionResult onItemUse(
-      ItemStack stack, Player player, InteractionHand hand, net.minecraft.world.phys.BlockHitResult hit) {
+      ItemStack stack,
+      Player player,
+      InteractionHand hand,
+      net.minecraft.world.phys.BlockHitResult hit) {
     return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
   }
 

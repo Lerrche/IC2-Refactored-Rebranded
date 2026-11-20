@@ -86,7 +86,8 @@ public class ItemMug extends Item implements ItemLike {
     }
   }
 
-  private void applyCoffee(Player player, int maxAmplifier, int extraDuration, boolean isRegularCoffee) {
+  private void applyCoffee(
+      Player player, int maxAmplifier, int extraDuration, boolean isRegularCoffee) {
     int highest = 0;
     int x = this.amplifyEffect(player, MobEffects.MOVEMENT_SPEED, maxAmplifier, extraDuration);
     if (x > highest) {

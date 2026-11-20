@@ -22,10 +22,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 
 /**
- * TileEntity for the Booze Barrel.
- * Handles water filling, ingredient loading (wheat, hops, sugar cane),
- * fermentation progression over time, tapping with a treetap,
- * and pouring into stone mugs.
+ * TileEntity for the Booze Barrel. Handles water filling, ingredient loading (wheat, hops, sugar
+ * cane), fermentation progression over time, tapping with a treetap, and pouring into stone mugs.
  */
 public class TileEntityBarrel extends Ic2TileEntity {
   public static final int MAX_WATER = 32000; // 32 buckets / cells
@@ -45,7 +43,9 @@ public class TileEntityBarrel extends Ic2TileEntity {
   @Override
   protected void updateEntityServer() {
     super.updateEntityServer();
-    if (!this.hasTap && this.waterAmount > 0 && (this.wheat > 0 || this.hops > 0 || this.sugarCane > 0)) {
+    if (!this.hasTap
+        && this.waterAmount > 0
+        && (this.wheat > 0 || this.hops > 0 || this.sugarCane > 0)) {
       this.fermentationProgress++;
       if (this.fermentationProgress % 600 == 0) {
         this.setChanged();
@@ -68,10 +68,13 @@ public class TileEntityBarrel extends Ic2TileEntity {
           if (!player.getAbilities().instabuild) {
             player.setItemInHand(hand, new ItemStack(Items.BUCKET));
           }
-          this.level.playSound(null, this.worldPosition, SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
+          this.level.playSound(
+              null, this.worldPosition, SoundEvents.BUCKET_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
           this.setChanged();
           player.displayClientMessage(
-              Component.translatable("ic2.barrel.water_added", this.waterAmount / 1000, MAX_WATER / 1000), true);
+              Component.translatable(
+                  "ic2.barrel.water_added", this.waterAmount / 1000, MAX_WATER / 1000),
+              true);
         }
         return ItemInteractionResult.sidedSuccess(this.level.isClientSide);
       } else {
@@ -93,10 +96,13 @@ public class TileEntityBarrel extends Ic2TileEntity {
               player.drop(new ItemStack(Ic2Items.EMPTY_CELL), false);
             }
           }
-          this.level.playSound(null, this.worldPosition, SoundEvents.BOTTLE_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
+          this.level.playSound(
+              null, this.worldPosition, SoundEvents.BOTTLE_EMPTY, SoundSource.BLOCKS, 1.0F, 1.0F);
           this.setChanged();
           player.displayClientMessage(
-              Component.translatable("ic2.barrel.water_added", this.waterAmount / 1000, MAX_WATER / 1000), true);
+              Component.translatable(
+                  "ic2.barrel.water_added", this.waterAmount / 1000, MAX_WATER / 1000),
+              true);
         }
         return ItemInteractionResult.sidedSuccess(this.level.isClientSide);
       } else {
@@ -113,9 +119,11 @@ public class TileEntityBarrel extends Ic2TileEntity {
         if (!this.level.isClientSide) {
           this.wheat++;
           if (!player.getAbilities().instabuild) stack.shrink(1);
-          this.level.playSound(null, this.worldPosition, SoundEvents.CROP_PLANTED, SoundSource.BLOCKS, 1.0F, 1.0F);
+          this.level.playSound(
+              null, this.worldPosition, SoundEvents.CROP_PLANTED, SoundSource.BLOCKS, 1.0F, 1.0F);
           this.setChanged();
-          player.displayClientMessage(Component.translatable("ic2.barrel.wheat_added", this.wheat), true);
+          player.displayClientMessage(
+              Component.translatable("ic2.barrel.wheat_added", this.wheat), true);
         }
         return ItemInteractionResult.sidedSuccess(this.level.isClientSide);
       }
@@ -128,9 +136,11 @@ public class TileEntityBarrel extends Ic2TileEntity {
         if (!this.level.isClientSide) {
           this.hops++;
           if (!player.getAbilities().instabuild) stack.shrink(1);
-          this.level.playSound(null, this.worldPosition, SoundEvents.CROP_PLANTED, SoundSource.BLOCKS, 1.0F, 1.0F);
+          this.level.playSound(
+              null, this.worldPosition, SoundEvents.CROP_PLANTED, SoundSource.BLOCKS, 1.0F, 1.0F);
           this.setChanged();
-          player.displayClientMessage(Component.translatable("ic2.barrel.hops_added", this.hops), true);
+          player.displayClientMessage(
+              Component.translatable("ic2.barrel.hops_added", this.hops), true);
         }
         return ItemInteractionResult.sidedSuccess(this.level.isClientSide);
       }
@@ -143,9 +153,11 @@ public class TileEntityBarrel extends Ic2TileEntity {
         if (!this.level.isClientSide) {
           this.sugarCane++;
           if (!player.getAbilities().instabuild) stack.shrink(1);
-          this.level.playSound(null, this.worldPosition, SoundEvents.CROP_PLANTED, SoundSource.BLOCKS, 1.0F, 1.0F);
+          this.level.playSound(
+              null, this.worldPosition, SoundEvents.CROP_PLANTED, SoundSource.BLOCKS, 1.0F, 1.0F);
           this.setChanged();
-          player.displayClientMessage(Component.translatable("ic2.barrel.sugarcane_added", this.sugarCane), true);
+          player.displayClientMessage(
+              Component.translatable("ic2.barrel.sugarcane_added", this.sugarCane), true);
         }
         return ItemInteractionResult.sidedSuccess(this.level.isClientSide);
       }
@@ -158,11 +170,13 @@ public class TileEntityBarrel extends Ic2TileEntity {
         if (!this.level.isClientSide) {
           this.hasTap = true;
           this.setActive(true);
-          this.level.setBlockAndUpdate(this.worldPosition, this.getBlockState().setValue(Ic2TileEntityBlock.ACTIVE, true));
+          this.level.setBlockAndUpdate(
+              this.worldPosition, this.getBlockState().setValue(Ic2TileEntityBlock.ACTIVE, true));
           if (!player.getAbilities().instabuild && stack.is(Ic2Items.TREETAP)) {
             stack.shrink(1);
           }
-          this.level.playSound(null, this.worldPosition, SoundEvents.WOOD_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
+          this.level.playSound(
+              null, this.worldPosition, SoundEvents.WOOD_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
           this.setChanged();
           player.displayClientMessage(Component.translatable("ic2.barrel.tapped"), true);
         }
@@ -196,7 +210,8 @@ public class TileEntityBarrel extends Ic2TileEntity {
             player.drop(pouredStack, false);
           }
         }
-        this.level.playSound(null, this.worldPosition, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
+        this.level.playSound(
+            null, this.worldPosition, SoundEvents.BOTTLE_FILL, SoundSource.BLOCKS, 1.0F, 1.0F);
         if (this.waterAmount <= 0) {
           this.wheat = 0;
           this.hops = 0;
@@ -205,7 +220,8 @@ public class TileEntityBarrel extends Ic2TileEntity {
         }
         this.setChanged();
         player.displayClientMessage(
-            Component.translatable("ic2.barrel.poured", boozeMug.getName(new ItemStack(boozeMug))), true);
+            Component.translatable("ic2.barrel.poured", boozeMug.getName(new ItemStack(boozeMug))),
+            true);
       }
       return ItemInteractionResult.sidedSuccess(this.level.isClientSide);
     }
@@ -221,9 +237,11 @@ public class TileEntityBarrel extends Ic2TileEntity {
       if (!this.level.isClientSide) {
         this.hasTap = false;
         this.setActive(false);
-        this.level.setBlockAndUpdate(this.worldPosition, this.getBlockState().setValue(Ic2TileEntityBlock.ACTIVE, false));
+        this.level.setBlockAndUpdate(
+            this.worldPosition, this.getBlockState().setValue(Ic2TileEntityBlock.ACTIVE, false));
         StackUtil.dropAsEntity(this.level, this.worldPosition, new ItemStack(Ic2Items.TREETAP));
-        this.level.playSound(null, this.worldPosition, SoundEvents.WOOD_BREAK, SoundSource.BLOCKS, 1.0F, 1.0F);
+        this.level.playSound(
+            null, this.worldPosition, SoundEvents.WOOD_BREAK, SoundSource.BLOCKS, 1.0F, 1.0F);
         this.setChanged();
         player.displayClientMessage(Component.translatable("ic2.barrel.untapped"), true);
       }
@@ -251,7 +269,8 @@ public class TileEntityBarrel extends Ic2TileEntity {
       player.displayClientMessage(
           Component.translatable("ic2.barrel.status.empty", stateStr), false);
     } else {
-      String brewName = this.getCurrentBoozeMug().getName(new ItemStack(this.getCurrentBoozeMug())).getString();
+      String brewName =
+          this.getCurrentBoozeMug().getName(new ItemStack(this.getCurrentBoozeMug())).getString();
       int progressSec = this.fermentationProgress / 20;
       player.displayClientMessage(
           Component.translatable(
@@ -290,7 +309,10 @@ public class TileEntityBarrel extends Ic2TileEntity {
       return Ic2Items.YOUNGSTER_MUG;
     }
 
-    if (this.fermentationProgress >= 24000 && this.wheat >= 2 && this.hops >= 2 && totalSolids >= waterBuckets) {
+    if (this.fermentationProgress >= 24000
+        && this.wheat >= 2
+        && this.hops >= 2
+        && totalSolids >= waterBuckets) {
       return Ic2Items.DRAGON_BLOOD_MUG;
     }
 
@@ -308,13 +330,16 @@ public class TileEntityBarrel extends Ic2TileEntity {
         StackUtil.dropAsEntity(this.level, this.worldPosition, new ItemStack(Ic2Items.TREETAP));
       }
       if (this.wheat > 0) {
-        StackUtil.dropAsEntity(this.level, this.worldPosition, new ItemStack(Items.WHEAT, this.wheat));
+        StackUtil.dropAsEntity(
+            this.level, this.worldPosition, new ItemStack(Items.WHEAT, this.wheat));
       }
       if (this.hops > 0) {
-        StackUtil.dropAsEntity(this.level, this.worldPosition, new ItemStack(Ic2Items.HOPS, this.hops));
+        StackUtil.dropAsEntity(
+            this.level, this.worldPosition, new ItemStack(Ic2Items.HOPS, this.hops));
       }
       if (this.sugarCane > 0) {
-        StackUtil.dropAsEntity(this.level, this.worldPosition, new ItemStack(Items.SUGAR_CANE, this.sugarCane));
+        StackUtil.dropAsEntity(
+            this.level, this.worldPosition, new ItemStack(Items.SUGAR_CANE, this.sugarCane));
       }
     }
     super.onBlockBreak();

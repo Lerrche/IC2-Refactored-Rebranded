@@ -20,19 +20,13 @@ import net.minecraft.world.level.gameevent.GameEvent;
 import net.neoforged.neoforge.common.ItemAbilities;
 
 /**
- * Diamond Chainsaw ported from Electro-Magic Tools (EMT).
- * Functions as a diamond-tier axe and chainsaw with high mining speed (16.0F),
- * shears support, axe stripping/scraping/waxing, and EMT's right-click torch placement.
+ * Diamond Chainsaw ported from Electro-Magic Tools (EMT). Functions as a diamond-tier axe and
+ * chainsaw with high mining speed (16.0F), shears support, axe stripping/scraping/waxing, and EMT's
+ * right-click torch placement.
  */
 public class ItemElectricToolDiamondChainsaw extends ItemElectricToolChainsaw {
   public ItemElectricToolDiamondChainsaw(Properties settings) {
-    super(
-        settings,
-        160,
-        Ic2ToolMaterials.DIAMOND_CHAINSAW,
-        40000,
-        200,
-        2);
+    super(settings, 160, Ic2ToolMaterials.DIAMOND_CHAINSAW, 40000, 200, 2);
   }
 
   @Override
@@ -109,8 +103,10 @@ public class ItemElectricToolDiamondChainsaw extends ItemElectricToolChainsaw {
           if (placeState.canSurvive(level, targetPos)) {
             if (!level.isClientSide) {
               level.setBlock(targetPos, placeState, 3);
-              level.playSound(null, targetPos, SoundEvents.WOOD_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
-              level.gameEvent(GameEvent.BLOCK_PLACE, targetPos, GameEvent.Context.of(player, placeState));
+              level.playSound(
+                  null, targetPos, SoundEvents.WOOD_PLACE, SoundSource.BLOCKS, 1.0F, 1.0F);
+              level.gameEvent(
+                  GameEvent.BLOCK_PLACE, targetPos, GameEvent.Context.of(player, placeState));
               if (!player.getAbilities().instabuild) {
                 invStack.shrink(1);
               }

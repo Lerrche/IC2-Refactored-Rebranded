@@ -47,13 +47,7 @@ import org.jetbrains.annotations.Nullable;
 public class ItemElectricToolChainsaw extends ItemElectricTool
     implements IHitSoundOverride, BlockBreakableItem, IEntityAttackableItem {
   public ItemElectricToolChainsaw(Properties settings) {
-    this(
-        settings,
-        100,
-        Ic2ToolMaterials.CHAINSAW,
-        30000,
-        100,
-        1);
+    this(settings, 100, Ic2ToolMaterials.CHAINSAW, 30000, 100, 1);
   }
 
   public ItemElectricToolChainsaw(
