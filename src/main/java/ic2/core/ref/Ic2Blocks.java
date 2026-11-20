@@ -102,6 +102,7 @@ import ic2.core.block.storage.tank.TileEntityIridiumTank;
 import ic2.core.block.storage.tank.TileEntityIronTank;
 import ic2.core.block.storage.tank.TileEntitySteelTank;
 import ic2.core.block.tileentity.Ic2TileEntityBlock;
+import ic2.core.block.tileentity.TileEntityBarrel;
 import ic2.core.block.tileentity.TileEntityWall;
 import ic2.core.block.transport.PipeSize;
 import ic2.core.block.transport.PipeType;
@@ -499,6 +500,16 @@ public final class Ic2Blocks {
           new DoorBlock(
               BlockSetType.IRON,
               Properties.of().strength(50.0F, 150.0F).noOcclusion().sound(SoundType.METAL)) {});
+  public static final Block BARREL =
+      register(
+          "barrel",
+          Ic2TileEntityBlock.create(
+              Properties.of().strength(2.0F, 3.0F).sound(SoundType.WOOD),
+              TileEntityBarrel.class,
+              true,
+              Ic2TileEntityBlock.DefaultDrop.Self,
+              Util.horizontalFacings,
+              true));
   public static final Block ITNT =
       register(
           "itnt",

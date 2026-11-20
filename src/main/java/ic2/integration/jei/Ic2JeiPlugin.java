@@ -16,6 +16,7 @@ import ic2.core.item.armor.jetpack.JetpackAttachmentRecipe;
 import ic2.core.recipe.AdvRecipe;
 import ic2.core.recipe.v2.RecipeHolder;
 import ic2.core.ref.Ic2Blocks;
+import ic2.core.ref.Ic2Items;
 import ic2.core.ref.Ic2ItemTags;
 import ic2.core.ref.Ic2RecipeTypes;
 import ic2.core.ref.Ic2ScreenHandlers;
@@ -551,6 +552,22 @@ public class Ic2JeiPlugin implements IModPlugin {
     generateCannerFluidContainerRecipes(emptyLiquidRecipes, bottleLiquidRecipes, bottleLiquidDedup);
     registration.addRecipes(this.CANNER_EMPTY_LIQUID, emptyLiquidRecipes);
     registration.addRecipes(this.CANNER_BOTTLE_LIQUID, bottleLiquidRecipes);
+    registration.addItemStackInfo(
+        new ItemStack(Ic2Items.HOPS),
+        Component.translatable("jei.ic2.hops.desc"));
+    registration.addItemStackInfo(
+        new ItemStack(Ic2Blocks.BARREL),
+        Component.translatable("jei.ic2.barrel.desc"));
+    registration.addItemStackInfo(
+        List.of(
+            new ItemStack(Ic2Items.BEER_MUG),
+            new ItemStack(Ic2Items.ALE_MUG),
+            new ItemStack(Ic2Items.DRAGON_BLOOD_MUG),
+            new ItemStack(Ic2Items.YOUNGSTER_MUG),
+            new ItemStack(Ic2Items.BREW_MUG),
+            new ItemStack(Ic2Items.BLACK_STUFF_MUG),
+            new ItemStack(Ic2Items.RUM_MUG)),
+        Component.translatable("jei.ic2.booze_mugs.desc"));
   }
 
   /**

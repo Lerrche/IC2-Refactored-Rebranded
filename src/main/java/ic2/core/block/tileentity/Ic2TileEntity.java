@@ -32,6 +32,7 @@ import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -421,6 +422,11 @@ public abstract class Ic2TileEntity extends BlockEntity
 
   protected InteractionResult onClicked(Player player) {
     return InteractionResult.PASS;
+  }
+
+  public ItemInteractionResult onItemUse(
+      ItemStack stack, Player player, InteractionHand hand, net.minecraft.world.phys.BlockHitResult hit) {
+    return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
   }
 
   protected void onNeighborChange(Block neighbor, BlockPos neighborPos) {

@@ -3,6 +3,7 @@
   "values": [
     "ic2:cutter",
     "ic2:chainsaw",
+    "ic2:diamond_chainsaw",
     {
       "id": "gravisuite:advanced_chainsaw",
       "required": false

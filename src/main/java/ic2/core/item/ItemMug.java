@@ -31,49 +31,81 @@ public class ItemMug extends Item implements ItemLike {
     } else {
       ItemMug.MugType type = this.getType(stack);
       if (type != null && type != ItemMug.MugType.empty) {
-        int maxAmplifier;
-        int extraDuration =
-            switch (type) {
-              case cold_coffee -> {
-                maxAmplifier = 1;
-                yield 600;
-              }
-              case dark_coffee -> {
-                maxAmplifier = 5;
-                yield 1200;
-              }
-              case coffee -> {
-                maxAmplifier = 6;
-                yield 1200;
-              }
-              default -> throw new IllegalStateException("unexpected type: " + type);
-            };
-
-        int highest = 0;
-        int x = this.amplifyEffect(player, MobEffects.MOVEMENT_SPEED, maxAmplifier, extraDuration);
-        if (x > highest) {
-          highest = x;
-        }
-
-        x = this.amplifyEffect(player, MobEffects.DIG_SPEED, maxAmplifier, extraDuration);
-        if (x > highest) {
-          highest = x;
-        }
-
-        if (type == ItemMug.MugType.coffee) {
-          highest -= 2;
-        }
-
-        if (highest >= 3) {
-          player.addEffect(new MobEffectInstance(MobEffects.CONFUSION, (highest - 2) * 200, 0));
-          if (highest >= 4) {
-            player.addEffect(new MobEffectInstance(MobEffects.HARM, 1, highest - 3));
+        if (!worldIn.isClientSide) {
+          switch (type) {
+            case cold_coffee -> this.applyCoffee(player, 1, 600, false);
+            case dark_coffee -> this.applyCoffee(player, 5, 1200, false);
+            case coffee -> this.applyCoffee(player, 6, 1200, true);
+            case brew -> {
+              player.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 100, 0));
+              player.getFoodData().eat(1, 0.2F);
+            }
+            case youngster -> {
+              player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SPEED, 1200, 0));
+              player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 1200, 0));
+            }
+            case beer -> {
+              player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 3600, 1));
+              player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 3600, 0));
+              player.addEffect(new MobEffectInstance(MobEffects.ABSORPTION, 2400, 1));
+            }
+            case ale -> {
+              player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 3600, 1));
+              player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 3600, 0));
+              player.addEffect(new MobEffectInstance(MobEffects.HEALTH_BOOST, 2400, 0));
+            }
+            case black_stuff -> {
+              player.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, 2400, 1));
+              player.addEffect(new MobEffectInstance(MobEffects.DIG_SLOWDOWN, 2400, 1));
+              player.addEffect(new MobEffectInstance(MobEffects.CONFUSION, 600, 0));
+              player.addEffect(new MobEffectInstance(MobEffects.POISON, 200, 0));
+            }
+            case dragon_blood -> {
+              player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 4800, 2));
+              player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 4800, 1));
+              player.addEffect(new MobEffectInstance(MobEffects.DIG_SPEED, 4800, 2));
+              player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 4800, 0));
+              player.addEffect(new MobEffectInstance(MobEffects.REGENERATION, 1200, 0));
+            }
+            case rum -> {
+              player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_RESISTANCE, 3600, 1));
+              player.addEffect(new MobEffectInstance(MobEffects.FIRE_RESISTANCE, 3600, 0));
+              player.addEffect(new MobEffectInstance(MobEffects.DAMAGE_BOOST, 3600, 0));
+              MobEffectInstance existingConf = player.getEffect(MobEffects.CONFUSION);
+              int confDur = existingConf != null ? existingConf.getDuration() + 300 : 200;
+              player.addEffect(new MobEffectInstance(MobEffects.CONFUSION, confDur, 0));
+            }
+            default -> {}
           }
         }
 
         return new ItemStack(Ic2Items.EMPTY_MUG, 1);
       } else {
         return stack;
+      }
+    }
+  }
+
+  private void applyCoffee(Player player, int maxAmplifier, int extraDuration, boolean isRegularCoffee) {
+    int highest = 0;
+    int x = this.amplifyEffect(player, MobEffects.MOVEMENT_SPEED, maxAmplifier, extraDuration);
+    if (x > highest) {
+      highest = x;
+    }
+
+    x = this.amplifyEffect(player, MobEffects.DIG_SPEED, maxAmplifier, extraDuration);
+    if (x > highest) {
+      highest = x;
+    }
+
+    if (isRegularCoffee) {
+      highest -= 2;
+    }
+
+    if (highest >= 3) {
+      player.addEffect(new MobEffectInstance(MobEffects.CONFUSION, (highest - 2) * 200, 0));
+      if (highest >= 4) {
+        player.addEffect(new MobEffectInstance(MobEffects.HARM, 1, highest - 3));
       }
     }
   }
@@ -125,6 +157,13 @@ public class ItemMug extends Item implements ItemLike {
     empty,
     cold_coffee,
     dark_coffee,
-    coffee
+    coffee,
+    brew,
+    youngster,
+    beer,
+    ale,
+    black_stuff,
+    dragon_blood,
+    rum
   }
 }

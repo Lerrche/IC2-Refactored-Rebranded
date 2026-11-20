@@ -10,7 +10,8 @@ import org.jetbrains.annotations.NotNull;
 
 public enum Ic2ToolMaterials implements Tier {
   BRONZE(2, 350, 6.0F, 2.0F, () -> Ingredient.of(Ic2Items.BRONZE_INGOT)),
-  CHAINSAW(3, 250, 12.0F, 9.0F, Ingredient::of);
+  CHAINSAW(3, 250, 12.0F, 9.0F, Ingredient::of),
+  DIAMOND_CHAINSAW(3, 1561, 16.0F, 12.0F, Ingredient::of);
 
   private final int miningLevel;
   private final int itemDurability;

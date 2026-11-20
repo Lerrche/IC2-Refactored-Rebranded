@@ -528,7 +528,23 @@ public final class Ic2TileEntityBlock extends Block
         return ItemInteractionResult.sidedSuccess(world.isClientSide);
       }
     }
+    Ic2TileEntity te = getTe(world, pos);
+    if (te != null) {
+      ItemInteractionResult result = te.onItemUse(stack, player, hand, hit);
+      if (result != ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION) {
+        return result;
+      }
+    }
     return super.useItemOn(stack, state, world, pos, player, hand, hit);
+  }
+
+  @Override
+  public void attack(BlockState state, Level level, BlockPos pos, Player player) {
+    Ic2TileEntity te = getTe(level, pos);
+    if (te != null) {
+      te.onClicked(player);
+    }
+    super.attack(state, level, pos, player);
   }
 
   public static boolean isHammer(ItemStack stack) {

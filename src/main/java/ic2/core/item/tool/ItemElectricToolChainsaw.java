@@ -29,6 +29,7 @@ import net.minecraft.world.entity.monster.piglin.PiglinAi;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Tier;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -38,24 +39,48 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.gameevent.GameEvent.Context;
 import net.neoforged.neoforge.common.IShearable;
+import net.neoforged.neoforge.common.ItemAbilities;
+import net.neoforged.neoforge.common.ItemAbility;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class ItemElectricToolChainsaw extends ItemElectricTool
     implements IHitSoundOverride, BlockBreakableItem, IEntityAttackableItem {
   public ItemElectricToolChainsaw(Properties settings) {
-    super(
+    this(
         settings,
         100,
         Ic2ToolMaterials.CHAINSAW,
-        Collections.singletonList(BlockTags.MINEABLE_WITH_AXE));
-    this.maxCharge = 30000;
-    this.transferLimit = 100;
-    this.tier = 1;
+        30000,
+        100,
+        1);
   }
 
-  private boolean isShearMode(ItemStack stack) {
+  public ItemElectricToolChainsaw(
+      Properties settings,
+      int operationEnergyCost,
+      Tier material,
+      int maxCharge,
+      int transferLimit,
+      int tier) {
+    super(
+        settings,
+        operationEnergyCost,
+        material,
+        Collections.singletonList(BlockTags.MINEABLE_WITH_AXE));
+    this.maxCharge = maxCharge;
+    this.transferLimit = transferLimit;
+    this.tier = tier;
+  }
+
+  protected boolean isShearMode(ItemStack stack) {
     return !StackUtil.getOrCreateNbtData(stack).getBoolean("disableShear");
+  }
+
+  @Override
+  public boolean canPerformAction(ItemStack stack, ItemAbility itemAbility) {
+    return ItemAbilities.DEFAULT_AXE_ACTIONS.contains(itemAbility)
+        || (this.isShearMode(stack) && ItemAbilities.DEFAULT_SHEARS_ACTIONS.contains(itemAbility));
   }
 
   @Override

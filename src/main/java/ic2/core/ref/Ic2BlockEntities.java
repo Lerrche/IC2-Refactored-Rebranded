@@ -92,6 +92,7 @@ import ic2.core.block.storage.tank.TileEntityIronTank;
 import ic2.core.block.storage.tank.TileEntitySteelTank;
 import ic2.core.block.tileentity.Ic2SignBlockEntity;
 import ic2.core.block.tileentity.TileEntityWall;
+import ic2.core.block.tileentity.TileEntityBarrel;
 import ic2.core.block.transport.TransportPipeBlockEntity;
 import ic2.core.block.wiring.tileentity.TileEntityChargePadBatBox;
 import ic2.core.block.wiring.tileentity.TileEntityChargePadCESU;
@@ -125,6 +126,8 @@ public final class Ic2BlockEntities {
       register("wall", TileEntityWall::new, Ic2Blocks.OBSCURED_WALL);
   public static final BlockEntityType<TileEntityCrop> CROP_STICK =
       register("crop_stick", TileEntityCrop::new, Ic2Blocks.CROP_STICK);
+  public static final BlockEntityType<TileEntityBarrel> BARREL =
+      register("barrel", TileEntityBarrel::new, Ic2Blocks.BARREL);
   public static final BlockEntityType<TileEntityITnt> ITNT =
       register("itnt", TileEntityITnt::new, Ic2Blocks.ITNT);
   public static final BlockEntityType<TileEntityCrop> WEED_CROP =

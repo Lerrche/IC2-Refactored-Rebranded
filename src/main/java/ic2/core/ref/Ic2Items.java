@@ -56,6 +56,7 @@ import ic2.core.item.tool.ItemDebug;
 import ic2.core.item.tool.ItemDrill;
 import ic2.core.item.tool.ItemDrillIridium;
 import ic2.core.item.tool.ItemElectricToolChainsaw;
+import ic2.core.item.tool.ItemElectricToolDiamondChainsaw;
 import ic2.core.item.tool.ItemElectricToolHoe;
 import ic2.core.item.tool.ItemFrequencyTransmitter;
 import ic2.core.item.tool.ItemNanoSaber;
@@ -228,6 +229,8 @@ public final class Ic2Items {
       register("red_wall", new ItemBlockIc2(Ic2Blocks.RED_WALL, new Properties()));
   public static final Item BLACK_WALL =
       register("black_wall", new ItemBlockIc2(Ic2Blocks.BLACK_WALL, new Properties()));
+  public static final Item BARREL =
+      register("barrel", new ItemBlockIc2(Ic2Blocks.BARREL, new Properties()));
   public static final Item ITNT =
       register("itnt", new ItemBlockIc2(Ic2Blocks.ITNT, new Properties()));
   public static final Item NUKE =
@@ -933,6 +936,20 @@ public final class Ic2Items {
       register(
           "dark_coffee_mug",
           new ItemMug(new Properties().stacksTo(1), ItemMug.MugType.dark_coffee));
+  public static final Item BREW_MUG =
+      register("brew_mug", new ItemMug(new Properties().stacksTo(1), ItemMug.MugType.brew));
+  public static final Item YOUNGSTER_MUG =
+      register("youngster_mug", new ItemMug(new Properties().stacksTo(1), ItemMug.MugType.youngster));
+  public static final Item BEER_MUG =
+      register("beer_mug", new ItemMug(new Properties().stacksTo(1), ItemMug.MugType.beer));
+  public static final Item ALE_MUG =
+      register("ale_mug", new ItemMug(new Properties().stacksTo(1), ItemMug.MugType.ale));
+  public static final Item BLACK_STUFF_MUG =
+      register("black_stuff_mug", new ItemMug(new Properties().stacksTo(1), ItemMug.MugType.black_stuff));
+  public static final Item DRAGON_BLOOD_MUG =
+      register("dragon_blood_mug", new ItemMug(new Properties().stacksTo(1), ItemMug.MugType.dragon_blood));
+  public static final Item RUM_MUG =
+      register("rum_mug", new ItemMug(new Properties().stacksTo(1), ItemMug.MugType.rum));
   public static final Item CROP_STICK = register("crop_stick", new ItemCrop(new Properties()));
   public static final Item CROP_SEED_BACK =
       register("crop_seed_bag", new ItemCropSeed(new Properties().stacksTo(1)));
@@ -1006,6 +1023,8 @@ public final class Ic2Items {
       register("advanced_scanner", new ItemScannerAdv(new Properties().stacksTo(1)));
   public static final Item CHAINSAW =
       register("chainsaw", new ItemElectricToolChainsaw(new Properties().stacksTo(1)));
+  public static final Item DIAMOND_CHAINSAW =
+      register("diamond_chainsaw", new ItemElectricToolDiamondChainsaw(new Properties().stacksTo(1)));
   public static final Item DIAMOND_DRILL =
       register(
           "diamond_drill",
@@ -1485,6 +1504,14 @@ public final class Ic2Items {
     addToCreativeTab(Ic2ItemGroupType.FARMING, () -> CROP_SEED_BACK);
     addToCreativeTab(Ic2ItemGroupType.FARMING, () -> CROP_STICK);
     addToCreativeTab(Ic2ItemGroupType.FARMING, () -> DARK_COFFEE_MUG);
+    addToCreativeTab(Ic2ItemGroupType.FARMING, () -> BARREL);
+    addToCreativeTab(Ic2ItemGroupType.FARMING, () -> BREW_MUG);
+    addToCreativeTab(Ic2ItemGroupType.FARMING, () -> YOUNGSTER_MUG);
+    addToCreativeTab(Ic2ItemGroupType.FARMING, () -> BEER_MUG);
+    addToCreativeTab(Ic2ItemGroupType.FARMING, () -> ALE_MUG);
+    addToCreativeTab(Ic2ItemGroupType.FARMING, () -> BLACK_STUFF_MUG);
+    addToCreativeTab(Ic2ItemGroupType.FARMING, () -> DRAGON_BLOOD_MUG);
+    addToCreativeTab(Ic2ItemGroupType.FARMING, () -> RUM_MUG);
     addToCreativeTab(Ic2ItemGroupType.FARMING, () -> EMPTY_MUG);
     addToCreativeTab(Ic2ItemGroupType.FARMING, () -> FERTILIZER);
     addToCreativeTab(Ic2ItemGroupType.FARMING, () -> GRIN_POWDER);
@@ -1892,6 +1919,7 @@ public final class Ic2Items {
     addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> CARBON_BOAT);
     addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> CARBON_ROTOR);
     addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> CHAINSAW);
+    addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> DIAMOND_CHAINSAW);
     addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> CHILLING_TFBP);
     addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> CROWBAR);
     addToCreativeTab(Ic2ItemGroupType.TOOLS_AND_UTILITIES, () -> CULTIVATION_TFBP);
