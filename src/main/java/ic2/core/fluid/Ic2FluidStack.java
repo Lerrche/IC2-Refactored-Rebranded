@@ -37,12 +37,17 @@ public interface Ic2FluidStack {
   }
 
   default String getFluidTypeKey() {
-    // Returns a string like: `fluid_type.ic2.xxx` for the fluid type, or null if the stack is
-    // empty.
     if (isEmpty()) return null;
 
-    return "fluid_type."
-        + String.valueOf(BuiltInRegistries.FLUID.getKey(getFluid())).replace(':', '.');
+    Fluid fluid = getFluid();
+    if (fluid == null) return null;
+
+    try {
+      return fluid.getFluidType().getDescriptionId();
+    } catch (Throwable t) {
+      return "fluid_type."
+          + String.valueOf(BuiltInRegistries.FLUID.getKey(fluid)).replace(':', '.');
+    }
   }
 
   Ic2FluidStack copy();

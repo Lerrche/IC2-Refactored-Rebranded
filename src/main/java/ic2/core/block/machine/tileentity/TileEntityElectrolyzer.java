@@ -125,17 +125,32 @@ public class TileEntityElectrolyzer extends TileEntityElectricMachine
     }
   }
 
+  protected boolean isAcceptableTank(BlockEntity te, Direction facing) {
+    if (te instanceof TileEntityTank || te instanceof ic2.core.block.storage.tank.TileEntityTank) {
+      return true;
+    }
+    return LiquidUtil.isFluidTile(te, facing.getOpposite()) || LiquidUtil.isFluidTile(te, facing);
+  }
+
   protected boolean canFillTank(Direction facing, Ic2FluidStack fluid) {
     BlockEntity te = this.getLevel().getBlockEntity(this.worldPosition.relative(facing));
-    return te instanceof TileEntityTank
-        ? LiquidUtil.fillTile(te, facing, fluid, true) == fluid.getAmountMb()
-        : false;
+    if (!this.isAcceptableTank(te, facing)) {
+      return false;
+    }
+    int filled = LiquidUtil.fillTile(te, facing.getOpposite(), fluid, true);
+    if (filled != fluid.getAmountMb()) {
+      filled = LiquidUtil.fillTile(te, facing, fluid, true);
+    }
+    return filled == fluid.getAmountMb();
   }
 
   protected void fillTank(Direction facing, Ic2FluidStack fluid) {
     BlockEntity te = this.getLevel().getBlockEntity(this.worldPosition.relative(facing));
-    if (te instanceof TileEntityTank) {
-      LiquidUtil.fillTile(te, facing, fluid, false);
+    if (this.isAcceptableTank(te, facing)) {
+      int filled = LiquidUtil.fillTile(te, facing.getOpposite(), fluid, false);
+      if (filled <= 0) {
+        LiquidUtil.fillTile(te, facing, fluid, false);
+      }
     }
   }
 
