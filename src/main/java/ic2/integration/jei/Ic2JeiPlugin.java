@@ -16,12 +16,22 @@ import ic2.core.item.armor.jetpack.JetpackAttachmentRecipe;
 import ic2.core.recipe.AdvRecipe;
 import ic2.core.recipe.v2.RecipeHolder;
 import ic2.core.ref.Ic2Blocks;
+import ic2.core.ref.Ic2Fluids;
 import ic2.core.ref.Ic2ItemTags;
 import ic2.core.ref.Ic2Items;
 import ic2.core.ref.Ic2RecipeTypes;
 import ic2.core.ref.Ic2ScreenHandlers;
 import ic2.core.util.LiquidUtil;
 import ic2.core.util.StackUtil;
+import ic2.api.recipe.IElectrolyzerRecipeManager;
+import ic2.api.recipe.Recipes;
+import ic2.core.block.machine.tileentity.TileEntityElectrolyzer;
+import ic2.integration.jei.recipe.machine.BoozeBarrelCategory;
+import ic2.integration.jei.recipe.machine.BoozeBarrelRecipeWrapper;
+import ic2.integration.jei.recipe.machine.ElectrolyzerCategory;
+import ic2.integration.jei.recipe.machine.ElectrolyzerRecipeWrapper;
+import ic2.integration.jei.recipe.machine.MatterFabricatorCategory;
+import ic2.integration.jei.recipe.machine.MatterFabricatorRecipeWrapper;
 import ic2.integration.jei.recipe.machine.CannerBottleCategory;
 import ic2.integration.jei.recipe.machine.CannerBottleLiquidCategory;
 import ic2.integration.jei.recipe.machine.CannerBottleLiquidRecipeWrapper;
@@ -76,6 +86,7 @@ import net.minecraft.world.inventory.MenuType;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeManager;
@@ -113,6 +124,12 @@ public class Ic2JeiPlugin implements IModPlugin {
       RecipeType.create("ic2", "canner_bottle_liquid", CannerBottleLiquidRecipeWrapper.class);
   private final RecipeType<CannerEmptyLiquidRecipeWrapper> CANNER_EMPTY_LIQUID =
       RecipeType.create("ic2", "canner_empty_liquid", CannerEmptyLiquidRecipeWrapper.class);
+  private final RecipeType<BoozeBarrelRecipeWrapper> BOOZE_BARREL =
+      RecipeType.create("ic2", "barrel_fermenting", BoozeBarrelRecipeWrapper.class);
+  private final RecipeType<MatterFabricatorRecipeWrapper> MATTER_FABRICATOR =
+      RecipeType.create("ic2", "matter_fabricator", MatterFabricatorRecipeWrapper.class);
+  private final RecipeType<ElectrolyzerRecipeWrapper> ELECTROLYZER =
+      RecipeType.create("ic2", "electrolyzer", ElectrolyzerRecipeWrapper.class);
 
   private static void generateCannerFluidContainerRecipes(
       List<CannerEmptyLiquidRecipeWrapper> emptyLiquidRecipes,
@@ -190,15 +207,16 @@ public class Ic2JeiPlugin implements IModPlugin {
         new MetalFormerCategory(this.METAL_FORMER_CUTTING, 2, guiHelper));
     registration.addRecipeCategories(
         new DynamicCategory(Ic2Blocks.ORE_WASHING_PLANT, this.ORE_WASHER, guiHelper));
-    registration.addRecipeCategories(
-        new CannerBottleCategory(
-            (ic2.core.block.tileentity.Ic2TileEntityBlock) Ic2Blocks.SOLID_CANNER,
-            this.CANNER_BOTTLE,
-            guiHelper));
+    registration.addRecipeCategories(new CannerBottleCategory(this.CANNER_BOTTLE, guiHelper));
     registration.addRecipeCategories(new CannerEnrichCategory(this.CANNER_ENRICH, guiHelper));
     registration.addRecipeCategories(
         new CannerBottleLiquidCategory(this.CANNER_BOTTLE_LIQUID, guiHelper));
-    registration.addRecipeCategories(new CannerEmptyLiquidCategory(this.CANNER_EMPTY_LIQUID));
+    registration.addRecipeCategories(
+        new CannerEmptyLiquidCategory(this.CANNER_EMPTY_LIQUID, guiHelper));
+    registration.addRecipeCategories(new BoozeBarrelCategory(this.BOOZE_BARREL, guiHelper));
+    registration.addRecipeCategories(
+        new MatterFabricatorCategory(this.MATTER_FABRICATOR, guiHelper));
+    registration.addRecipeCategories(new ElectrolyzerCategory(this.ELECTROLYZER, guiHelper));
   }
 
   @Override
@@ -263,6 +281,10 @@ public class Ic2JeiPlugin implements IModPlugin {
     registration.addRecipeCatalyst(new ItemStack(Ic2Blocks.ELECTRIC_FURNACE), RecipeTypes.SMELTING);
     registration.addRecipeCatalyst(
         new ItemStack(Ic2Blocks.INDUCTION_FURNACE), RecipeTypes.SMELTING);
+    registration.addRecipeCatalyst(new ItemStack(Ic2Blocks.BARREL), this.BOOZE_BARREL);
+    registration.addRecipeCatalyst(
+        new ItemStack(Ic2Blocks.MATTER_GENERATOR), this.MATTER_FABRICATOR);
+    registration.addRecipeCatalyst(new ItemStack(Ic2Blocks.ELECTROLYZER), this.ELECTROLYZER);
   }
 
   @Override
@@ -324,6 +346,8 @@ public class Ic2JeiPlugin implements IModPlugin {
     aliases.put("canner_empty_liquid", this.CANNER_EMPTY_LIQUID);
     aliases.put("canner_bottle_liquid", this.CANNER_BOTTLE_LIQUID);
     aliases.put("canner_enrich", this.CANNER_ENRICH);
+    aliases.put("electrolyzer", this.ELECTROLYZER);
+    aliases.put("matter_fabricator", this.MATTER_FABRICATOR);
 
     aliases.put("minecraft.smelting", RecipeTypes.SMELTING);
     aliases.put("minecraft.fuel", RecipeTypes.FUELING);
@@ -347,6 +371,8 @@ public class Ic2JeiPlugin implements IModPlugin {
     putUidAliases(aliases, this.CANNER_ENRICH);
     putUidAliases(aliases, this.CANNER_BOTTLE_LIQUID);
     putUidAliases(aliases, this.CANNER_EMPTY_LIQUID);
+    putUidAliases(aliases, this.ELECTROLYZER);
+    putUidAliases(aliases, this.MATTER_FABRICATOR);
 
     return aliases;
   }
@@ -552,6 +578,159 @@ public class Ic2JeiPlugin implements IModPlugin {
     generateCannerFluidContainerRecipes(emptyLiquidRecipes, bottleLiquidRecipes, bottleLiquidDedup);
     registration.addRecipes(this.CANNER_EMPTY_LIQUID, emptyLiquidRecipes);
     registration.addRecipes(this.CANNER_BOTTLE_LIQUID, bottleLiquidRecipes);
+
+    List<ItemStack> waterContainers =
+        List.of(new ItemStack(Items.WATER_BUCKET), new ItemStack(Ic2Items.WATER_CELL));
+    List<ItemStack> taps =
+        List.of(new ItemStack(Ic2Items.TREETAP), new ItemStack(Ic2Items.ELECTRIC_TREETAP));
+    ItemStack emptyMug = new ItemStack(Ic2Items.EMPTY_MUG);
+
+    List<BoozeBarrelRecipeWrapper> barrelRecipes = new ArrayList<>();
+    barrelRecipes.add(
+        new BoozeBarrelRecipeWrapper(
+            waterContainers,
+            List.of(new ItemStack(Items.WHEAT, 1), new ItemStack(Items.WHEAT, 2)),
+            List.of(new ItemStack(Ic2Items.HOPS, 1), new ItemStack(Ic2Items.HOPS, 2)),
+            taps,
+            emptyMug,
+            new ItemStack(Ic2Items.BEER_MUG),
+            Component.translatable("jei.ic2.barrel.recipe.beer.duration"),
+            Component.translatable("jei.ic2.barrel.recipe.beer.ratio")));
+    barrelRecipes.add(
+        new BoozeBarrelRecipeWrapper(
+            waterContainers,
+            List.of(new ItemStack(Items.WHEAT, 2), new ItemStack(Items.WHEAT, 3)),
+            List.of(new ItemStack(Ic2Items.HOPS, 1)),
+            taps,
+            emptyMug,
+            new ItemStack(Ic2Items.ALE_MUG),
+            Component.translatable("jei.ic2.barrel.recipe.ale.duration"),
+            Component.translatable("jei.ic2.barrel.recipe.ale.ratio")));
+    barrelRecipes.add(
+        new BoozeBarrelRecipeWrapper(
+            waterContainers,
+            List.of(new ItemStack(Items.WHEAT, 2), new ItemStack(Items.WHEAT, 4)),
+            List.of(new ItemStack(Ic2Items.HOPS, 2), new ItemStack(Ic2Items.HOPS, 4)),
+            taps,
+            emptyMug,
+            new ItemStack(Ic2Items.DRAGON_BLOOD_MUG),
+            Component.translatable("jei.ic2.barrel.recipe.dragon_blood.duration"),
+            Component.translatable("jei.ic2.barrel.recipe.dragon_blood.ratio")));
+    barrelRecipes.add(
+        new BoozeBarrelRecipeWrapper(
+            waterContainers,
+            List.of(new ItemStack(Items.SUGAR_CANE, 2), new ItemStack(Items.SUGAR, 2)),
+            List.of(),
+            taps,
+            emptyMug,
+            new ItemStack(Ic2Items.RUM_MUG),
+            Component.translatable("jei.ic2.barrel.recipe.rum.duration"),
+            Component.translatable("jei.ic2.barrel.recipe.rum.ratio")));
+    barrelRecipes.add(
+        new BoozeBarrelRecipeWrapper(
+            waterContainers,
+            List.of(new ItemStack(Items.WHEAT, 1)),
+            List.of(new ItemStack(Ic2Items.HOPS, 1)),
+            taps,
+            emptyMug,
+            new ItemStack(Ic2Items.YOUNGSTER_MUG),
+            Component.translatable("jei.ic2.barrel.recipe.youngster.duration"),
+            Component.translatable("jei.ic2.barrel.recipe.youngster.ratio")));
+    barrelRecipes.add(
+        new BoozeBarrelRecipeWrapper(
+            waterContainers,
+            List.of(new ItemStack(Items.WHEAT, 1), new ItemStack(Items.SUGAR_CANE, 1)),
+            List.of(new ItemStack(Ic2Items.HOPS, 1)),
+            taps,
+            emptyMug,
+            new ItemStack(Ic2Items.BREW_MUG),
+            Component.translatable("jei.ic2.barrel.recipe.brew.duration"),
+            Component.translatable("jei.ic2.barrel.recipe.brew.ratio")));
+    barrelRecipes.add(
+        new BoozeBarrelRecipeWrapper(
+            waterContainers,
+            List.of(new ItemStack(Items.WHEAT, 1)),
+            List.of(new ItemStack(Ic2Items.HOPS, 3), new ItemStack(Ic2Items.HOPS, 4)),
+            taps,
+            emptyMug,
+            new ItemStack(Ic2Items.BLACK_STUFF_MUG),
+            Component.translatable("jei.ic2.barrel.recipe.black_stuff.duration"),
+            Component.translatable("jei.ic2.barrel.recipe.black_stuff.ratio")));
+
+    registration.addRecipes(this.BOOZE_BARREL, barrelRecipes);
+
+    List<MatterFabricatorRecipeWrapper> matterRecipes = new ArrayList<>();
+    ItemStack uuItem = new ItemStack(Ic2Items.UU_MATTER);
+    ItemStack uuCell = new ItemStack(Ic2Items.UU_MATTER_CELL);
+    ItemStack emptyCell = new ItemStack(Ic2Items.EMPTY_CELL);
+    FluidStack uuFluid = new FluidStack(Ic2Fluids.UU_MATTER.still(), 1000);
+    List<ItemStack> outputs = List.of(uuItem, uuCell);
+
+    matterRecipes.add(
+        new MatterFabricatorRecipeWrapper(
+            List.of(),
+            emptyCell,
+            outputs,
+            uuFluid,
+            "0",
+            "1,000,000 EU"));
+    matterRecipes.add(
+        new MatterFabricatorRecipeWrapper(
+            List.of(new ItemStack(Ic2Items.SCRAP)),
+            emptyCell,
+            outputs,
+            uuFluid,
+            "+5,000",
+            "200,000 EU"));
+    matterRecipes.add(
+        new MatterFabricatorRecipeWrapper(
+            List.of(new ItemStack(Ic2Items.SCRAP_BOX)),
+            emptyCell,
+            outputs,
+            uuFluid,
+            "+45,000",
+            "200,000 EU"));
+
+    for (var holder : recipeManager.getAllRecipesFor(Ic2RecipeTypes.MATTER_FABRICATOR)) {
+      List<ItemStack> matching = holder.value().recipe().getInput().getInputs();
+      if (!matching.isEmpty()) {
+        ItemStack first = matching.get(0);
+        if (!first.is(Ic2Items.SCRAP) && !first.is(Ic2Items.SCRAP_BOX)) {
+          int amp = holder.value().recipe().getOutput();
+          matterRecipes.add(
+              new MatterFabricatorRecipeWrapper(
+                  matching,
+                  emptyCell,
+                  outputs,
+                  uuFluid,
+                  "+" + String.format(java.util.Locale.US, "%,d", amp),
+                  "200,000 EU"));
+        }
+      }
+    }
+    registration.addRecipes(this.MATTER_FABRICATOR, matterRecipes);
+
+    if (Recipes.electrolyzer == null) {
+      TileEntityElectrolyzer.init();
+    }
+    List<ElectrolyzerRecipeWrapper> electrolyzerRecipes = new ArrayList<>();
+    if (Recipes.electrolyzer != null) {
+      for (Map.Entry<net.minecraft.world.level.material.Fluid, IElectrolyzerRecipeManager.ElectrolyzerRecipe> entry :
+          Recipes.electrolyzer.getRecipeMap().entrySet()) {
+        IElectrolyzerRecipeManager.ElectrolyzerRecipe rec = entry.getValue();
+        electrolyzerRecipes.add(
+            new ElectrolyzerRecipeWrapper(
+                entry.getKey(),
+                rec.inputAmount(),
+                rec.EUaTick(),
+                rec.ticksNeeded(),
+                rec.outputs()));
+      }
+    }
+    registration.addRecipes(this.ELECTROLYZER, electrolyzerRecipes);
+    registration.addItemStackInfo(
+        List.of(uuItem, uuCell, new ItemStack(Ic2Blocks.MATTER_GENERATOR)),
+        Component.translatable("jei.ic2.matter_generator.desc"));
     registration.addItemStackInfo(
         new ItemStack(Ic2Items.HOPS), Component.translatable("jei.ic2.hops.desc"));
     registration.addItemStackInfo(

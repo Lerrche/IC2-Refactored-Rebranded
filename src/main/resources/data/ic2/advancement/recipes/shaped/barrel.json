@@ -1,12 +1,22 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_rubber_wood": {
+    "has_planks": {
+      "conditions": {
+        "items": [
+          {
+            "items": "#minecraft:planks"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_rubber_log": {
       "conditions": {
         "items": [
           {
             "items": [
-              "ic2:rubber_wood"
+              "ic2:rubber_log"
             ]
           }
         ]
@@ -22,7 +32,8 @@
   },
   "requirements": [
     [
-      "has_rubber_wood",
+      "has_planks",
+      "has_rubber_log",
       "has_the_recipe"
     ]
   ],

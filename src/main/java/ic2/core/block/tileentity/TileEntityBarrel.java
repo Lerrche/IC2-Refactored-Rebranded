@@ -271,7 +271,10 @@ public class TileEntityBarrel extends Ic2TileEntity {
     } else {
       String brewName =
           this.getCurrentBoozeMug().getName(new ItemStack(this.getCurrentBoozeMug())).getString();
-      int progressSec = this.fermentationProgress / 20;
+      int totalSec = this.fermentationProgress / 20;
+      int min = totalSec / 60;
+      int sec = totalSec % 60;
+      String timeFormatted = String.format("%d:%02d", min, sec);
       player.displayClientMessage(
           Component.translatable(
               "ic2.barrel.status.info",
@@ -281,7 +284,7 @@ public class TileEntityBarrel extends Ic2TileEntity {
               this.hops,
               this.sugarCane,
               brewName,
-              progressSec),
+              timeFormatted),
           false);
     }
   }
