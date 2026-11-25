@@ -130,11 +130,7 @@ public class ElectrolyzerCategory implements IRecipeCategory<ElectrolyzerRecipeW
             ? (recipe.getTicks() / 20) + "s"
             : String.format(java.util.Locale.US, "%.1fs", recipe.getTicks() / 20.0);
     String info =
-        recipe.getEuPerTick()
-            + " EU/t ("
-            + recipe.getTotalEu()
-            + " EU) \u2022 "
-            + timeStr;
+        recipe.getEuPerTick() + " EU/t (" + recipe.getTotalEu() + " EU) \u2022 " + timeStr;
     guiGraphics.drawString(font, info, 80 - font.width(info) / 2, 59, 0x444444, false);
   }
 

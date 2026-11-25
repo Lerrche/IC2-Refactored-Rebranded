@@ -71,41 +71,29 @@ public class BoozeBarrelCategory implements IRecipeCategory<BoozeBarrelRecipeWra
 
     // Slot 1: Water Container (Buckets / Cells)
     if (!recipe.getWaterContainers().isEmpty()) {
-      builder
-          .addSlot(RecipeIngredientRole.INPUT, 5, 25)
-          .addItemStacks(recipe.getWaterContainers());
+      builder.addSlot(RecipeIngredientRole.INPUT, 5, 25).addItemStacks(recipe.getWaterContainers());
     }
 
     // Slot 2: Ingredient 1 (Wheat / Sugar Cane)
     if (!recipe.getIngredient1().isEmpty()) {
-      builder
-          .addSlot(RecipeIngredientRole.INPUT, 25, 5)
-          .addItemStacks(recipe.getIngredient1());
+      builder.addSlot(RecipeIngredientRole.INPUT, 25, 5).addItemStacks(recipe.getIngredient1());
     }
 
     // Slot 3: Ingredient 2 (Hops / Sugar)
     if (!recipe.getIngredient2().isEmpty()) {
-      builder
-          .addSlot(RecipeIngredientRole.INPUT, 25, 25)
-          .addItemStacks(recipe.getIngredient2());
+      builder.addSlot(RecipeIngredientRole.INPUT, 25, 25).addItemStacks(recipe.getIngredient2());
     }
 
     // Slot 4: Treetap (Catalyst/Tool)
     if (!recipe.getTaps().isEmpty()) {
-      builder
-          .addSlot(RecipeIngredientRole.INPUT, 45, 5)
-          .addItemStacks(recipe.getTaps());
+      builder.addSlot(RecipeIngredientRole.INPUT, 45, 5).addItemStacks(recipe.getTaps());
     }
 
     // Slot 5: Empty Stone Mug
-    builder
-        .addSlot(RecipeIngredientRole.INPUT, 45, 25)
-        .addItemStack(recipe.getEmptyMug());
+    builder.addSlot(RecipeIngredientRole.INPUT, 45, 25).addItemStack(recipe.getEmptyMug());
 
     // Slot 6: Output Mug
-    builder
-        .addSlot(RecipeIngredientRole.OUTPUT, 119, 15)
-        .addItemStack(recipe.getOutput());
+    builder.addSlot(RecipeIngredientRole.OUTPUT, 119, 15).addItemStack(recipe.getOutput());
   }
 
   @Override

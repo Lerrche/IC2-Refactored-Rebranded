@@ -4,8 +4,7 @@ import ic2.api.energy.tile.IKineticSource;
 import ic2.core.init.IC2Config;
 import ic2.core.profile.NotClassic;
 import ic2.core.ref.Ic2BlockEntities;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
+import ic2.integration.create.CreateKineticCompat;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.level.Level;
@@ -32,6 +31,27 @@ public class TileEntityKineticGenerator extends TileEntityConversionGenerator {
   }
 
   @Override
+  protected void onUnloaded() {
+    if (this.createKineticSource != null && ModList.get().isLoaded("create")) {
+      CreateKineticCompat.clearConsumerStress(this.worldPosition, this.createKineticSource);
+      this.createKineticSource = null;
+    }
+    super.onUnloaded();
+  }
+
+  @Override
+  protected void updateEntityServer() {
+    super.updateEntityServer();
+    if (this.createKineticSource != null && ModList.get().isLoaded("create")) {
+      if (this.createKineticSource.isRemoved()) {
+        this.createKineticSource = null;
+      } else {
+        CreateKineticCompat.updateConsumerStress(this.worldPosition, this.createKineticSource);
+      }
+    }
+  }
+
+  @Override
   protected void setFacing(Level world, Direction facing) {
     super.setFacing(world, facing);
     this.updateSource();
@@ -46,14 +66,21 @@ public class TileEntityKineticGenerator extends TileEntityConversionGenerator {
   }
 
   protected void updateSource() {
+    if (this.createKineticSource != null && ModList.get().isLoaded("create")) {
+      CreateKineticCompat.clearConsumerStress(this.worldPosition, this.createKineticSource);
+    }
     BlockEntity te = this.level.getBlockEntity(this.worldPosition.relative(this.getFacing()));
     this.createKineticSource = null;
     if (te instanceof IKineticSource kineticSource && !te.isRemoved()) {
       this.source = kineticSource;
     } else {
       this.source = null;
-      if (te != null && !te.isRemoved() && CreateKineticCompat.isKineticBlockEntity(te)) {
+      if (te != null
+          && !te.isRemoved()
+          && ModList.get().isLoaded("create")
+          && CreateKineticCompat.isKineticBlockEntity(te)) {
         this.createKineticSource = te;
+        CreateKineticCompat.updateConsumerStress(this.worldPosition, te);
       }
     }
   }
@@ -66,7 +93,7 @@ public class TileEntityKineticGenerator extends TileEntityConversionGenerator {
           this.getFacing().getOpposite(),
           this.source.getConnectionBandwidth(this.getFacing().getOpposite()),
           true);
-    } else if (this.createKineticSource != null) {
+    } else if (this.createKineticSource != null && ModList.get().isLoaded("create")) {
       return CreateKineticCompat.getKineticUnits(this.createKineticSource);
     } else {
       return 0;
@@ -86,53 +113,5 @@ public class TileEntityKineticGenerator extends TileEntityConversionGenerator {
   @Override
   protected double getMultiplier() {
     return this.euPerKu;
-  }
-
-  /** Optional Create 6.x bridge. Reflection keeps Create genuinely optional at runtime. */
-  private static final class CreateKineticCompat {
-    private static final String KINETIC_BLOCK_ENTITY =
-        "com.simibubi.create.content.kinetics.base.KineticBlockEntity";
-
-    private static boolean isKineticBlockEntity(BlockEntity blockEntity) {
-      if (!ModList.get().isLoaded("create")) {
-        return false;
-      }
-      for (Class<?> type = blockEntity.getClass(); type != null; type = type.getSuperclass()) {
-        if (KINETIC_BLOCK_ENTITY.equals(type.getName())) {
-          return true;
-        }
-      }
-      return false;
-    }
-
-    /**
-     * Create exposes rotational speed rather than IC2's buffered KU API. Treat one RPM as one KU
-     * per tick, bounded by the existing kinetic-generator input limit. The Create source is
-     * continuous, so unlike an IC2 IKineticSource it has no finite KU buffer to debit here.
-     */
-    private static int getKineticUnits(BlockEntity source) {
-      if (source == null || source.isRemoved()) {
-        return 0;
-      }
-      try {
-        Method getSpeed = source.getClass().getMethod("getSpeed");
-        Object value = getSpeed.invoke(source);
-        if (value instanceof Number number) {
-          return Math.min(1000, Math.round(Math.abs(number.floatValue())));
-        }
-      } catch (ReflectiveOperationException ignored) {
-        // Fall back to the speed field used by Create's KineticBlockEntity in supported releases.
-      }
-      for (Class<?> type = source.getClass(); type != null; type = type.getSuperclass()) {
-        try {
-          Field speed = type.getDeclaredField("speed");
-          speed.setAccessible(true);
-          return Math.min(1000, Math.round(Math.abs(speed.getFloat(source))));
-        } catch (ReflectiveOperationException ignored) {
-          // Continue through the class hierarchy.
-        }
-      }
-      return 0;
-    }
   }
 }

@@ -1,7 +1,9 @@
 package ic2.integration.jei;
 
 import ic2.api.item.IElectricItem;
+import ic2.api.recipe.IElectrolyzerRecipeManager;
 import ic2.api.recipe.IRecipeInput;
+import ic2.api.recipe.Recipes;
 import ic2.api.util.FluidContainerOutputMode;
 import ic2.core.IC2;
 import ic2.core.block.machine.container.ContainerBatchCrafter;
@@ -9,6 +11,7 @@ import ic2.core.block.machine.container.ContainerCanner;
 import ic2.core.block.machine.container.ContainerIndustrialWorkbench;
 import ic2.core.block.machine.container.ContainerMetalFormer;
 import ic2.core.block.machine.tileentity.TileEntityCanner;
+import ic2.core.block.machine.tileentity.TileEntityElectrolyzer;
 import ic2.core.fluid.Ic2FluidStack;
 import ic2.core.gui.RecipeButton;
 import ic2.core.gui.dynamic.DynamicContainer;
@@ -23,15 +26,8 @@ import ic2.core.ref.Ic2RecipeTypes;
 import ic2.core.ref.Ic2ScreenHandlers;
 import ic2.core.util.LiquidUtil;
 import ic2.core.util.StackUtil;
-import ic2.api.recipe.IElectrolyzerRecipeManager;
-import ic2.api.recipe.Recipes;
-import ic2.core.block.machine.tileentity.TileEntityElectrolyzer;
 import ic2.integration.jei.recipe.machine.BoozeBarrelCategory;
 import ic2.integration.jei.recipe.machine.BoozeBarrelRecipeWrapper;
-import ic2.integration.jei.recipe.machine.ElectrolyzerCategory;
-import ic2.integration.jei.recipe.machine.ElectrolyzerRecipeWrapper;
-import ic2.integration.jei.recipe.machine.MatterFabricatorCategory;
-import ic2.integration.jei.recipe.machine.MatterFabricatorRecipeWrapper;
 import ic2.integration.jei.recipe.machine.CannerBottleCategory;
 import ic2.integration.jei.recipe.machine.CannerBottleLiquidCategory;
 import ic2.integration.jei.recipe.machine.CannerBottleLiquidRecipeWrapper;
@@ -41,7 +37,11 @@ import ic2.integration.jei.recipe.machine.CannerEmptyLiquidRecipeWrapper;
 import ic2.integration.jei.recipe.machine.CannerEnrichCategory;
 import ic2.integration.jei.recipe.machine.CannerEnrichRecipeWrapper;
 import ic2.integration.jei.recipe.machine.DynamicCategory;
+import ic2.integration.jei.recipe.machine.ElectrolyzerCategory;
+import ic2.integration.jei.recipe.machine.ElectrolyzerRecipeWrapper;
 import ic2.integration.jei.recipe.machine.IORecipeWrapper;
+import ic2.integration.jei.recipe.machine.MatterFabricatorCategory;
+import ic2.integration.jei.recipe.machine.MatterFabricatorRecipeWrapper;
 import ic2.integration.jei.recipe.machine.MetalFormerCategory;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -668,12 +668,7 @@ public class Ic2JeiPlugin implements IModPlugin {
 
     matterRecipes.add(
         new MatterFabricatorRecipeWrapper(
-            List.of(),
-            emptyCell,
-            outputs,
-            uuFluid,
-            "0",
-            "1,000,000 EU"));
+            List.of(), emptyCell, outputs, uuFluid, "0", "1,000,000 EU"));
     matterRecipes.add(
         new MatterFabricatorRecipeWrapper(
             List.of(new ItemStack(Ic2Items.SCRAP)),
@@ -715,8 +710,10 @@ public class Ic2JeiPlugin implements IModPlugin {
     }
     List<ElectrolyzerRecipeWrapper> electrolyzerRecipes = new ArrayList<>();
     if (Recipes.electrolyzer != null) {
-      for (Map.Entry<net.minecraft.world.level.material.Fluid, IElectrolyzerRecipeManager.ElectrolyzerRecipe> entry :
-          Recipes.electrolyzer.getRecipeMap().entrySet()) {
+      for (Map.Entry<
+              net.minecraft.world.level.material.Fluid,
+              IElectrolyzerRecipeManager.ElectrolyzerRecipe>
+          entry : Recipes.electrolyzer.getRecipeMap().entrySet()) {
         IElectrolyzerRecipeManager.ElectrolyzerRecipe rec = entry.getValue();
         electrolyzerRecipes.add(
             new ElectrolyzerRecipeWrapper(

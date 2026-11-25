@@ -1,10 +1,13 @@
 {
   "required": true,
   "package": "ic2.mixin",
+  "plugin": "ic2.mixin.Ic2MixinPlugin",
   "compatibilityLevel": "JAVA_21",
   "minVersion": "0.8",
   "mixins": [
-    "RecipeManagerMixin"
+    "RecipeManagerMixin",
+    "create.KineticBlockEntityMixin",
+    "create.KineticNetworkMixin"
   ],
   "injectors": {
     "defaultRequire": 1
